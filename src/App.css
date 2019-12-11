@@ -1,8 +1,20 @@
+@font-face {
+  font-family: "NotoSans Regular";
+    src:
+    url("fonts/NotoSans-Regular.woff"), /* Pretty Modern Browsers */
+    url("fonts/NotoSans-Regular.woff2"), /* Super Modern Browsers */
+    url("fonts/NotoSans-Regular.eot"),
+    url("fonts/NotoSans-Regular.ttf") format("truetype"), /* Safari, Android, iOS */
+    url("fonts/NotoSans-Regular.eot?#iefix") format("embedded-opentype"); /* IE6-IE8 */
+}
+
 .App {
   /*text-align: center;*/
   background-color: #000034;
   color: #EEE;
-  font-size: calc(10px + 1vmin);
+  font-size: calc(10px + 0.8vmin);
+  line-height: calc(10px + 1.3vmin);
+  font-family: 'NotoSans Regular', Fallback, sans-serif;
 }
 
 .App-header {
@@ -15,15 +27,19 @@
 
 .active-view {
   width: 100%;
-  max-width: 800px;
+  max-width: 900px;
 }
 
 .tool-dropdown {
-  margin-top: 2vh;
+  margin-bottom: 2vh;
+}
+
+.dropdown-toggle {
+  font-size: calc(10px + 1.3vmin);
 }
 
 .active-view {
-  margin-top: 4vh;
+  margin-top: 2vh;
 }
 
 a {
@@ -48,6 +64,13 @@ a:hover, .a:focus {
   color: #FFF;
 }
 
+/* Medium width button */
+.btn-medium {
+  width: 130px;
+  margin-bottom: 2vh;
+  margin-right: 20px;
+}
+
 .QR-container {
   width: 148px;
   height: 148px;
@@ -57,6 +80,11 @@ a:hover, .a:focus {
 .QR-img {
   width: 128px;
   height: 128px;
+}
+
+/* The left thing of input boxes */
+.input-group-prepend, .input-group-text {
+  width: 130px;
 }
 
 /* Visible content to activate if no javascript */
@@ -69,9 +97,16 @@ a:hover, .a:focus {
   color: #e36767;
 }
 
+.hidden {
+  display: none;
+}
+
 @media screen and (max-width: 992px) {
   h1{font-size: 2rem;}
-  .App{font-size: calc(10px + 0.9vmin);}
+  .App {
+    font-size: calc(10px + 0.7vmin);
+    line-height: calc(10px + 1.2vmin);
+  }
   .active-view {
     max-width: 95%;
   }
@@ -79,5 +114,8 @@ a:hover, .a:focus {
 
 @media screen and (max-width: 600px) {
   h1{font-size: 1.8rem;}
-  .App{font-size: calc(10px + 0.8vmin);}
+  .App {
+    font-size: calc(10px + 0.6vmin);
+    line-height: calc(10px + 1.1vmin);
+  }
 }

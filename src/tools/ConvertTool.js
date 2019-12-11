@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import './convert.css'
-import MainPage from '../mainPage'
-import QrImageStyle from '../modules/qrImageStyle';
+import QrImageStyle from '../modules/qrImageStyle'
+import * as helpers from '../helpers'
 
 class ConvertTool extends Component {
   constructor(props) {
@@ -15,47 +14,36 @@ class ConvertTool extends Component {
       Mnano: '1',
       qrContent: '1',
       qrSize: 512,
-      activeQR: 'Mnano',
+      activeQR: '',
       rawBtnActive: false,
       nanoBtnActive: false,
-      MnanoBtnActive: true,
+      MnanoBtnActive: false,
+      qrHidden: true,
     }
 
     this.handleRawChange = this.handleRawChange.bind(this)
     this.handlenanoChange = this.handlenanoChange.bind(this)
     this.handleMnanoChange = this.handleMnanoChange.bind(this)
-    this.isNumeric = this.isNumeric.bind(this)
     this.updateQR = this.updateQR.bind(this)
   }
 
-  //Check if numeric string
-  isNumeric(val) {
-    //numerics and last character is not a dot and number of dots is 0 or 1
-    let isnum = /(?<=^| )\d+(\.\d+)?(?=$| )/.test(val)
-    if (isnum) {
-      return true
+  // Any QR button is pressed. Handle active button.
+  changeQR(event) {
+    // already selected, deselect
+    if (this.state.activeQR === event.target.value) {
+      this.setState({
+        activeQR: '',
+        qrHidden: false
+      })
+      this.updateQR('')
     }
     else {
-      return false
+      this.setState({
+        activeQR: event.target.value,
+        qrHidden: false
+      })
+      this.updateQR(event.target.value)
     }
-  }
-
-  //Copy any text to clipboard
-  copyText(event) {
-    var dummy = document.createElement("input")
-    document.body.appendChild(dummy)
-    dummy.setAttribute('value', event.target.value)
-    dummy.select()
-    document.execCommand("copy")
-    document.body.removeChild(dummy)
-    new MainPage().notifyCopy()
-  }
-
-  changeQR(event) {
-    this.setState({
-      activeQR: event.target.value
-    })
-    this.updateQR(event.target.value)
   }
 
   updateQR(unit) {
@@ -85,32 +73,39 @@ class ConvertTool extends Component {
         })
         break
       default:
+        this.setState({
+          qrContent: '',
+          qrHidden: true,
+          rawBtnActive: false,
+          nanoBtnActive: false,
+          MnanoBtnActive: false,
+        })
         break
     }
   }
 
   rawTonano(input) {
-    return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.nano}) : 'N/A'
+    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.nano}) : 'N/A'
   }
 
   rawToMnano(input) {
-    return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.NANO}) : 'N/A'
+    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.NANO}) : 'N/A'
   }
 
   nanoToRaw(input) {
-    return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.raw}) : 'N/A'
+    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.raw}) : 'N/A'
   }
 
   nanoToMnano(input) {
-    return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.NANO}) : 'N/A'
+    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.NANO}) : 'N/A'
   }
 
   MnanoToRaw(input) {
-    return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.raw}) : 'N/A'
+    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.raw}) : 'N/A'
   }
 
   MnanoTonano(input) {
-    return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.nano}) : 'N/A'
+    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.nano}) : 'N/A'
   }
 
   handleRawChange(event) {
@@ -147,8 +142,7 @@ class ConvertTool extends Component {
   render() {
     return (
       <div>
-        <h1>Unit Converter</h1>
-        <p>Enter a number in any field to have it converted to different Nano units.</p>
+        <p>Convert between Nano units.</p>
         <InputGroup className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="raw">
@@ -157,7 +151,7 @@ class ConvertTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="raw" aria-describedby="raw" className="amount-box" value={this.state.raw} title="Smallest possible unit" onChange={this.handleRawChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.raw} onClick={this.copyText.bind(this)}>Copy</Button>
+            <Button variant="outline-secondary" value={this.state.raw} onClick={helpers.copyText.bind(this)}>Copy</Button>
             <Button variant="outline-secondary" value='raw' onClick={this.changeQR.bind(this)} className={ this.state.rawBtnActive ? "btn-active" : ""}>QR</Button>
           </InputGroup.Append>
         </InputGroup>
@@ -170,7 +164,7 @@ class ConvertTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="nano" aria-describedby="nano" className="amount-box" value={this.state.nano} title="Original main unit" onChange={this.handlenanoChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.nano} onClick={this.copyText.bind(this)}>Copy</Button>
+            <Button variant="outline-secondary" value={this.state.nano} onClick={helpers.copyText.bind(this)}>Copy</Button>
             <Button variant="outline-secondary" value='nano' onClick={this.changeQR.bind(this)} className={ this.state.nanoBtnActive ? "btn-active" : ""}>QR</Button>
           </InputGroup.Append>
         </InputGroup>
@@ -183,12 +177,12 @@ class ConvertTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="Mnano" aria-describedby="Mnano" className="amount-box" value={this.state.Mnano} title="Unit for wallets/exchanges" onChange={this.handleMnanoChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.Mnano} onClick={this.copyText.bind(this)}>Copy</Button>
+            <Button variant="outline-secondary" value={this.state.Mnano} onClick={helpers.copyText.bind(this)}>Copy</Button>
             <Button variant="outline-secondary" value='Mnano' onClick={this.changeQR.bind(this)} className={ this.state.MnanoBtnActive ? "btn-active" : ""}>QR</Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <div className="QR-container">
+        <div className={ this.state.qrHidden ? "hidden" : "QR-container"}>
           <QrImageStyle className="QR-img" content={this.state.qrContent} size={this.state.qrSize} />
         </div>
       </div>
