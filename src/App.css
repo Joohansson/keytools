@@ -1,38 +1,83 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  /*text-align: center;*/
+  background-color: #000034;
+  color: #EEE;
+  font-size: calc(10px + 1vmin);
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin: 0 auto;
 }
 
-.App-link {
-  color: #61dafb;
+.active-view {
+  width: 100%;
+  max-width: 800px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.tool-dropdown {
+  margin-top: 2vh;
+}
+
+.active-view {
+  margin-top: 4vh;
+}
+
+a {
+  color: #4a90e2;
+  text-decoration: none;
+}
+
+a:hover, .a:focus {
+  color: #377ccc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+}
+
+.btn-active {
+  background-color: #6C757D;
+  color: #FFF;
+}
+
+.QR-container {
+  width: 148px;
+  height: 148px;
+  padding: 10px;
+  background-color: #EEE;
+}
+.QR-img {
+  width: 128px;
+  height: 128px;
+}
+
+/* Visible content to activate if no javascript */
+.noscript {
+  display: none;
+  z-index: 10;
+  width: 100%;
+  padding: 0 !important;
+  margin: 2em 0 0.5em 0 !important;
+  color: #e36767;
+}
+
+@media screen and (max-width: 992px) {
+  h1{font-size: 2rem;}
+  .App{font-size: calc(10px + 0.9vmin);}
+  .active-view {
+    max-width: 95%;
   }
-  to {
-    transform: rotate(360deg);
-  }
+}
+
+@media screen and (max-width: 600px) {
+  h1{font-size: 1.8rem;}
+  .App{font-size: calc(10px + 0.8vmin);}
 }

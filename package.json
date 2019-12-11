@@ -2,13 +2,21 @@
   "name": "keytools",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
+  "license": "MIT",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "bootstrap": "^4.4.1",
+    "glamor": "^2.20.40",
+    "nanocurrency": "^2.3.0",
+    "nanocurrency-web": "^1.0.6",
     "react": "^16.12.0",
+    "react-bootstrap": "^1.0.0-beta.16",
     "react-dom": "^16.12.0",
-    "react-scripts": "3.3.0"
+    "react-scripts": "3.3.0",
+    "react-toastify": "^5.4.1"
   },
   "scripts": {
     "start": "react-scripts start",
