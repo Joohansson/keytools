@@ -32,6 +32,9 @@ class SeedTool extends Component {
     this.handlePubChange = this.handlePubChange.bind(this)
     this.handleAddressChange = this.handleAddressChange.bind(this)
     this.updateQR = this.updateQR.bind(this)
+    this.generateSeed = this.generateSeed.bind(this)
+    this.generatePriv = this.generatePriv.bind(this)
+    this.generatePub = this.generatePub.bind(this)
   }
 
   // Any QR button is pressed. Handle active button.
@@ -105,14 +108,29 @@ class SeedTool extends Component {
   }
 
   handleSeedChange(event) {
-    let seed = event.target.value
-    if (!nano.checkSeed(seed)) {
+    this.seedChange(event.target.value)
+  }
+
+  seedChange(seed) {
+    var index = this.state.index
+    if (helpers.isNumeric(index)) {
+      index = parseInt(index)
+      if (!nano.checkIndex(index) || !nano.checkSeed(seed)) {
+        this.setState({
+          seed: seed
+        })
+        new MainPage().notifyInvalidFormat()
+        return
+      }
+    }
+    else {
       this.setState({
         seed: seed
       })
       new MainPage().notifyInvalidFormat()
       return
     }
+
     let privKey = nano.deriveSecretKey(seed, parseInt(this.state.index))
     let pubKey = nano.derivePublicKey(privKey)
     this.setState({
@@ -127,9 +145,9 @@ class SeedTool extends Component {
   }
 
   handleIndexChange(event) {
-    var index = 0
-    if (helpers.isNumeric(event.target.value)) {
-      index = parseInt(event.target.value)
+    var index = event.target.value
+    if (helpers.isNumeric(index)) {
+      index = parseInt(index)
       if (!nano.checkIndex(index) || !nano.checkSeed(this.state.seed)) {
         this.setState({
           index: index
@@ -140,7 +158,7 @@ class SeedTool extends Component {
     }
     else {
       this.setState({
-        index: event.target.value
+        index: index
       })
       new MainPage().notifyInvalidFormat()
       return
@@ -160,7 +178,10 @@ class SeedTool extends Component {
   }
 
   handlePrivChange(event) {
-    let priv = event.target.value
+    this.privChange(event.target.value)
+  }
+
+  privChange(priv) {
     if (!nano.checkKey(priv)) {
       this.setState({
         privKey: priv
@@ -182,7 +203,10 @@ class SeedTool extends Component {
   }
 
   handlePubChange(event) {
-    let pub = event.target.value
+    this.pubChange(event.target.value)
+  }
+
+  pubChange(pub) {
     if (!nano.checkSeed(pub)) {
       this.setState({
         pubKey: pub
@@ -223,6 +247,27 @@ class SeedTool extends Component {
     })
   }
 
+  // Generate a new secure seed
+  async generateSeed() {
+    let seed = await nano.generateSeed()
+    this.seedChange(seed.toUpperCase())
+  }
+
+  // Generate a new secure private key
+  async generatePriv() {
+    let seed = await nano.generateSeed()
+    let priv = nano.deriveSecretKey(seed, 0)
+    this.privChange(priv)
+  }
+
+  // Generate a new demo account
+  async generatePub() {
+    let seed = await nano.generateSeed()
+    let priv = nano.deriveSecretKey(seed, 0)
+    let pub = nano.derivePublicKey(priv)
+    this.pubChange(pub)
+  }
+
   render() {
     return (
       <div>
@@ -238,7 +283,7 @@ class SeedTool extends Component {
 
         <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Gen Seed</Button>
         <Button variant="primary" onClick={this.generatePriv} className="btn-medium">Gen Priv Key</Button>
-        <Button variant="primary" onClick={this.generateAddress} className="btn-medium">Gen Address</Button>
+        <Button variant="primary" onClick={this.generatePub} className="btn-medium">Gen Address</Button>
 
         <InputGroup className="mb-3">
           <InputGroup.Prepend>
