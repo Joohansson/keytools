@@ -6,12 +6,13 @@ import { css } from 'glamor';
 import * as helpers from './helpers'
 import { ConvertTool, SeedTool } from './tools'
 import FindAddressTool from './tools/FindAddressTool'
-const tools = [ConvertTool, SeedTool, FindAddressTool]
+import KeyGeneratorTool from './tools/KeyGeneratorTool'
+const tools = [ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool]
 
 class MainPage extends Component {
   constructor(props) {
     super(props)
-    this.tools = ['1: Nano Units Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed']
+    this.tools = ['1: Nano Units Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed', '4: Keypair Generator']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,

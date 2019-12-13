@@ -73,6 +73,15 @@ a:hover, .a:focus {
   cursor: pointer;
 }
 
+/* Special input width */
+.index-input {
+  width: 300px;
+}
+
+.count-input {
+  width: 260px;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #4a90e2;
@@ -101,6 +110,11 @@ a:hover, .a:focus {
   margin-bottom: 2vh;
 }
 
+/* Max min button */
+.max-btn {
+  width: 48px;
+}
+
 .QR-container {
   width: 148px;
   height: 148px;
@@ -114,7 +128,7 @@ a:hover, .a:focus {
 
 /* The left thing of input boxes */
 .input-group-prepend, .input-group-text {
-  width: 130px;
+  width: 110px;
 }
 
 /* Visible content to activate if no javascript */

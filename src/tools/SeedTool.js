@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import './SeedTool.css'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
@@ -69,7 +68,10 @@ class SeedTool extends Component {
   // set max value for end index
   setMax() {
     this.setState({
-      index: 4294967295
+      index: helpers.constants.INDEX_MAX
+    },
+    function() {
+      this.seedChange(this.state.seed)
     })
   }
 

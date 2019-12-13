@@ -1,6 +1,12 @@
 import MainPage from './mainPage'
 import { css } from 'glamor';
 
+//Constants
+export const constants = {
+  INDEX_MAX: 4294967295,
+  KEYS_MAX: 100000
+}
+
 //Check if numeric string
 export function isNumeric(val) {
   //numerics and last character is not a dot and number of dots is 0 or 1
@@ -32,11 +38,11 @@ export function copyText(event) {
 
 //Toast styling
 export const toastType = {
-    SUCCESS: 'success',
-    SUCCESS_AUTO: 'success-auto',
-    ERROR: 'error',
-    ERROR_AUTO: 'error-auto',
-    ERROR_AUTO_LONG: 'error-auto-long'
+  SUCCESS: 'success',
+  SUCCESS_AUTO: 'success-auto',
+  ERROR: 'error',
+  ERROR_AUTO: 'error-auto',
+  ERROR_AUTO_LONG: 'error-auto-long'
 }
 
 export function getToast(id) {

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import './FindAddressTool.css'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
@@ -179,7 +178,7 @@ class FindAddressTool extends Component {
   // set max value for end index
   setMax() {
     this.setState({
-      endIndex: 4294967295
+      endIndex: helpers.constants.INDEX_MAX
     })
   }
 
@@ -259,7 +258,7 @@ class FindAddressTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" onChange={this.handleStartIndexChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" onClick={this.setMin}>Min</Button>
+            <Button variant="outline-secondary" className="max-btn" onClick={this.setMin}>Min</Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -271,7 +270,7 @@ class FindAddressTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" onChange={this.handleEndIndexChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" onClick={this.setMax}>Max</Button>
+            <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
         </InputGroup>
 
