@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import './App.css';
-import MainPage from './mainPage';
+import React, { Component } from 'react'
+import './App.css'
+import MainPage from './mainPage'
 
 class App extends Component {
   render() {
@@ -8,7 +8,7 @@ class App extends Component {
       <div className="App">
         <MainPage />
       </div>
-    );
+    )
   }
 }
 

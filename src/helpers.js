@@ -1,4 +1,5 @@
 import MainPage from './mainPage'
+import { css } from 'glamor';
 
 //Check if numeric string
 export function isNumeric(val) {
@@ -27,5 +28,59 @@ export function copyText(event) {
   else {
     new MainPage().notifyCopyFail()
   }
+}
 
+//Toast styling
+export const toastType = {
+    SUCCESS: 'success',
+    SUCCESS_AUTO: 'success-auto',
+    ERROR: 'error',
+    ERROR_AUTO: 'error-auto',
+    ERROR_AUTO_LONG: 'error-auto-long'
+}
+
+export function getToast(id) {
+  const colorRed = 'rgba(214,95,100,1.0)'
+  const colorBlue = 'rgba(74,144,226,1.0)'
+
+  var color = ''
+  switch (id) {
+    case toastType.SUCCESS:
+    color = colorBlue
+    break
+
+    case toastType.SUCCESS_AUTO:
+    color = colorBlue
+    break
+
+    case toastType.ERROR:
+    color = colorRed
+    break
+
+    case toastType.ERROR_AUTO:
+    color = colorRed
+    break
+
+    case toastType.ERROR_AUTO_LONG:
+    color = colorRed
+    break
+
+    default:
+    color = colorBlue
+    break
+  }
+  return {
+    containerId: id,
+    className: css({
+      background: color,
+      minHeight: '54px'
+    }),
+    bodyClassName: css({
+      fontSize: 'calc(10px + 1vmin)',
+      color: '#EEE',
+    }),
+    progressClassName: css({
+      background: '#EEE'
+    })
+  }
 }

@@ -35,9 +35,45 @@ class SeedTool extends Component {
     this.generateSeed = this.generateSeed.bind(this)
     this.generatePriv = this.generatePriv.bind(this)
     this.generatePub = this.generatePub.bind(this)
+    this.setMax = this.setMax.bind(this)
   }
 
-  // Any QR button is pressed. Handle active button.
+  //Clear text from input field
+  clearText(event) {
+    switch(event.target.value) {
+      case 'seed':
+        this.setState({
+          seed: ''
+        })
+        break
+      case 'privKey':
+        this.setState({
+          privKey: ''
+        })
+        break
+      case 'pubKey':
+        this.setState({
+          pubKey: ''
+        })
+        break
+      case 'address':
+        this.setState({
+          address: ''
+        })
+        break
+      default:
+        break
+    }
+  }
+
+  // set max value for end index
+  setMax() {
+    this.setState({
+      index: 4294967295
+    })
+  }
+
+  // Any QR button is pressed
   changeQR(event) {
     // already selected, deselect
     if (this.state.activeQR === event.target.value) {
@@ -56,6 +92,7 @@ class SeedTool extends Component {
     }
   }
 
+  // load new QR code and handle active buttons
   updateQR(unit) {
     switch(unit) {
       case 'seed':
@@ -113,21 +150,24 @@ class SeedTool extends Component {
 
   seedChange(seed) {
     var index = this.state.index
+    var invalid = false
     if (helpers.isNumeric(index)) {
       index = parseInt(index)
       if (!nano.checkIndex(index) || !nano.checkSeed(seed)) {
-        this.setState({
-          seed: seed
-        })
-        new MainPage().notifyInvalidFormat()
-        return
+        invalid = true
       }
     }
     else {
+      invalid = true
+    }
+
+    if (invalid) {
       this.setState({
         seed: seed
       })
-      new MainPage().notifyInvalidFormat()
+      if (seed !== '' && this.state.index !== '') {
+        new MainPage().notifyInvalidFormat()
+      }
       return
     }
 
@@ -146,21 +186,23 @@ class SeedTool extends Component {
 
   handleIndexChange(event) {
     var index = event.target.value
+    var invalid = false
     if (helpers.isNumeric(index)) {
       index = parseInt(index)
       if (!nano.checkIndex(index) || !nano.checkSeed(this.state.seed)) {
-        this.setState({
-          index: index
-        })
-        new MainPage().notifyInvalidFormat()
-        return
+        invalid = true
       }
     }
     else {
+      invalid = true
+    }
+    if (invalid) {
       this.setState({
         index: index
       })
-      new MainPage().notifyInvalidFormat()
+      if (this.state.seed !== '' && index !== '') {
+        new MainPage().notifyInvalidFormat()
+      }
       return
     }
 
@@ -186,7 +228,9 @@ class SeedTool extends Component {
       this.setState({
         privKey: priv
       })
-      new MainPage().notifyInvalidFormat()
+      if (priv !== '') {
+        new MainPage().notifyInvalidFormat()
+      }
       return
     }
 
@@ -211,7 +255,9 @@ class SeedTool extends Component {
       this.setState({
         pubKey: pub
       })
-      new MainPage().notifyInvalidFormat()
+      if (pub !== '') {
+        new MainPage().notifyInvalidFormat()
+      }
       return
     }
 
@@ -227,12 +273,17 @@ class SeedTool extends Component {
   }
 
   handleAddressChange(event) {
-    let address = event.target.value
+    this.addressChange(event.target.value)
+  }
+
+  addressChange(address) {
     if (!nano.checkAddress(address)) {
       this.setState({
         address: address
       })
-      new MainPage().notifyInvalidFormat()
+      if (address !== '') {
+        new MainPage().notifyInvalidFormat()
+      }
       return
     }
 
@@ -249,23 +300,20 @@ class SeedTool extends Component {
 
   // Generate a new secure seed
   async generateSeed() {
-    let seed = await nano.generateSeed()
-    this.seedChange(seed.toUpperCase())
+    let key = await nano.generateSeed()
+    this.seedChange(key.toUpperCase())
   }
 
   // Generate a new secure private key
   async generatePriv() {
-    let seed = await nano.generateSeed()
-    let priv = nano.deriveSecretKey(seed, 0)
-    this.privChange(priv)
+    let key = await nano.generateSeed()
+    this.privChange(key.toUpperCase())
   }
 
   // Generate a new demo account
   async generatePub() {
-    let seed = await nano.generateSeed()
-    let priv = nano.deriveSecretKey(seed, 0)
-    let pub = nano.derivePublicKey(priv)
-    this.pubChange(pub)
+    let key = await nano.generateSeed()
+    this.pubChange(key.toUpperCase())
   }
 
   render() {
@@ -281,68 +329,75 @@ class SeedTool extends Component {
         <p>Generate secure random keys or demo addresses using the buttons.<br/>
         No data is ever stored but consider downloading the tool and run offline.</p>
 
-        <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Gen Seed</Button>
-        <Button variant="primary" onClick={this.generatePriv} className="btn-medium">Gen Priv Key</Button>
-        <Button variant="primary" onClick={this.generatePub} className="btn-medium">Gen Address</Button>
+        <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Nano Seed</Button>
+        <Button variant="primary" onClick={this.generatePriv} className="btn-medium">Private Key</Button>
+        <Button variant="primary" onClick={this.generatePub} className="btn-medium">Address</Button>
 
-        <InputGroup className="mb-3">
+        <InputGroup size="sm" className="mb-3 has-clear">
           <InputGroup.Prepend>
             <InputGroup.Text id="seed">
               Seed
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" className="amount-box" value={this.state.seed} title="64 hex Master key containing private keys" onChange={this.handleSeedChange.bind(this)}/>
+          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing private keys" placeholder="ABC123... or abc123..." onChange={this.handleSeedChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.seed} onClick={helpers.copyText.bind(this)}>Copy</Button>
-            <Button variant="outline-secondary" value='seed' onClick={this.changeQR.bind(this)} className={ this.state.seedBtnActive ? "btn-active" : ""}>QR</Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.seedBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='seed' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup className="mb-3 index-input">
+        <InputGroup size="sm" className="mb-3 index-input">
           <InputGroup.Prepend>
             <InputGroup.Text id="index">
               Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="index" aria-describedby="index" className="amount-box" value={this.state.index} title="Index integer for the derived private key. Max: 4,294,967,295" onChange={this.handleIndexChange.bind(this)}/>
+          <FormControl id="index" aria-describedby="index" value={this.state.index} title="Index integer for the derived private key. Max: 4,294,967,295" onChange={this.handleIndexChange.bind(this)}/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" onClick={this.setMax}>Max</Button>
+          </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup className="mb-3">
+        <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="privKey">
               Private Key
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="privKey" aria-describedby="privKey" className="amount-box" value={this.state.privKey} title="64 hex Private key to derive Public key" onChange={this.handlePrivChange.bind(this)}/>
+          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="64 hex Private key to derive Public key" placeholder="ABC123... or abc123..." onChange={this.handlePrivChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.privKey} onClick={helpers.copyText.bind(this)}>Copy</Button>
-            <Button variant="outline-secondary" value='privKey' onClick={this.changeQR.bind(this)} className={ this.state.privBtnActive ? "btn-active" : ""}>QR</Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.privBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='privKey' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup className="mb-3">
+        <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="pubKey">
               Public Key
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="pubKey" aria-describedby="pubKey" className="amount-box" value={this.state.pubKey} title="64 hex Public key to derive address" onChange={this.handlePubChange.bind(this)}/>
+          <FormControl id="pubKey" aria-describedby="pubKey" value={this.state.pubKey} title="64 hex Public key to derive address" placeholder="ABC123... or abc123..." onChange={this.handlePubChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.pubKey} onClick={helpers.copyText.bind(this)}>Copy</Button>
-            <Button variant="outline-secondary" value='pubKey' onClick={this.changeQR.bind(this)} className={ this.state.pubBtnActive ? "btn-active" : ""}>QR</Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='pubKey' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.pubKey} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.pubBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='pubKey' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup className="mb-3">
+        <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="address">
               Address
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="address" aria-describedby="address" className="amount-box" value={this.state.address} title="Nano address used in wallets. Also derives Public key." onChange={this.handleAddressChange.bind(this)}/>
+          <FormControl id="address" aria-describedby="address" value={this.state.address} title="Nano address used in wallets. Also derives Public key." placeholder="nano_xxx... or xrb_xxx..." onChange={this.handleAddressChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.address} onClick={helpers.copyText.bind(this)}>Copy</Button>
-            <Button variant="outline-secondary" value='address' onClick={this.changeQR.bind(this)} className={ this.state.addressBtnActive ? "btn-active" : ""}>QR</Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.addressBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='address' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 

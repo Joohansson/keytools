@@ -27,6 +27,15 @@ class ConvertTool extends Component {
     this.updateQR = this.updateQR.bind(this)
   }
 
+  //Clear text from input field
+  clearText(event) {
+    this.setState({
+      raw: '',
+      nano: '',
+      Mnano: ''
+    })
+  }
+
   // Any QR button is pressed. Handle active button.
   changeQR(event) {
     // already selected, deselect
@@ -143,42 +152,45 @@ class ConvertTool extends Component {
     return (
       <div>
         <p>Convert between Nano units.</p>
-        <InputGroup className="mb-3">
+        <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="raw">
               raw
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="raw" aria-describedby="raw" className="amount-box" value={this.state.raw} title="Smallest possible unit" onChange={this.handleRawChange.bind(this)}/>
+          <FormControl id="raw" aria-describedby="raw" value={this.state.raw} title="Smallest possible unit" onChange={this.handleRawChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.raw} onClick={helpers.copyText.bind(this)}>Copy</Button>
-            <Button variant="outline-secondary" value='raw' onClick={this.changeQR.bind(this)} className={ this.state.rawBtnActive ? "btn-active" : ""}>QR</Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='raw' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.raw} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.rawBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='raw' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup className="mb-3">
+        <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="nano">
               nano
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="nano" aria-describedby="nano" className="amount-box" value={this.state.nano} title="Original main unit" onChange={this.handlenanoChange.bind(this)}/>
+          <FormControl id="nano" aria-describedby="nano" value={this.state.nano} title="Original main unit" onChange={this.handlenanoChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.nano} onClick={helpers.copyText.bind(this)}>Copy</Button>
-            <Button variant="outline-secondary" value='nano' onClick={this.changeQR.bind(this)} className={ this.state.nanoBtnActive ? "btn-active" : ""}>QR</Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='nano' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.nano} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.nanoBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='nano' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup className="mb-3">
+        <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="Mnano">
               NANO
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="Mnano" aria-describedby="Mnano" className="amount-box" value={this.state.Mnano} title="Unit for wallets/exchanges" onChange={this.handleMnanoChange.bind(this)}/>
+          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.Mnano} title="Unit for wallets/exchanges" onChange={this.handleMnanoChange.bind(this)}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" value={this.state.Mnano} onClick={helpers.copyText.bind(this)}>Copy</Button>
-            <Button variant="outline-secondary" value='Mnano' onClick={this.changeQR.bind(this)} className={ this.state.MnanoBtnActive ? "btn-active" : ""}>QR</Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='Mnano' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.Mnano} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.MnanoBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='Mnano' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
