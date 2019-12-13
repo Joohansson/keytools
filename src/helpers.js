@@ -1,5 +1,6 @@
 import MainPage from './mainPage'
 import { css } from 'glamor';
+import $ from 'jquery'
 
 //Constants
 export const constants = {
@@ -27,6 +28,25 @@ export function copyText(event) {
   dummy.select()
   let success = document.execCommand("copy")
   document.body.removeChild(dummy)
+
+  if (success) {
+    new MainPage().notifyCopy()
+  }
+  else {
+    new MainPage().notifyCopyFail()
+  }
+}
+
+// Copy output of textarea to clipboard, and preserve line breaks
+export function copyOutput() {
+  $('#output-area').select()
+  document.execCommand('copy')
+
+  // clear selection
+  if (window.getSelection) {window.getSelection().removeAllRanges();}
+  else if (document.selection) {document.selection.empty();}
+
+  let success = document.execCommand("copy")
 
   if (success) {
     new MainPage().notifyCopy()

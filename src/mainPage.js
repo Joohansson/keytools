@@ -4,15 +4,14 @@ import 'react-toastify/dist/ReactToastify.css'
 import { Dropdown, DropdownButton, InputGroup, FormControl} from 'react-bootstrap'
 import { css } from 'glamor';
 import * as helpers from './helpers'
-import { ConvertTool, SeedTool } from './tools'
-import FindAddressTool from './tools/FindAddressTool'
-import KeyGeneratorTool from './tools/KeyGeneratorTool'
-const tools = [ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool]
+import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool } from './tools'
+const tools = [ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool]
 
 class MainPage extends Component {
   constructor(props) {
     super(props)
-    this.tools = ['1: Nano Units Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed', '4: Keypair Generator']
+    this.tools = ['1: Nano Units Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed', '4: Keypair Generator',
+    '5: Address Extractor']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,

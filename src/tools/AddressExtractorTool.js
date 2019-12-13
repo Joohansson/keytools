@@ -3,32 +3,46 @@ import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
-import {toast } from 'react-toastify'
 
-class FindAddressTool extends Component {
+class AddressExtractorTool extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
       seed: '',
-      address: '',
       startIndex: '0',
-      endIndex: '100',
+      endIndex: '10',
+      indexChecked: false,
       validSeed: false,
       validStartIndex: true,
       validEndIndex: true,
-      validAddress: false,
-      searching: false,
+      prepend: true,
+      generating: false,
+      output: ''
     }
 
+    this.setMin = this.setMin.bind(this)
+    this.setMax = this.setMax.bind(this)
     this.handleSeedChange = this.handleSeedChange.bind(this)
     this.handleStartIndexChange = this.handleStartIndexChange.bind(this)
     this.handleEndIndexChange = this.handleEndIndexChange.bind(this)
-    this.handleAddressChange = this.handleAddressChange.bind(this)
-    this.setMin = this.setMin.bind(this)
-    this.setMax = this.setMax.bind(this)
-    this.search = this.search.bind(this)
+    this.handleIndexCheck = this.handleIndexCheck.bind(this)
     this.sample = this.sample.bind(this)
+    this.generate = this.generate.bind(this)
+  }
+
+  // set min value for start index
+  setMin() {
+    this.setState({
+      startIndex: 0
+    })
+  }
+
+  // set max value for end index
+  setMax() {
+    this.setState({
+      endIndex: helpers.constants.INDEX_MAX
+    })
   }
 
   //Clear text from input field
@@ -40,27 +54,19 @@ class FindAddressTool extends Component {
           validSeed: false
         })
         break
-      case 'address':
-        this.setState({
-          address: '',
-          validAddress: false
-        })
-        break
       default:
         break
     }
   }
 
-  sample() {
+  async sample() {
+    var seed = await nano.generateSeed()
+    seed = seed.toUpperCase()
     this.setState({
-      seed: 'AC0FF1422C1C31145FDA5DD6D2A629B81C3E452B856A56E26E576B4076F839D4',
-      address: 'nano_157tpyfy3d8xxa8mnz7atj38xmra6xnkkhamnase14cu3dzcxi1pc9z8izi5',
-      startIndex: '0',
-      endIndex: '100',
+      seed: seed,
       validSeed: true,
       validStartIndex: true,
       validEndIndex: true,
-      validAddress: true,
     })
   }
 
@@ -84,29 +90,6 @@ class FindAddressTool extends Component {
     }
     this.setState({
       validSeed: true
-    })
-  }
-
-  handleAddressChange(event) {
-    this.addressChange(event.target.value)
-  }
-
-  addressChange(address) {
-    this.setState({
-      address: address
-    })
-
-    if (!nano.checkAddress(address)) {
-      if (address !== '') {
-        new MainPage().notifyInvalidFormat()
-      }
-      this.setState({
-        validAddress: false
-      })
-      return
-    }
-    this.setState({
-      validAddress: true
     })
   }
 
@@ -170,64 +153,52 @@ class FindAddressTool extends Component {
     })
   }
 
-  // set min value for start index
-  setMin() {
+  handleIndexCheck(event) {
     this.setState({
-      startIndex: 0
+      indexChecked: event.target.checked
     })
   }
 
-  // set max value for end index
-  setMax() {
+  /* Start generation of addresses */
+  async generate() {
     this.setState({
-      endIndex: helpers.constants.INDEX_MAX
+      generating: true
     })
-  }
 
-  search() {
-    this.setState({
-      searching: true
-    })
     var i
-    var found = false
-    // replace xrb with nano for old addresses
-    let checkAddress = this.state.address.replace('xrb', 'nano')
-
-    if (this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) {
+    var output = ''
+    if (this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) {
       for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
         let privKey = nano.deriveSecretKey(this.state.seed, i)
         let pubKey = nano.derivePublicKey(privKey)
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
-        // check for match
-        if (address === checkAddress) {
-          found = true
-          break
+        // save result in array
+        if (this.state.indexChecked) {
+          output = output + i + ',' + address + '\r'
+        }
+        else {
+          output = output + address + '\r'
         }
       }
+      this.setState({
+        output: output
+      })
     }
     else {
       new MainPage().notifyInvalidFormat()
     }
 
     this.setState({
-      searching: false
+      generating: false
     })
-    if (found) {
-      toast("Found the address at index: " + i, helpers.getToast('success'))
-    }
-    else {
-      toast("Finished but no address found", helpers.getToast('error'))
-    }
   }
 
   render() {
     return (
       <div>
-        <p>Find out if an address belongs to a seed.<br/>
-        Could be useful if a wallet does not import an address at correct index.<br/>
-        A large search range may take a very long time and browser freezing.</p>
-
+        <p>Mass extract addresses in a range of indexes using a fixed seed.<br/>
+        Output format is INDEX, ADDRESS</p>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="seed">
@@ -237,18 +208,6 @@ class FindAddressTool extends Component {
           <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." onChange={this.handleSeedChange.bind(this)}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText.bind(this)}></Button>
-          </InputGroup.Append>
-        </InputGroup>
-
-        <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
-            <InputGroup.Text id="address">
-              Address
-            </InputGroup.Text>
-          </InputGroup.Prepend>
-          <FormControl id="address" aria-describedby="address" value={this.state.address} title="Address to find in the seed. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." onChange={this.handleAddressChange.bind(this)}/>
-          <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -276,10 +235,25 @@ class FindAddressTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <Button variant="primary" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || this.state.searching}>Search for Address</Button>
-        <Button variant="primary" onClick={this.sample} disabled={this.state.searching}>Sample</Button>
+        <div className="form-check form-check-inline index-checkbox">
+          <input className="form-check-input" type="checkbox" id="index-check" value="index" checked={this.state.indexChecked} onChange={this.handleIndexCheck.bind(this)}/>
+          <label className="form-check-label" for="index-check">Include Index</label>
+        </div>
+
+        <InputGroup size="sm" className="mb-3">
+          <InputGroup.Prepend>
+            <InputGroup.Text id="output">
+              Output
+            </InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="15" placeholder="" value={this.state.output} readOnly/>
+        </InputGroup>
+
+        <Button variant="primary" onClick={this.generate} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) || this.state.generating}>Generate</Button>
+        <Button variant="primary" onClick={this.sample} disabled={this.state.generating}>Random Seed</Button>
+        <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
       </div>
     )
   }
 }
-export default FindAddressTool
+export default AddressExtractorTool

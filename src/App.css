@@ -50,7 +50,7 @@ html, body {
 }
 
 .content {
-  max-width: 850px;
+  max-width: 750px;
   margin: 0 auto;
 }
 
@@ -129,6 +129,20 @@ a:hover, .a:focus {
 /* The left thing of input boxes */
 .input-group-prepend, .input-group-text {
   width: 110px;
+}
+
+/* Striped dropdown menu */
+.dropdown-menu > a:nth-child(odd) {
+  background: #EEE;
+}
+
+/* Change color on dropdown menu hover */
+.dropdown-item:hover {
+  background: #4a90e2 !important;
+}
+
+.index-checkbox {
+  margin-bottom: 13px;
 }
 
 /* Visible content to activate if no javascript */

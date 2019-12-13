@@ -3,7 +3,6 @@ import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
-import $ from 'jquery'
 
 class KeyGeneratorTool extends Component {
   constructor(props) {
@@ -25,25 +24,6 @@ class KeyGeneratorTool extends Component {
     this.setState({
       count: helpers.constants.KEYS_MAX
     })
-  }
-
-  // Copy output of textarea to clipboard, and preserve line breaks
-  copyOutput() {
-    $('#output-area').select()
-    document.execCommand('copy')
-
-    // clear selection
-    if (window.getSelection) {window.getSelection().removeAllRanges();}
-    else if (document.selection) {document.selection.empty();}
-
-    let success = document.execCommand("copy")
-
-    if (success) {
-      new MainPage().notifyCopy()
-    }
-    else {
-      new MainPage().notifyCopyFail()
-    }
   }
 
   handleCountChange(event) {
@@ -125,7 +105,7 @@ class KeyGeneratorTool extends Component {
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="15" placeholder="" value={this.state.output} readOnly/>
         </InputGroup>
         <Button variant="primary" onClick={this.generate} disabled={this.state.generating}>Generate</Button>
-        <Button variant="primary" onClick={this.copyOutput} disabled={this.state.generating}>Copy Output</Button>
+        <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
       </div>
     )
   }
