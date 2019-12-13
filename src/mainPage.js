@@ -4,14 +4,14 @@ import 'react-toastify/dist/ReactToastify.css'
 import { Dropdown, DropdownButton, InputGroup, FormControl} from 'react-bootstrap'
 import { css } from 'glamor';
 import * as helpers from './helpers'
-import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool } from './tools'
-const tools = [ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool]
+import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool} from './tools'
+const tools = [ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool]
 
 class MainPage extends Component {
   constructor(props) {
     super(props)
     this.tools = ['1: Nano Units Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed', '4: Keypair Generator',
-    '5: Address Extractor']
+    '5: Address Extractor', '6: Paper Wallet Generator']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,
@@ -46,7 +46,7 @@ class MainPage extends Component {
     const ActiveView = tools[this.state.activeToolId]
     return (
       <div>
-        <header className="header">
+        <header className="header noprint">
           <ToastContainer
             enableMultiContainer
             containerId={'success-auto'}
@@ -146,14 +146,14 @@ class MainPage extends Component {
               }.bind(this))}
             </DropdownButton>
         </header>
-        <div className="line"></div>
+        <div className="line noprint"></div>
         <div className="content-wrapper">
           <div className="content">
             <ActiveView/>
           </div>
         </div>
 
-        <footer className="footer">
+        <footer className="footer noprint">
           <div className="line"></div>
           <InputGroup>
             <FormControl as="textarea" rows="3" placeholder="Memo for copy/paste across tools"/>
