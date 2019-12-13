@@ -45,7 +45,7 @@ class PaperWalletTool extends Component {
     return (
       <div>
         <div className="noprint">
-          <p>Generate simple paper wallets with a SEED and ADDRESS.</p>
+          <p>Generate simple paper wallets with a SEED and ADDRESS</p>
           <ul>
             <li>The address is derived using seed index 0</li>
             <li>To save the wallet: Use a screen capture tool or print</li>

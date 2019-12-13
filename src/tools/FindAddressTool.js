@@ -224,9 +224,11 @@ class FindAddressTool extends Component {
   render() {
     return (
       <div>
-        <p>Find out if an address belongs to a seed.<br/>
-        Could be useful if a wallet does not import an address at correct index.<br/>
-        A large search range may take a very long time and browser freezing.</p>
+        <p>Find out if an address belongs to a seed</p>
+        <ul>
+          <li>Could be useful if a wallet does not import an address at correct index</li>
+          <li>A large search range may take a very long time and browser freezing</li>
+        </ul>
 
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>

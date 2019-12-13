@@ -151,8 +151,11 @@ class ConvertTool extends Component {
   render() {
     return (
       <div>
-        <p>Convert between Nano units.<br/>
-        NANO is used in wallets and exchanges and raw is the smallest possible unit.</p>
+        <p>Convert between Nano units</p>
+        <ul>
+          <li>NANO is used in wallets and exchanges and raw is the smallest possible unit</li>
+        </ul>
+        
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="raw">

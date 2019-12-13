@@ -83,8 +83,11 @@ class KeyGeneratorTool extends Component {
   render() {
     return (
       <div>
-        <p>Mass generate secure key pairs using seed index 0.<br/>
-        Output format is SEED, PRIVKEY, ADDRESS</p>
+        <p>Mass generate secure key pairs using seed index 0</p>
+        <ul>
+          <li>Output format is SEED, PRIVKEY, ADDRESS</li>
+        </ul>
+
         <InputGroup size="sm" className="mb-3 count-input">
           <InputGroup.Prepend>
             <InputGroup.Text id="raw">
@@ -102,7 +105,7 @@ class KeyGeneratorTool extends Component {
               Output
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="15" placeholder="" value={this.state.output} readOnly/>
+          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="12" placeholder="" value={this.state.output} readOnly/>
         </InputGroup>
         <Button variant="primary" onClick={this.generate} disabled={this.state.generating}>Generate</Button>
         <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>

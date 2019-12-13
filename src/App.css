@@ -26,6 +26,22 @@ html, body {
   flex-direction: column;
 }
 
+p {
+  font-size: calc(10px + 1vmin);
+  line-height: calc(10px + 1.4vmin);
+}
+
+a {
+  color: #4a90e2;
+  text-decoration: none;
+}
+
+a:hover, .a:focus {
+  color: #377ccc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .header {
   height: 80px;
   display: flex;
@@ -60,17 +76,6 @@ html, body {
 
 .dropdown-toggle {
   font-size: calc(10px + 1.1vmin);
-}
-
-a {
-  color: #4a90e2;
-  text-decoration: none;
-}
-
-a:hover, .a:focus {
-  color: #377ccc;
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 /* Special input width */

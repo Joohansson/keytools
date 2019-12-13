@@ -321,15 +321,14 @@ class SeedTool extends Component {
   render() {
     return (
       <div>
-        <p>Convert / Verify a Seed, Private & Public key, or Address.</p>
+        <p>Convert / Verify a Seed, Private & Public key, or Address</p>
         <ul>
           <li><strong>Seed + Index &gt;</strong> Priv Key, Pub Key & Address </li>
           <li><strong>Priv Key  &gt;</strong> Pub Key & Address </li>
           <li><strong>Pub Key &gt;</strong> Address </li>
           <li><strong>Address &gt;</strong> Pub Key </li>
         </ul>
-        <p>Generate secure random keys or demo addresses using the buttons.<br/>
-        No data is ever stored but consider downloading the tool and run offline.</p>
+        <p>Generate secure random keys or demo addresses using the buttons</p>
 
         <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Nano Seed</Button>
         <Button variant="primary" onClick={this.generatePriv} className="btn-medium">Private Key</Button>

@@ -197,8 +197,11 @@ class AddressExtractorTool extends Component {
   render() {
     return (
       <div>
-        <p>Mass extract addresses in a range of indexes using a fixed seed.<br/>
-        Output format is INDEX, ADDRESS</p>
+        <p>Mass extract addresses in a range of indexes using a fixed seed</p>
+        <ul>
+          <li>Output format is INDEX, ADDRESS</li>
+        </ul>
+
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="seed">
@@ -246,7 +249,7 @@ class AddressExtractorTool extends Component {
               Output
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="15" placeholder="" value={this.state.output} readOnly/>
+          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="12" placeholder="" value={this.state.output} readOnly/>
         </InputGroup>
 
         <Button variant="primary" onClick={this.generate} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) || this.state.generating}>Generate</Button>
