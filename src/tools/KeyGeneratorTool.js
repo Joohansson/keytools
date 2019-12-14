@@ -12,6 +12,8 @@ class KeyGeneratorTool extends Component {
       count: '10',
       generating: false,
       validCount: true,
+      privKeyChecked: false,
+      addressChecked: false,
       output: ''
     }
 
@@ -48,6 +50,18 @@ class KeyGeneratorTool extends Component {
     })
   }
 
+  handlePrivKeyCheck(event) {
+    this.setState({
+      privKeyChecked: event.target.checked
+    })
+  }
+
+  handleAddressCheck(event) {
+    this.setState({
+      addressChecked: event.target.checked
+    })
+  }
+
   /* Start generation of key pairs */
   async generate() {
     this.setState({
@@ -65,7 +79,19 @@ class KeyGeneratorTool extends Component {
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
         // save result in array
-        output = output + seed + ',' + privKey + ',' + address + '\r'
+        if (this.state.privKeyChecked && this.state.addressChecked) {
+          output = output + seed + ',' + privKey + ',' + address + '\r'
+        }
+        else if (this.state.privKeyChecked && !this.state.addressChecked ) {
+          output = output + seed + ',' + privKey + '\r'
+        }
+        else if (!this.state.privKeyChecked && this.state.addressChecked) {
+          output = output + seed + ',' + address + '\r'
+        }
+        else {
+          output = output + seed + '\r'
+        }
+
       }
       this.setState({
         output: output
@@ -99,6 +125,16 @@ class KeyGeneratorTool extends Component {
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
         </InputGroup>
+
+        <div className="form-check form-check-inline index-checkbox">
+          <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
+          <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
+        </div>
+        <div className="form-check form-check-inline index-checkbox">
+          <input className="form-check-input" type="checkbox" id="address-check" value="address" checked={this.state.addressChecked} onChange={this.handleAddressCheck.bind(this)}/>
+          <label className="form-check-label" htmlFor="address-check">Include Address</label>
+        </div>
+
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="output">
