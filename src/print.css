@@ -3,4 +3,17 @@
   .noprint * {
     display: none;
   }
+  html, body, .QR-container-paper, .QR-container-paper-inner, .QR-container-payment {
+    background-color: #FFF !important;
+  }
+
+  .QR-container-payment {
+    width: 276px !important;
+    height: 276px !important;
+  }
+
+  .QR-img-payment {
+    width: 256px !important;
+    height: 256px !important;
+  }
 }

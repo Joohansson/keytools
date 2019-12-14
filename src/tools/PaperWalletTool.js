@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
-import { InputGroup, FormControl, Button} from 'react-bootstrap'
+import { Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
-import * as helpers from '../helpers'
 import { ReactComponent as NanoLogo } from '../img/nano.svg';
+import './PaperWalletTool.css';
 
 class PaperWalletTool extends Component {
   constructor(props) {
@@ -12,8 +12,7 @@ class PaperWalletTool extends Component {
     this.state = {
       qrSeedContent: '',
       qrAddressContent: '',
-      qrSize: 512,
-      qrHidden: true,
+      qrSize: 720,
     }
 
     this.componentDidMount = this.componentDidMount.bind(this)

@@ -13,6 +13,7 @@ class AddressExtractorTool extends Component {
       startIndex: '0',
       endIndex: '10',
       indexChecked: false,
+      privKeyChecked: false,
       validSeed: false,
       validStartIndex: true,
       validEndIndex: true,
@@ -27,6 +28,7 @@ class AddressExtractorTool extends Component {
     this.handleStartIndexChange = this.handleStartIndexChange.bind(this)
     this.handleEndIndexChange = this.handleEndIndexChange.bind(this)
     this.handleIndexCheck = this.handleIndexCheck.bind(this)
+    this.handlePrivKeyCheck = this.handlePrivKeyCheck.bind(this)
     this.sample = this.sample.bind(this)
     this.generate = this.generate.bind(this)
   }
@@ -159,6 +161,12 @@ class AddressExtractorTool extends Component {
     })
   }
 
+  handlePrivKeyCheck(event) {
+    this.setState({
+      privKeyChecked: event.target.checked
+    })
+  }
+
   /* Start generation of addresses */
   async generate() {
     this.setState({
@@ -174,8 +182,14 @@ class AddressExtractorTool extends Component {
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
         // save result in array
-        if (this.state.indexChecked) {
+        if (this.state.indexChecked && this.state.privKeyChecked) {
+          output = output + i + ',' + privKey + ',' + address + '\r'
+        }
+        else if (this.state.indexChecked && !this.state.privKeyChecked) {
           output = output + i + ',' + address + '\r'
+        }
+        else if (!this.state.indexChecked && this.state.privKeyChecked) {
+          output = output + privKey + ',' + address + '\r'
         }
         else {
           output = output + address + '\r'
@@ -199,7 +213,7 @@ class AddressExtractorTool extends Component {
       <div>
         <p>Mass extract addresses in a range of indexes using a fixed seed</p>
         <ul>
-          <li>Output format is INDEX, ADDRESS</li>
+          <li>Output format is INDEX, PRIVATE KEY, ADDRESS</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
@@ -240,7 +254,11 @@ class AddressExtractorTool extends Component {
 
         <div className="form-check form-check-inline index-checkbox">
           <input className="form-check-input" type="checkbox" id="index-check" value="index" checked={this.state.indexChecked} onChange={this.handleIndexCheck.bind(this)}/>
-          <label className="form-check-label" for="index-check">Include Index</label>
+          <label className="form-check-label" htmlFor="index-check">Include Index</label>
+        </div>
+        <div className="form-check form-check-inline index-checkbox">
+          <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
+          <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
         </div>
 
         <InputGroup size="sm" className="mb-3">

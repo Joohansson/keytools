@@ -1,11 +1,37 @@
 import MainPage from './mainPage'
 import { css } from 'glamor';
 import $ from 'jquery'
+import * as nano from 'nanocurrency'
 
 //Constants
 export const constants = {
   INDEX_MAX: 4294967295,
-  KEYS_MAX: 100000
+  KEYS_MAX: 100000,
+  SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
+}
+
+export function rawTonano(input) {
+  return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.nano}) : 'N/A'
+}
+
+export function rawToMnano(input) {
+  return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.NANO}) : 'N/A'
+}
+
+export function nanoToRaw(input) {
+  return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.raw}) : 'N/A'
+}
+
+export function nanoToMnano(input) {
+  return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.NANO}) : 'N/A'
+}
+
+export function MnanoToRaw(input) {
+  return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.raw}) : 'N/A'
+}
+
+export function MnanoTonano(input) {
+  return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.nano}) : 'N/A'
 }
 
 //Check if numeric string

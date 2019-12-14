@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
@@ -93,35 +92,11 @@ class ConvertTool extends Component {
     }
   }
 
-  rawTonano(input) {
-    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.nano}) : 'N/A'
-  }
-
-  rawToMnano(input) {
-    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.raw, to: nano.Unit.NANO}) : 'N/A'
-  }
-
-  nanoToRaw(input) {
-    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.raw}) : 'N/A'
-  }
-
-  nanoToMnano(input) {
-    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.nano, to: nano.Unit.NANO}) : 'N/A'
-  }
-
-  MnanoToRaw(input) {
-    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.raw}) : 'N/A'
-  }
-
-  MnanoTonano(input) {
-    return helpers.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.nano}) : 'N/A'
-  }
-
   handleRawChange(event) {
     this.setState({
       raw: event.target.value,
-      nano: this.rawTonano(event.target.value),
-      Mnano: this.rawToMnano(event.target.value)
+      nano: helpers.rawTonano(event.target.value),
+      Mnano: helpers.rawToMnano(event.target.value)
     },
     function() {
       this.updateQR(this.state.activeQR)
@@ -129,9 +104,9 @@ class ConvertTool extends Component {
   }
   handlenanoChange(event) {
     this.setState({
-      raw: this.nanoToRaw(event.target.value),
+      raw: helpers.nanoToRaw(event.target.value),
       nano: event.target.value,
-      Mnano: this.nanoToMnano(event.target.value),
+      Mnano: helpers.nanoToMnano(event.target.value),
     },
     function() {
       this.updateQR(this.state.activeQR)
@@ -139,8 +114,8 @@ class ConvertTool extends Component {
   }
   handleMnanoChange(event) {
     this.setState({
-      raw: this.MnanoToRaw(event.target.value),
-      nano: this.MnanoTonano(event.target.value),
+      raw: helpers.MnanoToRaw(event.target.value),
+      nano: helpers.MnanoTonano(event.target.value),
       Mnano: event.target.value
     },
     function() {
@@ -155,7 +130,7 @@ class ConvertTool extends Component {
         <ul>
           <li>NANO is used in wallets and exchanges and raw is the smallest possible unit</li>
         </ul>
-        
+
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="raw">

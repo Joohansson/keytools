@@ -87,6 +87,18 @@ a:hover, .a:focus {
   width: 260px;
 }
 
+.QR-container {
+  width: 148px;
+  height: 148px;
+  padding: 10px;
+  background-color: #EEE;
+}
+
+.QR-img {
+  width: 128px;
+  height: 128px;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #4a90e2;
@@ -118,67 +130,6 @@ a:hover, .a:focus {
 /* Max min button */
 .max-btn {
   width: 48px;
-}
-
-.QR-container {
-  width: 148px;
-  height: 148px;
-  padding: 10px;
-  background-color: #EEE;
-}
-.QR-img {
-  width: 128px;
-  height: 128px;
-}
-.QR-container-paper {
-  width: 750px;
-  height: 356px;
-  padding: 50px;
-  background-color: #EEE;
-  margin-top: 20px;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-}
-
-.QR-container-paper-inner {
-  border: #4a90e2 4px solid;
-  width: 100%;
-  height: 100%;
-  padding: 10px 40px;
-  text-align: center;
-}
-
-.QR-img-paper {
-  width: 180px;
-  height: 180px;
-}
-
-.QR-img-paper-left {
-  float: left;
-}
-
-.QR-img-paper-right {
-  float: right;
-}
-
-.paper-wallet-text-container {
-  width: 100%;
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: #222;
-}
-
-.paper-wallet-text {
-  width: 180px;
-    text-align: center;
-}
-
-.paper-wallet-logo {
-  width: 100px;
-  margin-top: 68px;
 }
 
 /* The left thing of input boxes */
