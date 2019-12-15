@@ -126,14 +126,21 @@ class KeyGeneratorTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className="form-check form-check-inline index-checkbox">
-          <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
-          <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
-        </div>
-        <div className="form-check form-check-inline index-checkbox">
-          <input className="form-check-input" type="checkbox" id="address-check" value="address" checked={this.state.addressChecked} onChange={this.handleAddressCheck.bind(this)}/>
-          <label className="form-check-label" htmlFor="address-check">Include Address</label>
-        </div>
+        <InputGroup size="sm" className="mb-3">
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
+            <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="address-check" value="address" checked={this.state.addressChecked} onChange={this.handleAddressCheck.bind(this)}/>
+            <label className="form-check-label" htmlFor="address-check">Include Address</label>
+          </div>
+        </InputGroup>
+
+        <InputGroup size="sm" className="mb-3">
+          <Button variant="primary" onClick={this.generate} disabled={this.state.generating}>Generate</Button>
+          <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
+        </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
@@ -141,10 +148,8 @@ class KeyGeneratorTool extends Component {
               Output
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="12" placeholder="" value={this.state.output} readOnly/>
+          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
         </InputGroup>
-        <Button variant="primary" onClick={this.generate} disabled={this.state.generating}>Generate</Button>
-        <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
       </div>
     )
   }

@@ -3,6 +3,7 @@ import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
+import QrImageStyle from '../modules/qrImageStyle'
 
 class AddressExtractorTool extends Component {
   constructor(props) {
@@ -12,6 +13,11 @@ class AddressExtractorTool extends Component {
       seed: '',
       startIndex: '0',
       endIndex: '10',
+      seedBtnActive: false,
+      qrContent: '',
+      qrSize: 512,
+      activeQR: false,
+      qrHidden: true,
       indexChecked: false,
       privKeyChecked: false,
       validSeed: false,
@@ -31,6 +37,7 @@ class AddressExtractorTool extends Component {
     this.handlePrivKeyCheck = this.handlePrivKeyCheck.bind(this)
     this.sample = this.sample.bind(this)
     this.generate = this.generate.bind(this)
+    this.updateQR = this.updateQR.bind(this)
   }
 
   // set min value for start index
@@ -54,9 +61,49 @@ class AddressExtractorTool extends Component {
         this.setState({
           seed: '',
           validSeed: false
+        },
+        function() {
+          this.updateQR(this.state.activeQR)
         })
         break
       default:
+        break
+    }
+  }
+
+  // Any QR button is pressed. Handle active button.
+  changeQR(event) {
+    // already selected, deselect
+    if (this.state.activeQR === event.target.value) {
+      this.setState({
+        activeQR: '',
+        qrHidden: false
+      })
+      this.updateQR('')
+    }
+    else {
+      this.setState({
+        activeQR: event.target.value,
+        qrHidden: false
+      })
+      this.updateQR(event.target.value)
+    }
+  }
+
+  updateQR(unit) {
+    switch(unit) {
+      case 'seed':
+        this.setState({
+          qrContent: this.state.seed,
+          seedBtnActive: true,
+        })
+        break
+      default:
+        this.setState({
+          qrContent: '',
+          qrHidden: true,
+          seedBtnActive: false,
+        })
         break
     }
   }
@@ -69,6 +116,9 @@ class AddressExtractorTool extends Component {
       validSeed: true,
       validStartIndex: true,
       validEndIndex: true,
+    },
+    function() {
+      this.updateQR(this.state.activeQR)
     })
   }
 
@@ -77,12 +127,9 @@ class AddressExtractorTool extends Component {
   }
 
   seedChange(seed) {
-    this.setState({
-      seed: seed,
-    })
-
     if (!nano.checkSeed(seed)) {
       this.setState({
+        seed: seed,
         validSeed: false
       })
       if (seed !== '') {
@@ -91,7 +138,11 @@ class AddressExtractorTool extends Component {
       return
     }
     this.setState({
-      validSeed: true
+      seed: seed,
+      validSeed: true,
+    },
+    function() {
+      this.updateQR(this.state.activeQR)
     })
   }
 
@@ -225,6 +276,8 @@ class AddressExtractorTool extends Component {
           <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." onChange={this.handleSeedChange.bind(this)}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={ this.state.seedBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='seed' onClick={this.changeQR.bind(this)}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -252,14 +305,22 @@ class AddressExtractorTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className="form-check form-check-inline index-checkbox">
-          <input className="form-check-input" type="checkbox" id="index-check" value="index" checked={this.state.indexChecked} onChange={this.handleIndexCheck.bind(this)}/>
-          <label className="form-check-label" htmlFor="index-check">Include Index</label>
-        </div>
-        <div className="form-check form-check-inline index-checkbox">
-          <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
-          <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
-        </div>
+        <InputGroup size="sm" className="mb-3">
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="index-check" value="index" checked={this.state.indexChecked} onChange={this.handleIndexCheck.bind(this)}/>
+            <label className="form-check-label" htmlFor="index-check">Include Index</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
+            <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
+          </div>
+        </InputGroup>
+
+        <InputGroup size="sm" className="mb-3">
+          <Button variant="primary" onClick={this.generate} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) || this.state.generating}>Generate</Button>
+          <Button variant="primary" onClick={this.sample} disabled={this.state.generating}>Random Seed</Button>
+          <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
+        </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
@@ -267,12 +328,12 @@ class AddressExtractorTool extends Component {
               Output
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="12" placeholder="" value={this.state.output} readOnly/>
+          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
         </InputGroup>
 
-        <Button variant="primary" onClick={this.generate} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) || this.state.generating}>Generate</Button>
-        <Button variant="primary" onClick={this.sample} disabled={this.state.generating}>Random Seed</Button>
-        <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
+        <div className={ this.state.qrHidden ? "hidden" : "QR-container"}>
+          <QrImageStyle className="QR-img" content={this.state.qrContent} size={this.state.qrSize} />
+        </div>
       </div>
     )
   }

@@ -43,21 +43,33 @@ class SeedTool extends Component {
       case 'seed':
         this.setState({
           seed: ''
+        },
+        function() {
+          this.updateQR(this.state.activeQR)
         })
         break
       case 'privKey':
         this.setState({
           privKey: ''
+        },
+        function() {
+          this.updateQR(this.state.activeQR)
         })
         break
       case 'pubKey':
         this.setState({
           pubKey: ''
+        },
+        function() {
+          this.updateQR(this.state.activeQR)
         })
         break
       case 'address':
         this.setState({
           address: ''
+        },
+        function() {
+          this.updateQR(this.state.activeQR)
         })
         break
       default:

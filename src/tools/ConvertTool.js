@@ -32,6 +32,9 @@ class ConvertTool extends Component {
       raw: '',
       nano: '',
       Mnano: ''
+    },
+    function() {
+      this.updateQR(this.state.activeQR)
     })
   }
 
