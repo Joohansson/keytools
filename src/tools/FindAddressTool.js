@@ -214,10 +214,10 @@ class FindAddressTool extends Component {
       searching: false
     })
     if (found) {
-      toast("Found the address at index: " + i, helpers.getToast('success'))
+      toast("Found the address at index: " + i, helpers.getToast(helpers.toastType.SUCCESS))
     }
     else {
-      toast("Finished but no address found", helpers.getToast('error'))
+      toast("Finished but no address found", helpers.getToast(helpers.toastType.ERROR))
     }
   }
 
