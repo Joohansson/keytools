@@ -1,7 +1,7 @@
 .QR-container-paper {
-  width: 750px;
+  width: 780px;
   height: 356px;
-  padding: 50px;
+  padding: 50px 80px;
   background-color: #000034;
   font-size: 16px;
   font-weight: bold;

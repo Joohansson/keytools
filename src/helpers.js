@@ -2,12 +2,25 @@ import MainPage from './mainPage'
 import { css } from 'glamor';
 import $ from 'jquery'
 import * as nano from 'nanocurrency'
+import bigInt from 'big-integer'
 
 //Constants
 export const constants = {
   INDEX_MAX: 4294967295,
   KEYS_MAX: 100000,
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
+}
+
+// Subtract two big integers
+export function bigSubtract(input,value) {
+  let insert = bigInt(input)
+  let val = bigInt(value)
+  return insert.subtract(val).toString()
+}
+
+// Checks if a big integer is negative
+export function bigIsNegative(input) {
+  return bigInt(input).isNegative()
 }
 
 export function rawTonano(input) {
@@ -28,6 +41,7 @@ export function nanoToMnano(input) {
 
 export function MnanoToRaw(input) {
   return this.isNumeric(input) ? nano.convert(input, {from: nano.Unit.NANO, to: nano.Unit.raw}) : 'N/A'
+  //return bigInt(parseFloat(input)).times('1000000000000000000000000000000').toString()
 }
 
 export function MnanoTonano(input) {

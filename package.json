@@ -9,6 +9,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "big-integer": "^1.6.48",
     "bootstrap": "^4.4.1",
     "glamor": "^2.20.40",
     "jquery": "^3.4.1",

@@ -66,7 +66,7 @@ a:hover, .a:focus {
 }
 
 .content {
-  max-width: 750px;
+  max-width: 780px;
   margin: 0 auto;
 }
 
@@ -134,7 +134,12 @@ a:hover, .a:focus {
 
 /* The left thing of input boxes */
 .input-group-prepend, .input-group-text {
-  width: 110px;
+  width: 140px;
+}
+
+/* Disabled input  */
+.form-control:disabled {
+  background-color: #cacaca;
 }
 
 /* Striped dropdown menu */
@@ -145,6 +150,23 @@ a:hover, .a:focus {
 /* Change color on dropdown menu hover */
 .dropdown-item:hover {
   background: #4a90e2 !important;
+}
+
+/* Special prepended dropdown button to resemble normal prepend text style */
+.dropdown-prepend .dropdown-toggle {
+  color: #495057;
+  text-align: center;
+  white-space: nowrap;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  display: -webkit-box;
+  width: 140px;
+  height: 31px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .index-checkbox {
