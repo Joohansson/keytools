@@ -1,7 +1,7 @@
 .QR-container-paper {
-  width: 780px;
+  width: 100%;
   height: 356px;
-  padding: 50px 80px;
+  padding: 50px 0;
   background-color: #000034;
   font-size: 16px;
   font-weight: bold;
@@ -11,10 +11,11 @@
 .QR-container-paper-inner {
   background-color: #EEE;
   border: #4a90e2 4px solid;
-  width: 100%;
+  width: 600px;
   height: 100%;
   padding: 10px 40px;
   text-align: center;
+  margin: auto;
 }
 
 .QR-img-paper {
