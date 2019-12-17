@@ -13,6 +13,7 @@
     "bootstrap": "^4.4.1",
     "glamor": "^2.20.40",
     "jquery": "^3.4.1",
+    "nano-webgl-pow": "^1.0.0",
     "nanocurrency": "^2.3.0",
     "nanocurrency-web": "^1.0.6",
     "react": "^16.12.0",

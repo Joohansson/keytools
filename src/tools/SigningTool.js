@@ -5,6 +5,7 @@ import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
+import 'nano-webgl-pow'
 
 class SigningTool extends Component {
   constructor(props) {
@@ -127,6 +128,7 @@ class SigningTool extends Component {
       BALANCE: '5080000000000000000000000000000',
       AMOUNT: '5.08',
       PRIV: '4F30562EB814E3576C5ADA81F6C64E9E858C175D6099ADAB01AA75BBC176F45C',
+      WORK: '837d0a3484b674a0',
     }
 
     this.state = {
@@ -139,6 +141,8 @@ class SigningTool extends Component {
       privKey: '',
       blockHash: '',
       signature: '',
+      work: '',
+      output: '',
       validAddress: false,
       validPrevious: false,
       validRep: false,
@@ -148,10 +152,13 @@ class SigningTool extends Component {
       validPrivKey: false,
       validBlockHash: false,
       validSignature: false,
+      validWork: false,
       selectedOption: '0',
+      qrActive: '',
       qrContent: '',
       qrHidden: true,
       qrSize: 512,
+      qrLarge: false, //double size QR for json block
       text_address: this.addressText[0],
       text_previous: this.previousText[0],
       text_rep: this.repText[0],
@@ -173,6 +180,16 @@ class SigningTool extends Component {
     this.sample = this.sample.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.selectAmount = this.selectAmount.bind(this)
+
+    // Tuning for webGL PoW performance. 512 is default load
+    this.webGLWidth = 512
+    this.webGLHeight = 512
+  }
+
+  // Init component
+  componentDidMount() {
+    window.NanoWebglPow.width = this.webGLWidth
+    window.NanoWebglPow.height = this.webGLHeight
   }
 
   //Clear text from input field
@@ -196,7 +213,7 @@ class SigningTool extends Component {
       },
       function() {
         this.updateQR()
-        this.ashBlock()
+        this.hashBlock()
       })
       break
 
@@ -270,6 +287,17 @@ class SigningTool extends Component {
       this.setState({
         signature: '',
         validSignature: false
+      },
+      function() {
+        this.updateQR()
+        this.hashBlock()
+      })
+      break
+
+      case 'work':
+      this.setState({
+        work: '',
+        validWork: false
       },
       function() {
         this.updateQR()
@@ -365,6 +393,17 @@ class SigningTool extends Component {
       })
       return
     }
+    // invalidate work if changing previous hash if the work was valid before
+    if (this.state.validWork) {
+      if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
+        this.setState({
+          work: '',
+          validWork: false
+        })
+        toast("The work provided is not valid for the given previous hash.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+    }
+
     this.setState({
       previous: hash,
       validPrevious: true
@@ -515,8 +554,175 @@ class SigningTool extends Component {
     })
   }
 
-  updateQR() {
+  handleWorkChange = changeEvent => {
+    this.workChange(changeEvent.target.value)
+  }
 
+  workChange(hash) {
+    var failed = false
+    if (nano.checkWork(hash)) {
+      if (this.state.validPrevious) {
+        if (!nano.validateWork({blockHash:this.state.previous, work:hash})) {
+          failed = true
+          toast("The work provided is not valid for the given previous hash.", helpers.getToast(helpers.toastType.ERROR))
+        }
+      }
+      else {
+        failed = true
+        toast("Need a valid previous hash to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+    }
+    else {
+      failed = true
+      if (hash !== '') {
+        new MainPage().notifyInvalidFormat()
+      }
+    }
+
+    if (failed) {
+      this.setState({
+        work: hash,
+        validWork: false
+      },
+      function() {
+        this.createBlock()
+      })
+      return
+    }
+    this.setState({
+      work: hash,
+      validWork: true
+    },function() {
+      this.createBlock()
+    })
+  }
+
+  handleOptionChange = changeEvent => {
+    let val = changeEvent.target.value
+    this.setState({
+      selectedOption: val,
+      text_address: this.addressText[val],
+      text_previous: this.previousText[val],
+      text_rep: this.repText[val],
+      text_currBalance: this.currBalanceText[val],
+      text_link: this.linkText[val],
+      title_address: this.addressTitle[val],
+      title_previous: this.previousTitle[val],
+      title_rep: this.repTitle[val],
+      title_currBalance: this.currBalanceTitle[val],
+      title_amount: this.amountTitle[val],
+      title_link: this.linkTitle[val],
+      place_link: this.linkPlace[val],
+    })
+  }
+
+  handleQRChange = changeEvent => {
+    let val = changeEvent.target.value
+    // deselect button if clicking on the same button
+    if (this.state.qrActive === val) {
+      this.setState({
+        qrActive: '',
+        qrHidden: true
+      })
+    }
+    else {
+      this.setState({
+        qrActive: val,
+        qrHidden: false,
+      },
+      function() {
+        this.updateQR()
+      })
+    }
+  }
+
+  updateQR() {
+    switch(this.state.qrActive) {
+      case 'address':
+      this.setState({
+        qrContent: this.state.address,
+        qrLarge: false,
+      })
+      break
+
+      case 'link':
+      this.setState({
+        qrContent: this.state.link,
+        qrLarge: false,
+      })
+      break
+
+      case 'previous':
+      this.setState({
+        qrContent: this.state.previous,
+        qrLarge: false,
+      })
+      break
+
+      case 'rep':
+      this.setState({
+        qrContent: this.state.rep,
+        qrLarge: false,
+      })
+      break
+
+      case 'currBalance':
+      this.setState({
+        qrContent: this.state.currBalance,
+        qrLarge: false,
+      })
+      break
+
+      case 'amount':
+      this.setState({
+        qrContent: this.state.amount,
+        qrLarge: false,
+      })
+      break
+
+      case 'privKey':
+      this.setState({
+        qrContent: this.state.privKey,
+        qrLarge: false,
+      })
+      break
+
+      case 'blockHash':
+      this.setState({
+        qrContent: this.state.blockHash,
+        qrLarge: false,
+      })
+      break
+
+      case 'signature':
+      this.setState({
+        qrContent: this.state.signature,
+        qrLarge: false,
+      })
+      break
+
+      case 'work':
+      this.setState({
+        qrContent: this.state.work,
+        qrLarge: false,
+      })
+      break
+
+      case 'output':
+      this.setState({
+        qrContent: this.state.output,
+        qrLarge: true,
+      })
+      break
+
+      default:
+      this.setState({
+        qrContent: '',
+        qrHidden: true,
+        qrLarge: false,
+      })
+        break
+    }
   }
 
   sample() {
@@ -535,6 +741,8 @@ class SigningTool extends Component {
       validAmount: true,
       privKey:this.sampleSend.PRIV,
       validPrivKey: true,
+      work:this.sampleSend.WORK,
+      validWork: true,
     },
     function() {
       this.hashBlock()
@@ -596,6 +804,7 @@ class SigningTool extends Component {
     if (nano.checkKey(blockHash)) {
       this.setState({
         blockHash: blockHash,
+        adjustedBalance: newBalance,
         validBlockHash: true,
       },
       function() {
@@ -605,6 +814,7 @@ class SigningTool extends Component {
     else {
       this.setState({
         blockHash: 'Failed to create block hash',
+        adjustedBalance: null,
         validBlockHash: false,
       })
       toast("Failed to create block hash. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR))
@@ -617,6 +827,9 @@ class SigningTool extends Component {
       this.setState({
         signature: 'Invalid inputs',
         validSignature: false
+      },
+      function() {
+        this.createBlock()
       })
       return
     }
@@ -626,35 +839,104 @@ class SigningTool extends Component {
       this.setState({
         signature: signature,
         validSignature: true,
+      },
+      function() {
+        this.createBlock()
       })
     }
     else {
       this.setState({
         signature: 'Failed to create signature',
         validSignature: false,
+      },
+      function() {
+        this.createBlock()
       })
       toast("Failed to create signature. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR))
     }
   }
 
-  handleOptionChange = changeEvent => {
-    let val = changeEvent.target.value
-    this.setState({
-      selectedOption: val,
-      text_address: this.addressText[val],
-      text_previous: this.previousText[val],
-      text_rep: this.repText[val],
-      text_currBalance: this.currBalanceText[val],
-      text_link: this.linkText[val],
-      title_address: this.addressTitle[val],
-      title_previous: this.previousTitle[val],
-      title_rep: this.repTitle[val],
-      title_currBalance: this.currBalanceTitle[val],
-      title_amount: this.amountTitle[val],
-      title_link: this.linkTitle[val],
-      place_link: this.linkPlace[val],
-    })
-}
+  generateWork() {
+    if (this.state.validPrevious) {
+      try {
+        toast("Started generating PoW...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+        window.NanoWebglPow(this.state.previous,
+          (work, n) => {
+              toast("Successfully generated PoW!", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+              this.workChange(work)
+          },
+          n => {
+            toast("Calculated " + helpers.addCommas(n*window.NanoWebglPow.width * window.NanoWebglPow.height) + " hashes...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+          }
+        )
+      }
+      catch(error) {
+        if(error.message === 'webgl2_required')
+          toast("WebGL 2 is required to generate work.", helpers.getToast(helpers.toastType.ERROR))
+        else if(error.message === 'invalid_hash')
+          toast("Block hash must be 64 character hex string", helpers.getToast(helpers.toastType.ERROR))
+        else
+          toast("An unknown error occurred while generating PoW", helpers.getToast(helpers.toastType.ERROR))
+          console.log("An unknown error occurred while generating PoW" + error)
+        return
+      }
+    }
+    else {
+      toast("Need a valid previous block hash to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+    }
+  }
+
+  // Create the final JSON block representation
+  createBlock() {
+    // All input parameters must be valid
+    if (!this.state.validWork || !this.isValidHashInputs() || !this.isValidSignInputs()) {
+      this.setState({
+        output: 'Invalid input parameters...'
+      })
+      return
+    }
+    var block
+    var failed = false
+    try {
+      switch (this.state.selectedOption) {
+        // SEND BLOCK
+        case '0':
+        block = nano.createBlock(this.state.privKey,{balance:this.state.adjustedBalance, representative:this.state.rep,
+        work:this.state.work, link:this.state.link, previous:this.state.previous})
+
+      // check that the new block is valid
+        let pubKey = nano.derivePublicKey(block.block.account)
+        if (!nano.verifyBlock({hash:block.hash, publicKey:pubKey, signature:block.block.signature})) {
+          toast("Invalid block. Contact developer.", helpers.getToast(helpers.toastType.ERROR))
+          failed = true
+        }
+        break
+
+        default:
+        break
+      }
+    }
+    catch(error) {
+      failed = true
+      toast("Invalid block. Contact developer.", helpers.getToast(helpers.toastType.ERROR))
+      console.log("Invalid block:" + error)
+    }
+
+    // Output json formatted block
+    if (!failed) {
+      // prepare a RPC process command
+      let processJson = {action: "process",  json_block: "true",  block: block.block}
+
+      this.setState({
+        output: JSON.stringify(processJson, null, 2)
+      })
+    }
+    else {
+      this.setState({
+        output: 'Bad JSON block generated, please contact the developer'
+      })
+    }
+  }
 
   render() {
     return (
@@ -664,7 +946,7 @@ class SigningTool extends Component {
           <ul>
             <li>Most of the inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a></li>
             <li>You can get the current raw balance with "action":"account_balance" or publish the final JSON block directly via <a href="https://nanoo.tools/nano-rpc-playground">RPC Playground</a></li>
-            <li>Generating work is optional and can be done elsewhere using the previous block hash</li>
+            <li>Generating work locally is optional and can be done elsewhere using the previous block hash</li>
             <li>Hover on text fields to show more details</li>
           </ul>
         </div>
@@ -703,9 +985,9 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="address" aria-describedby="address" value={this.state.address} title={this.state.title_address} placeholder={this.state.text_address === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} onChange={this.handleAddressChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='address' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'address' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='address' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -719,7 +1001,7 @@ class SigningTool extends Component {
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='link' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.link} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='link' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'link' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='link' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -733,7 +1015,7 @@ class SigningTool extends Component {
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='previous' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.previous} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='previous' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'previous' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='previous' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -747,7 +1029,7 @@ class SigningTool extends Component {
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='rep' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.rep} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='rep' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'rep' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='rep' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -761,7 +1043,7 @@ class SigningTool extends Component {
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='currBalance' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.currBalance} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='currBalance' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'currBalance' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='currBalance' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -782,7 +1064,7 @@ class SigningTool extends Component {
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='amount' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'amount' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='amount' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -797,7 +1079,7 @@ class SigningTool extends Component {
           <InputGroup.Append>
           <Button variant="outline-secondary" className="fas fa-times-circle" value='blockHash' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.blockHash} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'blockHash' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='blockHash' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'blockHash' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='blockHash' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -812,7 +1094,7 @@ class SigningTool extends Component {
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='privKey' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'privKey' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='privKey' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -826,25 +1108,41 @@ class SigningTool extends Component {
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='signature' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.signature} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='signature' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='signature' onClick={this.handleQRChange}></Button>
+          </InputGroup.Append>
+        </InputGroup>
+
+        GENERATED WORK
+        <InputGroup size="sm" className="mb-3">
+          <InputGroup.Prepend>
+            <InputGroup.Text id="work">
+              PoW
+            </InputGroup.Text>
+            <Button variant="outline-secondary" className="fas fa-hammer" value='work' title="Use webGL and the GPU to calculate work now. It may take a few seconds." onClick={this.generateWork.bind(this)}></Button>
+          </InputGroup.Prepend>
+          <FormControl id="work" aria-describedby="work" value={this.state.work} title="The generated proof of work or provided 16 char hex from another work generator." placeholder="ABC123... or abc123..." onChange={this.handleWorkChange}/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='work' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'work' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='work' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="output">
-              JSON Block
+              Process Command
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
-            <Button variant="outline-secondary" className={this.state.signatureActive === 'output' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='output' onClick={this.updateQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'output' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='output' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={ this.state.qrHidden ? "hidden" : "QR-container"}>
-          <QrImageStyle className="QR-img-payment" content={this.state.qrContent} size={this.state.qrSize} />
+        <div className={(this.state.qrHidden ? "hidden" : "QR-container") + ' ' + (this.state.qrLarge ? "QR-container-large" : "QR-container")}>
+          <QrImageStyle className={this.state.qrLarge ? "QR-img-large" : "QR-img"} content={this.state.qrContent} size={this.state.qrSize} />
         </div>
       </div>
     )

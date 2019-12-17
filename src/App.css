@@ -94,9 +94,21 @@ a:hover, .a:focus {
   background-color: #EEE;
 }
 
+.QR-container-large {
+  width: 276px;
+  height: 276px;
+  padding: 10px;
+  background-color: #EEE;
+}
+
 .QR-img {
   width: 128px;
   height: 128px;
+}
+
+.QR-img-large {
+  width: 256px;
+  height: 256px;
 }
 
 .btn-primary {
