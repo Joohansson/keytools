@@ -13,7 +13,6 @@ class AddressExtractorTool extends Component {
       seed: '',
       startIndex: '0',
       endIndex: '10',
-      seedBtnActive: false,
       qrContent: '',
       qrSize: 512,
       activeQR: false,
@@ -63,7 +62,7 @@ class AddressExtractorTool extends Component {
           validSeed: false
         },
         function() {
-          this.updateQR(this.state.activeQR)
+          this.updateQR()
         })
         break
       default:
@@ -72,37 +71,38 @@ class AddressExtractorTool extends Component {
   }
 
   // Any QR button is pressed. Handle active button.
-  changeQR(event) {
-    // already selected, deselect
-    if (this.state.activeQR === event.target.value) {
+  // Any QR button is pressed
+  handleQRChange = changeEvent => {
+    let val = changeEvent.target.value
+    // deselect button if clicking on the same button
+    if (this.state.qrActive === val) {
       this.setState({
-        activeQR: '',
-        qrHidden: false
+        qrActive: '',
+        qrHidden: true
       })
-      this.updateQR('')
     }
     else {
       this.setState({
-        activeQR: event.target.value,
-        qrHidden: false
+        qrActive: val,
+        qrHidden: false,
+      },
+      function() {
+        this.updateQR()
       })
-      this.updateQR(event.target.value)
     }
   }
 
-  updateQR(unit) {
-    switch(unit) {
+  updateQR() {
+    switch(this.state.qrActive) {
       case 'seed':
         this.setState({
           qrContent: this.state.seed,
-          seedBtnActive: true,
         })
         break
       default:
         this.setState({
           qrContent: '',
           qrHidden: true,
-          seedBtnActive: false,
         })
         break
     }
@@ -131,6 +131,9 @@ class AddressExtractorTool extends Component {
       this.setState({
         seed: seed,
         validSeed: false
+      },
+      function() {
+        this.updateQR()
       })
       if (seed !== '') {
         new MainPage().notifyInvalidFormat()
@@ -142,7 +145,7 @@ class AddressExtractorTool extends Component {
       validSeed: true,
     },
     function() {
-      this.updateQR(this.state.activeQR)
+      this.updateQR()
     })
   }
 
@@ -265,6 +268,7 @@ class AddressExtractorTool extends Component {
         <p>Mass extract addresses in a range of indexes using a fixed seed</p>
         <ul>
           <li>Output format is INDEX, PRIVATE KEY, ADDRESS</li>
+          <li>A large index range may take a very long time and browser freezing</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
@@ -273,11 +277,11 @@ class AddressExtractorTool extends Component {
               Seed
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." onChange={this.handleSeedChange.bind(this)}/>
+          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange.bind(this)}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={ this.state.seedBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='seed' onClick={this.changeQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'seed' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='seed' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -287,7 +291,7 @@ class AddressExtractorTool extends Component {
               Start Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" onChange={this.handleStartIndexChange.bind(this)}/>
+          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" maxLength="10"onChange={this.handleStartIndexChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMin}>Min</Button>
           </InputGroup.Append>
@@ -299,7 +303,7 @@ class AddressExtractorTool extends Component {
               End Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" onChange={this.handleEndIndexChange.bind(this)}/>
+          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" maxLength="10" onChange={this.handleEndIndexChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
@@ -307,11 +311,11 @@ class AddressExtractorTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="checkbox" id="index-check" value="index" checked={this.state.indexChecked} onChange={this.handleIndexCheck.bind(this)}/>
+            <input className="form-check-input" type="checkbox" id="index-check" value="index" checked={this.state.indexChecked} onChange={this.handleIndexCheck}/>
             <label className="form-check-label" htmlFor="index-check">Include Index</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
+            <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck}/>
             <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
           </div>
         </InputGroup>

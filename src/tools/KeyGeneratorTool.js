@@ -120,7 +120,7 @@ class KeyGeneratorTool extends Component {
               Pair Count
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="count" aria-describedby="count" value={this.state.count} title="Number of key pairs to generate." onChange={this.handleCountChange.bind(this)}/>
+          <FormControl id="count" aria-describedby="count" value={this.state.count} title="Number of key pairs to generate." maxLength="5" onChange={this.handleCountChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
@@ -128,11 +128,11 @@ class KeyGeneratorTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck.bind(this)}/>
+            <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck}/>
             <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="checkbox" id="address-check" value="address" checked={this.state.addressChecked} onChange={this.handleAddressCheck.bind(this)}/>
+            <input className="form-check-input" type="checkbox" id="address-check" value="address" checked={this.state.addressChecked} onChange={this.handleAddressCheck}/>
             <label className="form-check-label" htmlFor="address-check">Include Address</label>
           </div>
         </InputGroup>

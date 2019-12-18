@@ -236,7 +236,7 @@ class FindAddressTool extends Component {
               Seed
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." onChange={this.handleSeedChange.bind(this)}/>
+          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText.bind(this)}></Button>
           </InputGroup.Append>
@@ -248,7 +248,7 @@ class FindAddressTool extends Component {
               Address
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="address" aria-describedby="address" value={this.state.address} title="Address to find in the seed. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." onChange={this.handleAddressChange.bind(this)}/>
+          <FormControl id="address" aria-describedby="address" value={this.state.address} title="Address to find in the seed. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." maxLength="65" onChange={this.handleAddressChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText.bind(this)}></Button>
           </InputGroup.Append>
@@ -260,7 +260,7 @@ class FindAddressTool extends Component {
               Start Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" onChange={this.handleStartIndexChange.bind(this)}/>
+          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" maxLength="10" onChange={this.handleStartIndexChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMin}>Min</Button>
           </InputGroup.Append>
@@ -272,14 +272,16 @@ class FindAddressTool extends Component {
               End Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" onChange={this.handleEndIndexChange.bind(this)}/>
+          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" maxLength="10" onChange={this.handleEndIndexChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
         </InputGroup>
 
-        <Button variant="primary" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || this.state.searching}>Search for Address</Button>
-        <Button variant="primary" onClick={this.sample} disabled={this.state.searching}>Sample</Button>
+        <InputGroup className="mb-3">
+          <Button variant="primary" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || this.state.searching}>Search for Address</Button>
+          <Button variant="primary" onClick={this.sample} disabled={this.state.searching}>Sample</Button>
+        </InputGroup>
       </div>
     )
   }

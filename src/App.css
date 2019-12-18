@@ -29,6 +29,7 @@ html, body {
 p {
   font-size: calc(10px + 1vmin);
   line-height: calc(10px + 1.4vmin);
+  margin-bottom: 0.5rem;
 }
 
 a {

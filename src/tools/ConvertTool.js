@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
+import {toast } from 'react-toastify'
+import * as nano from 'nanocurrency'
 
 class ConvertTool extends Component {
   constructor(props) {
@@ -24,6 +26,7 @@ class ConvertTool extends Component {
     this.handlenanoChange = this.handlenanoChange.bind(this)
     this.handleMnanoChange = this.handleMnanoChange.bind(this)
     this.updateQR = this.updateQR.bind(this)
+    this.clearText = this.clearText.bind(this)
   }
 
   //Clear text from input field
@@ -34,95 +37,98 @@ class ConvertTool extends Component {
       Mnano: ''
     },
     function() {
-      this.updateQR(this.state.activeQR)
+      this.updateQR()
     })
   }
 
   // Any QR button is pressed. Handle active button.
-  changeQR(event) {
-    // already selected, deselect
-    if (this.state.activeQR === event.target.value) {
+  // Any QR button is pressed
+  handleQRChange = changeEvent => {
+    let val = changeEvent.target.value
+    // deselect button if clicking on the same button
+    if (this.state.qrActive === val) {
       this.setState({
-        activeQR: '',
-        qrHidden: false
+        qrActive: '',
+        qrHidden: true
       })
-      this.updateQR('')
     }
     else {
       this.setState({
-        activeQR: event.target.value,
-        qrHidden: false
+        qrActive: val,
+        qrHidden: false,
+      },
+      function() {
+        this.updateQR()
       })
-      this.updateQR(event.target.value)
     }
   }
 
-  updateQR(unit) {
-    switch(unit) {
+  updateQR() {
+    switch(this.state.qrActive) {
       case 'raw':
         this.setState({
           qrContent: this.state.raw,
-          rawBtnActive: true,
-          nanoBtnActive: false,
-          MnanoBtnActive: false,
         })
         break
       case 'nano':
         this.setState({
           qrContent: this.state.nano,
-          rawBtnActive: false,
-          nanoBtnActive: true,
-          MnanoBtnActive: false,
         })
         break
       case 'Mnano':
         this.setState({
           qrContent: this.state.Mnano,
-          rawBtnActive: false,
-          nanoBtnActive: false,
-          MnanoBtnActive: true,
         })
         break
       default:
         this.setState({
           qrContent: '',
           qrHidden: true,
-          rawBtnActive: false,
-          nanoBtnActive: false,
-          MnanoBtnActive: false,
         })
         break
     }
   }
 
   handleRawChange(event) {
+    let raw = event.target.value
+    if (raw !== '' && !nano.checkAmount(raw)) {
+      toast("Not a valid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    }
     this.setState({
-      raw: event.target.value,
+      raw: raw,
       nano: helpers.rawTonano(event.target.value),
       Mnano: helpers.rawToMnano(event.target.value)
     },
     function() {
-      this.updateQR(this.state.activeQR)
+      this.updateQR()
     })
   }
   handlenanoChange(event) {
+    let raw = helpers.nanoToRaw(event.target.value)
+    if (raw !== '' && !nano.checkAmount(raw)) {
+      toast("Not a valid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    }
     this.setState({
-      raw: helpers.nanoToRaw(event.target.value),
+      raw: raw,
       nano: event.target.value,
       Mnano: helpers.nanoToMnano(event.target.value),
     },
     function() {
-      this.updateQR(this.state.activeQR)
+      this.updateQR()
     })
   }
   handleMnanoChange(event) {
+    let raw = helpers.MnanoToRaw(event.target.value)
+    if (raw !== '' && !nano.checkAmount(raw)) {
+      toast("Not a valid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    }
     this.setState({
-      raw: helpers.MnanoToRaw(event.target.value),
+      raw: raw,
       nano: helpers.MnanoTonano(event.target.value),
       Mnano: event.target.value
     },
     function() {
-      this.updateQR(this.state.activeQR)
+      this.updateQR()
     })
   }
 
@@ -131,7 +137,8 @@ class ConvertTool extends Component {
       <div>
         <p>Convert between Nano units</p>
         <ul>
-          <li>NANO is used in wallets and exchanges and raw is the smallest possible unit</li>
+          <li>raw is the smallest possible unit | NANO is used in wallets and exchanges</li>
+          <li>1 nano = 10^24 raw | 1 NANO = 10^30 raw</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
@@ -140,11 +147,11 @@ class ConvertTool extends Component {
               raw
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="raw" aria-describedby="raw" value={this.state.raw} title="Smallest possible unit" onChange={this.handleRawChange.bind(this)}/>
+          <FormControl id="raw" aria-describedby="raw" value={this.state.raw} title="Smallest possible unit" maxLength="48" onChange={this.handleRawChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='raw' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.raw} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={ this.state.rawBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='raw' onClick={this.changeQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='raw' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.raw} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'raw' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='raw' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -154,11 +161,11 @@ class ConvertTool extends Component {
               nano
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="nano" aria-describedby="nano" value={this.state.nano} title="Original main unit" onChange={this.handlenanoChange.bind(this)}/>
+          <FormControl id="nano" aria-describedby="nano" value={this.state.nano} title="Original main unit" maxLength="26" onChange={this.handlenanoChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='nano' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.nano} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={ this.state.nanoBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='nano' onClick={this.changeQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='nano' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.nano} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'nano' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='nano' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -168,11 +175,11 @@ class ConvertTool extends Component {
               NANO
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.Mnano} title="Unit for wallets/exchanges" onChange={this.handleMnanoChange.bind(this)}/>
+          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.Mnano} title="Unit for wallets/exchanges" maxLength="32"  onChange={this.handleMnanoChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='Mnano' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.Mnano} onClick={helpers.copyText.bind(this)}></Button>
-            <Button variant="outline-secondary" className={ this.state.MnanoBtnActive ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='Mnano' onClick={this.changeQR.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='Mnano' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.Mnano} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'Mnano' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='Mnano' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
 

@@ -170,23 +170,23 @@ class PaymentTool extends Component {
                 Address
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="address" aria-describedby="address" value={this.state.address} title="Payment address. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." onChange={this.handleAddressChange.bind(this)}/>
+            <FormControl id="address" aria-describedby="address" value={this.state.address} title="Payment address. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." maxLength="65" onChange={this.handleAddressChange}/>
             <InputGroup.Append>
-              <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText.bind(this)}></Button>
-              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText.bind(this)}></Button>
+              <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText}></Button>
             </InputGroup.Append>
           </InputGroup>
 
-          <InputGroup size="sm" className="mb-3 index-input">
+          <InputGroup size="sm" className="mb-3">
             <InputGroup.Prepend>
               <InputGroup.Text id="amount">
                 NANO
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title="Payment amount in NANO" onChange={this.handleAmountChange.bind(this)}/>
+            <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title="Payment amount in NANO" maxLength="32" onChange={this.handleAmountChange}/>
             <InputGroup.Append>
-              <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText.bind(this)}></Button>
-              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText.bind(this)}></Button>
+              <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
             </InputGroup.Append>
           </InputGroup>
 

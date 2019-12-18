@@ -7,7 +7,7 @@ import bigInt from 'big-integer'
 //Constants
 export const constants = {
   INDEX_MAX: 4294967295, //seed index
-  KEYS_MAX: 100000, //max keys to export
+  KEYS_MAX: 10000, //max keys to export
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
 }
 
