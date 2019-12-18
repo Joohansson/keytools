@@ -6,8 +6,8 @@ import bigInt from 'big-integer'
 
 //Constants
 export const constants = {
-  INDEX_MAX: 4294967295,
-  KEYS_MAX: 100000,
+  INDEX_MAX: 4294967295, //seed index
+  KEYS_MAX: 100000, //max keys to export
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
 }
 
@@ -16,6 +16,13 @@ export function bigSubtract(input,value) {
   let insert = bigInt(input)
   let val = bigInt(value)
   return insert.subtract(val).toString()
+}
+
+// Add two big integers
+export function bigAdd(input,value) {
+  let insert = bigInt(input)
+  let val = bigInt(value)
+  return insert.add(val).toString()
 }
 
 // Checks if a big integer is negative
@@ -142,7 +149,7 @@ export function getToast(id) {
       minHeight: '54px'
     }),
     bodyClassName: css({
-      fontSize: 'calc(10px + 1vmin)',
+      fontSize: 'calc(10px + 0.8vmin)',
       color: '#EEE',
     }),
     progressClassName: css({

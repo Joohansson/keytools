@@ -120,16 +120,73 @@ class SigningTool extends Component {
       'Amount raw',
     ]
 
-    this.sampleSend = {
-      ADDRESS: 'nano_1xmastiputrdrhnf35jdh4yj1q339tyuk86w3k6oy5knede8zfowpa1rgjpn',
-      LINK: 'nano_1xmastreedxwfhpktqxppwgwwhdx1p6hiskpw7jt8g5y19khyy38axg4tohm',
-      PREV: 'B320F9AD2C3341E0FA6EFAF093C2D618036D10DB800F14830A928A44B8DD265C',
-      REP: 'nano_3rw4un6ys57hrb39sy1qx8qy5wukst1iiponztrz9qiz6qqa55kxzx4491or',
-      BALANCE: '5080000000000000000000000000000',
-      AMOUNT: '5.08',
-      PRIV: '4F30562EB814E3576C5ADA81F6C64E9E858C175D6099ADAB01AA75BBC176F45C',
-      WORK: '837d0a3484b674a0',
-    }
+    this.sampleText = [
+      {
+        // SEND
+        ADDRESS: 'nano_1xmastiputrdrhnf35jdh4yj1q339tyuk86w3k6oy5knede8zfowpa1rgjpn',
+        LINK: 'nano_1xmastreedxwfhpktqxppwgwwhdx1p6hiskpw7jt8g5y19khyy38axg4tohm',
+        PREV: '4E5004CA14899B8F9AABA7A76D010F73E6BAE54948912588B8C4FE0A3B558CA5',
+        REP: 'nano_3rw4un6ys57hrb39sy1qx8qy5wukst1iiponztrz9qiz6qqa55kxzx4491or',
+        BALANCE: '100000000000000000000000000',
+        AMOUNT: '0.0001',
+        PRIV: '4F30562EB814E3576C5ADA81F6C64E9E858C175D6099ADAB01AA75BBC176F45C',
+        WORK: 'a61abfd34321d0aa',
+        BLOCKHASH: '',
+        SIGNWORKHASH: '',
+      },
+      // RECEIVE
+      {
+        ADDRESS: 'nano_1xmastiputrdrhnf35jdh4yj1q339tyuk86w3k6oy5knede8zfowpa1rgjpn',
+        LINK: 'FB0D886948EF4BBC410C0C64C16291E31AB360BEB21B338988A6C37D89C24362',
+        PREV: 'B320F9AD2C3341E0FA6EFAF093C2D618036D10DB800F14830A928A44B8DD265C',
+        REP: 'nano_3rw4un6ys57hrb39sy1qx8qy5wukst1iiponztrz9qiz6qqa55kxzx4491or',
+        BALANCE: '0',
+        AMOUNT: '0.0001',
+        PRIV: '4F30562EB814E3576C5ADA81F6C64E9E858C175D6099ADAB01AA75BBC176F45C',
+        WORK: '837d0a3484b674a0',
+        BLOCKHASH: '',
+        SIGNWORKHASH: '',
+      },
+      // OPEN
+      {
+        ADDRESS: 'nano_1xmastiputrdrhnf35jdh4yj1q339tyuk86w3k6oy5knede8zfowpa1rgjpn',
+        LINK: '2576EB824D38955AE7BBCA02354116AF9378D1BBBD46AC7774C798669732E1CC',
+        PREV: '',
+        REP: 'nano_1iuz18n4g4wfp9gf7p1s8qkygxw7wx9qfjq6a9aq68uyrdnningdcjontgar',
+        BALANCE: '0',
+        AMOUNT: '0.0001',
+        PRIV: '4F30562EB814E3576C5ADA81F6C64E9E858C175D6099ADAB01AA75BBC176F45C',
+        WORK: '756fa92d08334f3d',
+        BLOCKHASH: '',
+        SIGNWORKHASH: '',
+      },
+      {
+        // CHANGE
+        ADDRESS: 'nano_1xmastiputrdrhnf35jdh4yj1q339tyuk86w3k6oy5knede8zfowpa1rgjpn',
+        LINK: '',
+        PREV: '0FB9CBDDE171296C53E5CA8FC0FDA0430FEB9E57004FE01F85F043ABBC633BC5',
+        REP: 'nano_1iuz18n4g4wfp9gf7p1s8qkygxw7wx9qfjq6a9aq68uyrdnningdcjontgar',
+        BALANCE: '200000000000000000000000000',
+        AMOUNT: '',
+        PRIV: '4F30562EB814E3576C5ADA81F6C64E9E858C175D6099ADAB01AA75BBC176F45C',
+        WORK: '2d6631a7abf4271c',
+        BLOCKHASH: '',
+        SIGNWORKHASH: '',
+      },
+      {
+        // SIGN
+        ADDRESS: '',
+        LINK: '',
+        PREV: '',
+        REP: '',
+        BALANCE: '',
+        AMOUNT: '',
+        PRIV: '4F30562EB814E3576C5ADA81F6C64E9E858C175D6099ADAB01AA75BBC176F45C',
+        WORK: '2d6631a7abf4271c',
+        BLOCKHASH: '23D220EE6F51DCE87C72A2E91EB66E7889A9E6AA460D6315DD5DCBEA50DD1FB8',
+        SIGNWORKHASH: '0FB9CBDDE171296C53E5CA8FC0FDA0430FEB9E57004FE01F85F043ABBC633BC5',
+      },
+    ]
 
     this.state = {
       address: '',
@@ -143,6 +200,7 @@ class SigningTool extends Component {
       signature: '',
       work: '',
       output: '',
+      signWorkHash: '', //special work hash field for sign block option
       validAddress: false,
       validPrevious: false,
       validRep: false,
@@ -153,6 +211,7 @@ class SigningTool extends Component {
       validBlockHash: false,
       validSignature: false,
       validWork: false,
+      validSignWorkHash: false,
       selectedOption: '0',
       qrActive: '',
       qrContent: '',
@@ -177,6 +236,7 @@ class SigningTool extends Component {
     }
 
     this.clearText = this.clearText.bind(this)
+    this.clearAll = this.clearAll.bind(this)
     this.sample = this.sample.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.selectAmount = this.selectAmount.bind(this)
@@ -201,7 +261,6 @@ class SigningTool extends Component {
         validAddress: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -212,7 +271,6 @@ class SigningTool extends Component {
         validLink: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -223,7 +281,6 @@ class SigningTool extends Component {
         validPrevious: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -234,7 +291,6 @@ class SigningTool extends Component {
         validRep: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -245,7 +301,6 @@ class SigningTool extends Component {
         validCurrBalance: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -256,7 +311,6 @@ class SigningTool extends Component {
         validAmount: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -267,7 +321,6 @@ class SigningTool extends Component {
         validPrivKey: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -278,7 +331,6 @@ class SigningTool extends Component {
         validBlockHash: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -289,7 +341,6 @@ class SigningTool extends Component {
         validSignature: false
       },
       function() {
-        this.updateQR()
         this.hashBlock()
       })
       break
@@ -300,7 +351,16 @@ class SigningTool extends Component {
         validWork: false
       },
       function() {
-        this.updateQR()
+        this.hashBlock()
+      })
+      break
+
+      case 'signWorkHash':
+      this.setState({
+        signWorkHash: '',
+        validSignWorkHash: false
+      },
+      function() {
         this.hashBlock()
       })
       break
@@ -308,6 +368,37 @@ class SigningTool extends Component {
       default:
         break
     }
+  }
+
+  clearAll() {
+    this.setState({
+      address: '',
+      previous: '',
+      rep: '',
+      currBalance: '',
+      amount: '',
+      link: '',
+      privKey: '',
+      blockHash: '',
+      signature: '',
+      work: '',
+      output: '',
+      signWorkHash: '',
+      validAddress: false,
+      validPrevious: false,
+      validRep: false,
+      validCurrBalance: false,
+      validAmount: false,
+      validLink: false,
+      validPrivKey: false,
+      validBlockHash: false,
+      validSignature: false,
+      validWork: false,
+      validSignWorkHash: false,
+      qrActive: '',
+      qrContent: '',
+      qrHidden: true,
+    })
   }
 
   // Change active amount unit on dropdown select
@@ -339,6 +430,29 @@ class SigningTool extends Component {
       })
       return
     }
+    // check that the private key actually correspond to the address provided
+    if (this.state.validPrivKey) {
+      let privKey = this.state.privKey
+      let nanoAddress = address.replace('xrb', 'nano')
+      let pubKey = nano.derivePublicKey(privKey)
+      let derivedAddress = nano.deriveAddress(pubKey, {useNanoPrefix: true})
+      if (derivedAddress !== nanoAddress) {
+        toast("The address does not match the private key given", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+    }
+
+    // invalidate work if changing address if the work was valid before
+    // only for open block since is based on public key (address)
+    let sendType = this.state.selectedOption
+    if (sendType === '2') {
+      if (this.state.validWork) {
+        let pubKey = nano.derivePublicKey(address)
+        if (!nano.validateWork({blockHash:pubKey, work:this.state.work})) {
+          toast("The PoW is no longer valid for the given address.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        }
+      }
+    }
+
     this.setState({
       address: address,
       validAddress: true
@@ -394,13 +508,13 @@ class SigningTool extends Component {
       return
     }
     // invalidate work if changing previous hash if the work was valid before
-    if (this.state.validWork) {
-      if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
-        this.setState({
-          work: '',
-          validWork: false
-        })
-        toast("The work provided is not valid for the given previous hash.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+    // only for send, receive and change because work for open block is based on public key
+    let sendType = this.state.selectedOption
+    if (sendType === '0' || sendType === '1' || sendType === '3') {
+      if (this.state.validWork) {
+        if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
+          toast("The PoW is no longer valid for the given previous hash.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        }
       }
     }
 
@@ -501,12 +615,12 @@ class SigningTool extends Component {
     })
   }
 
-  handleBlochHashChange = changeEvent => {
+  handleBlockHashChange = changeEvent => {
     this.blockHashChange(changeEvent.target.value)
   }
 
   blockHashChange(hash) {
-    if (!nano.checkKey(hash)) {
+    if (!nano.checkHash(hash)) {
       if (hash !== '') {
         new MainPage().notifyInvalidFormat()
       }
@@ -546,11 +660,58 @@ class SigningTool extends Component {
       })
       return
     }
+    // check that the private key actually correspond to the address provided. Do not do for SIGN BLOCK
+    if (this.state.validAddress && this.state.selectedOption !== '4') {
+      let address = this.state.address.replace('xrb', 'nano')
+      let pubKey = nano.derivePublicKey(hash)
+      let derivedAddress = nano.deriveAddress(pubKey, {useNanoPrefix: true})
+      if (derivedAddress !== address) {
+        toast("The private key does not match the address given", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+    }
     this.setState({
       privKey: hash,
       validPrivKey: true
     },function() {
       this.signBlock()
+    })
+  }
+
+  // only used for SIGN BLOCK
+  handleSignWorkHashChange = changeEvent => {
+    this.signWorkHashChange(changeEvent.target.value)
+  }
+
+  signWorkHashChange(hash) {
+    if (!nano.checkHash(hash)) {
+      if (hash !== '') {
+        new MainPage().notifyInvalidFormat()
+      }
+      this.setState({
+        signWorkHash: hash,
+        validSignWorkHash: false
+      },
+      function() {
+        this.hashBlock()
+      })
+      return
+    }
+    // invalidate work if changing previous hash if the work was valid before
+    // only for send, receive and change because work for open block is based on public key
+    if (this.state.selectedOption === '4') {
+      if (this.state.validWork) {
+        if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
+          toast("The PoW is no longer valid for the given input hash.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        }
+      }
+    }
+
+    this.setState({
+      signWorkHash: hash,
+      validSignWorkHash: true
+    },
+    function() {
+      this.hashBlock()
     })
   }
 
@@ -561,15 +722,33 @@ class SigningTool extends Component {
   workChange(hash) {
     var failed = false
     if (nano.checkWork(hash)) {
-      if (this.state.validPrevious) {
-        if (!nano.validateWork({blockHash:this.state.previous, work:hash})) {
+      let sendType = this.state.selectedOption
+      // use previous block hash for send, receive and change block
+      if (sendType === '0' || sendType === '1' || sendType === '3') {
+        if (this.state.validPrevious) {
+          if (!nano.validateWork({blockHash:this.state.previous, work:hash})) {
+            failed = true
+            toast("The previous hash is no longer valid for the given PoW.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+          }
+        }
+        else {
           failed = true
-          toast("The work provided is not valid for the given previous hash.", helpers.getToast(helpers.toastType.ERROR))
+          toast("Need a valid previous hash to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
         }
       }
-      else {
-        failed = true
-        toast("Need a valid previous hash to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      // use public key for open block
+      else if (sendType === '2') {
+        if (this.state.validAddress) {
+          let pubKey = nano.derivePublicKey(this.state.address)
+          if (!nano.validateWork({blockHash:pubKey, work:hash})) {
+            failed = true
+            toast("The address is no longer valid for the given PoW.", helpers.getToast(helpers.toastType.ERROR))
+          }
+        }
+        else {
+          failed = true
+          toast("Need a valid address to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
     }
     else {
@@ -614,6 +793,7 @@ class SigningTool extends Component {
       title_link: this.linkTitle[val],
       place_link: this.linkPlace[val],
     })
+    this.clearAll()
   }
 
   handleQRChange = changeEvent => {
@@ -715,6 +895,13 @@ class SigningTool extends Component {
       })
       break
 
+      case 'signWorkHash':
+      this.setState({
+        qrContent: this.state.signWorkHash,
+        qrLarge: false,
+      })
+      break
+
       default:
       this.setState({
         qrContent: '',
@@ -725,29 +912,80 @@ class SigningTool extends Component {
     }
   }
 
-  sample() {
+  sampleSet(i) {
     this.setState({
-      address: this.sampleSend.ADDRESS,
+      address: this.sampleText[i].ADDRESS,
       validAddress: true,
-      link:this.sampleSend.LINK,
+      link:this.sampleText[i].LINK,
       validLink: true,
-      previous:this.sampleSend.PREV,
+      previous:this.sampleText[i].PREV,
       validPrevious: true,
-      rep: this.sampleSend.REP,
+      rep: this.sampleText[i].REP,
       validRep: true,
-      currBalance:this.sampleSend.BALANCE,
+      currBalance:this.sampleText[i].BALANCE,
       validCurrBalance: true,
-      amount: this.sampleSend.AMOUNT,
+      amount: this.sampleText[i].AMOUNT,
       validAmount: true,
-      privKey:this.sampleSend.PRIV,
+      privKey:this.sampleText[i].PRIV,
       validPrivKey: true,
-      work:this.sampleSend.WORK,
+      work:this.sampleText[i].WORK,
       validWork: true,
+      blockHash:this.sampleText[i].BLOCKHASH,
+      validBlockHash: true,
+      signWorkHash:this.sampleText[i].SIGNWORKHASH,
+      validSignWorkHash: true,
     },
     function() {
+      // warn if work if not matching
+      var hash = ''
+      if (i === 0 || i === 1 || i === 3) {
+        hash = this.state.previous
+      }
+      else if (i === 2) {
+        let pubKey = nano.derivePublicKey(this.state.address)
+        hash = pubKey
+      }
+      else if (i === 4) {
+        hash = this.state.signWorkHash
+      }
+      if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
+        toast("The work value does not match", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+
       this.hashBlock()
-      this.updateQR()
     })
+  }
+
+  sample() {
+    switch (this.state.selectedOption) {
+      // SEND BLOCK
+      case '0':
+      this.sampleSet(0)
+      break
+
+      // RECEIVE BLOCK
+      case '1':
+      this.sampleSet(1)
+      break
+
+      // OPEN BLOCK
+      case '2':
+      this.sampleSet(2)
+      break
+
+      // CHANGE BLOCK
+      case '3':
+      this.sampleSet(3)
+      break
+
+      // SIGN BLOCK
+      case '4':
+      this.sampleSet(4)
+      break
+
+      default:
+      break
+    }
   }
 
   // valid to hash block
@@ -763,6 +1001,11 @@ class SigningTool extends Component {
 
   // Hash a block with block parameters to get a block hash
   hashBlock() {
+    this.updateQR()
+    // go directly to sign block if coming from SIGN BLOCK
+    if (this.state.selectedOption === '4') {
+      this.signBlock()
+    }
     if (!this.isValidHashInputs()) {
       this.setState({
         blockHash: 'Invalid inputs',
@@ -776,16 +1019,18 @@ class SigningTool extends Component {
 
     var amount = null
     var newBalance = null
+
+    // if NANO unit, convert to raw
+    if (this.state.activeAmountId === '0') {
+      amount = helpers.MnanoToRaw(this.state.amount)
+    }
+    else {
+      amount = this.state.amount
+    }
+
     switch (this.state.selectedOption) {
       // SEND BLOCK
       case '0':
-      // if NANO unit, convert to raw
-      if (this.state.activeAmountId === '0') {
-        amount = helpers.MnanoToRaw(this.state.amount)
-      }
-      else {
-        amount = this.state.amount
-      }
       newBalance = helpers.bigSubtract(this.state.currBalance,amount)
 
       // check that the new balance is not negative
@@ -795,11 +1040,50 @@ class SigningTool extends Component {
       }
       break
 
+      // RECEIVE BLOCK
+      case '1':
+      newBalance = helpers.bigAdd(this.state.currBalance,amount)
+
+      // check that the new balance is valid
+      if (!nano.checkAmount(newBalance)) {
+        toast("The new amount is invalid", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        return
+      }
+      break
+
+      // OPEN BLOCK
+      case '2':
+      newBalance = amount
+      break
+
+      // CHANGE BLOCK
+      case '3':
+      newBalance = this.state.currBalance
+      break
+
+      // SIGN BLOCK
+      case '4':
+      //do not create block hash (should not ever reach here)
+      return
+      break
+
       default:
       break
     }
 
-    let blockHash = nano.hashBlock({account:this.state.address, link:this.state.link, previous:this.state.previous, representative: this.state.rep,
+    // special hash if open block
+    var previous = this.state.previous
+    if (previous === '') {
+      previous = '0000000000000000000000000000000000000000000000000000000000000000'
+    }
+
+    // special link if change block
+    var link = this.state.link
+    if (link === '') {
+      link = '0000000000000000000000000000000000000000000000000000000000000000'
+    }
+
+    let blockHash = nano.hashBlock({account:this.state.address, link:link, previous:previous, representative: this.state.rep,
     balance: newBalance})
     if (nano.checkKey(blockHash)) {
       this.setState({
@@ -823,6 +1107,7 @@ class SigningTool extends Component {
 
   // Sign a block hash with private key to get a signature
   signBlock() {
+    this.updateQR()
     if (!this.isValidSignInputs()) {
       this.setState({
         signature: 'Invalid inputs',
@@ -857,10 +1142,31 @@ class SigningTool extends Component {
   }
 
   generateWork() {
-    if (this.state.validPrevious) {
+    var workInputHash = null
+    let sendType = this.state.selectedOption
+    // use previous block hash for send, receive and change block
+    if (sendType === '0' || sendType === '1' || sendType === '3') {
+      if (this.state.validPrevious) {
+        workInputHash = this.state.previous
+      }
+    }
+    // use public key for open block
+    else if (sendType === '2') {
+      if (this.state.validAddress) {
+        workInputHash = nano.derivePublicKey(this.state.address)
+      }
+    }
+    // sign block is using its own input
+    else if (sendType === '4') {
+      if (this.state.validSignWorkHash) {
+        workInputHash = this.state.signWorkHash
+      }
+    }
+
+    if (workInputHash) {
       try {
         toast("Started generating PoW...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
-        window.NanoWebglPow(this.state.previous,
+        window.NanoWebglPow(workInputHash,
           (work, n) => {
               toast("Successfully generated PoW!", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
               this.workChange(work)
@@ -881,13 +1187,51 @@ class SigningTool extends Component {
         return
       }
     }
-    else {
+    else if (this.state.selectedOption !== '2' && this.state.selectedOption !== '4'){
       toast("Need a valid previous block hash to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+    }
+    else if (this.state.selectedOption === '2'){
+      toast("Need a valid opening address to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+    }
+    else if (this.state.selectedOption === '4'){
+      toast("Need a valid input hash to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
     }
   }
 
   // Create the final JSON block representation
   createBlock() {
+    this.updateQR()
+    var subType = ''
+    switch (this.state.selectedOption) {
+      // SEND BLOCK
+      case '0':
+      subType = 'send'
+      break
+
+      // RECEIVE BLOCK
+      case '1':
+      subType = 'receive'
+      break
+
+      // OPEN BLOCK
+      case '2':
+      subType = 'open'
+      break
+
+      // CHANGE BLOCK
+      case '3':
+      subType = 'change'
+      break
+
+      // SIGN BLOCK
+      case '4':
+      return // do not create block, we don't have the required input
+      break
+
+      default:
+      break
+    }
+
     // All input parameters must be valid
     if (!this.state.validWork || !this.isValidHashInputs() || !this.isValidSignInputs()) {
       this.setState({
@@ -895,25 +1239,32 @@ class SigningTool extends Component {
       })
       return
     }
+
     var block
     var failed = false
+
+    // special previous if open block
+    var previous = this.state.previous
+    if (previous === '') {
+      previous = null
+    }
+
+    // special previous if change block
+    var link = this.state.link
+    if (link === '') {
+      link = null
+    }
+
     try {
-      switch (this.state.selectedOption) {
-        // SEND BLOCK
-        case '0':
-        block = nano.createBlock(this.state.privKey,{balance:this.state.adjustedBalance, representative:this.state.rep,
-        work:this.state.work, link:this.state.link, previous:this.state.previous})
+      // create the block
+      block = nano.createBlock(this.state.privKey,{balance:this.state.adjustedBalance, representative:this.state.rep,
+      work:this.state.work, link:link, previous:previous})
 
       // check that the new block is valid
-        let pubKey = nano.derivePublicKey(block.block.account)
-        if (!nano.verifyBlock({hash:block.hash, publicKey:pubKey, signature:block.block.signature})) {
-          toast("Invalid block. Contact developer.", helpers.getToast(helpers.toastType.ERROR))
-          failed = true
-        }
-        break
-
-        default:
-        break
+      let pubKey = nano.derivePublicKey(block.block.account)
+      if (!nano.verifyBlock({hash:block.hash, publicKey:pubKey, signature:block.block.signature})) {
+        toast("Invalid block. Contact developer.", helpers.getToast(helpers.toastType.ERROR))
+        failed = true
       }
     }
     catch(error) {
@@ -925,7 +1276,14 @@ class SigningTool extends Component {
     // Output json formatted block
     if (!failed) {
       // prepare a RPC process command
-      let processJson = {action: "process",  json_block: "true",  block: block.block}
+      var processJson
+      if (subType !== '') {
+        processJson = {action: "process",  json_block: "true",  subtype:subType, block: block.block}
+      }
+      // if just signing block and don't know subtype
+      else {
+        processJson = {action: "process",  json_block: "true", block: block.block}
+      }
 
       this.setState({
         output: JSON.stringify(processJson, null, 2)
@@ -944,9 +1302,10 @@ class SigningTool extends Component {
         <div className="noprint">
           <p>Create and Sign blocks off-chain to be published with an on-chain node</p>
           <ul>
-            <li>Most of the inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a></li>
-            <li>You can get the current raw balance with "action":"account_balance" or publish the final JSON block directly via <a href="https://nanoo.tools/nano-rpc-playground">RPC Playground</a></li>
-            <li>Generating work locally is optional and can be done elsewhere using the previous block hash</li>
+            <li>Most of the inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a>
+            for example, the raw balance is found under the latest block hash.</li>
+            <li>PoW can be done directly with this tool or done elsewhere and pasted</li>
+            <li>You can publish the final JSON block via <a href="https://nanoo.tools/nano-rpc-playground">RPC Playground</a></li>
             <li>Hover on text fields to show more details</li>
           </ul>
         </div>
@@ -975,6 +1334,7 @@ class SigningTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <Button variant="primary" onClick={this.sample}>Sample</Button>
+          <Button variant="primary" onClick={this.clearAll}>Clear All</Button>
         </InputGroup>
 
         <InputGroup size="sm" className={this.state.text_address === 'N/A' ? 'hidden':'mb-3'}>
@@ -1113,6 +1473,19 @@ class SigningTool extends Component {
         </InputGroup>
 
         GENERATED WORK
+        <InputGroup size="sm" className={this.state.selectedOption === '4' ? 'mb-3':'hidden'}>
+          <InputGroup.Prepend>
+            <InputGroup.Text id="signWorkHash">
+              Input Hash
+            </InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl id="signWorkHash" aria-describedby="signWorkHash" value={this.state.signWorkHash} title="64 char hex hash for generating work." placeholder="ABC123... or abc123..." onChange={this.handleSignWorkHashChange}/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='signWorkHash' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.signWorkHash} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'signWorkHash' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='signWorkHash' onClick={this.handleQRChange}></Button>
+          </InputGroup.Append>
+        </InputGroup>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="work">
@@ -1120,7 +1493,7 @@ class SigningTool extends Component {
             </InputGroup.Text>
             <Button variant="outline-secondary" className="fas fa-hammer" value='work' title="Use webGL and the GPU to calculate work now. It may take a few seconds." onClick={this.generateWork.bind(this)}></Button>
           </InputGroup.Prepend>
-          <FormControl id="work" aria-describedby="work" value={this.state.work} title="The generated proof of work or provided 16 char hex from another work generator." placeholder="ABC123... or abc123..." onChange={this.handleWorkChange}/>
+          <FormControl id="work" aria-describedby="work" value={this.state.work} disabled={this.state.selectedOption === '4'} title="The generated proof of work for given input." placeholder="ABC123... or abc123..." onChange={this.handleWorkChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='work' onClick={this.clearText.bind(this)}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText.bind(this)}></Button>
@@ -1128,7 +1501,7 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup size="sm" className="mb-3">
+        <InputGroup size="sm" className={this.state.selectedOption === '4' ? 'hidden':'mb-3'}>
           <InputGroup.Prepend>
             <InputGroup.Text id="output">
               Process Command
