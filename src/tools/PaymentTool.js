@@ -192,7 +192,7 @@ class PaymentTool extends Component {
 
           <Button variant="primary" onClick={this.sample}>Sample</Button>
           <a className="btn btn-primary" id="wallet-btn" href="https://keytools.nanos.cc" role="button">Open in Wallet</a>
-          <Button variant="primary" onClick={this.print}>Print</Button>
+          <Button variant="primary" onClick={this.print}>Print QR</Button>
         </div>
         <div className="QR-container-payment">
           <QrImageStyle className="QR-img-payment" content={this.state.qrContent} size={this.state.qrSize} />

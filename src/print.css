@@ -3,7 +3,8 @@
   .noprint * {
     display: none;
   }
-  html, body, .QR-container-paper, .QR-container-paper-inner, .QR-container-payment {
+  html, body, .QR-container-paper, .QR-container-paper-inner, .QR-container-payment,
+  .QR-container-general-1x, .QR-container-general-2x, .QR-container-general-4x {
     background-color: #FFF !important;
   }
 
