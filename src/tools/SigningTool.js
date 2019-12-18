@@ -1176,13 +1176,16 @@ class SigningTool extends Component {
         )
       }
       catch(error) {
-        if(error.message === 'webgl2_required')
+        if(error.message === 'webgl2_required') {
           toast("WebGL 2 is required to generate work.", helpers.getToast(helpers.toastType.ERROR))
-        else if(error.message === 'invalid_hash')
+        }
+        else if(error.message === 'invalid_hash') {
           toast("Block hash must be 64 character hex string", helpers.getToast(helpers.toastType.ERROR))
-        else
+        }
+        else {
           toast("An unknown error occurred while generating PoW", helpers.getToast(helpers.toastType.ERROR))
           console.log("An unknown error occurred while generating PoW" + error)
+        }
         return
       }
     }
@@ -1357,8 +1360,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="link" aria-describedby="link" value={this.state.link} title={this.state.title_link} placeholder={this.state.place_link} maxLength="65" onChange={this.handleLinkChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='link' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.link} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='link' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.link} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'link' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='link' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1371,8 +1374,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="previous" aria-describedby="previous" value={this.state.previous} title={this.state.title_previous} placeholder={this.state.text_previous === 'N/A' ? 'Not needed':'ABC123... or abc123...'} maxLength="64" onChange={this.handlePreviousChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='previous' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.previous} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='previous' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.previous} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'previous' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='previous' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1385,8 +1388,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="rep" aria-describedby="rep" value={this.state.rep} title={this.state.title_rep} placeholder={this.state.text_rep === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="64" onChange={this.handleRepChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='rep' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.rep} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='rep' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.rep} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'rep' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='rep' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1399,8 +1402,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="currBalance" aria-describedby="currBalance" value={this.state.currBalance} title={this.state.title_currBalance} placeholder={this.state.text_currBalance === 'N/A' ? 'Not needed':'Current balance in raw'} maxLength="48" onChange={this.handleCurrBalanceChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='currBalance' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.currBalance} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='currBalance' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.currBalance} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'currBalance' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='currBalance' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1420,8 +1423,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title={this.state.title_amount} placeholder={this.state.title_amount === 'N/A' ? 'Not needed':'Amount to be sent'} maxLength="48" onChange={this.handleAmountChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'amount' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='amount' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1435,8 +1438,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="blockHash" aria-describedby="blockHash" value={this.state.blockHash} disabled={this.state.selectedOption !== "4"} title="Block hash used together with the private key to create the signature." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleBlockHashChange}/>
           <InputGroup.Append>
-          <Button variant="outline-secondary" className="fas fa-times-circle" value='blockHash' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.blockHash} onClick={helpers.copyText.bind(this)}></Button>
+          <Button variant="outline-secondary" className="fas fa-times-circle" value='blockHash' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.blockHash} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'blockHash' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='blockHash' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1450,8 +1453,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="Account's private key for signing the block hash" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePrivKeyChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'privKey' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='privKey' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1464,8 +1467,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="signature" aria-describedby="signature" value={this.state.signature} disabled title="Final signature to be used when publishing the block on-chain." placeholder="Final output..."/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='signature' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.signature} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='signature' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.signature} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'signature' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='signature' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1479,8 +1482,8 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="signWorkHash" aria-describedby="signWorkHash" value={this.state.signWorkHash} title="64 char hex hash for generating work." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSignWorkHashChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='signWorkHash' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.signWorkHash} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='signWorkHash' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.signWorkHash} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'signWorkHash' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='signWorkHash' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
@@ -1489,12 +1492,12 @@ class SigningTool extends Component {
             <InputGroup.Text id="work">
               PoW
             </InputGroup.Text>
-            <Button variant="outline-secondary" className="fas fa-hammer" value='work' title="Use webGL and the GPU to calculate work now. It may take a few seconds." onClick={this.generateWork.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-hammer" value='work' title="Use webGL and the GPU to calculate work now. It may take a few seconds." onClick={this.generateWork}></Button>
           </InputGroup.Prepend>
           <FormControl id="work" aria-describedby="work" value={this.state.work} disabled={this.state.selectedOption === '4'} title="The generated proof of work for given input." placeholder="ABC123... or abc123..." maxLength="16" onChange={this.handleWorkChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='work' onClick={this.clearText.bind(this)}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='work' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'work' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='work' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>

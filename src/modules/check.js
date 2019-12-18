@@ -3,12 +3,6 @@
  * Copyright (c) 2019 Marvin ROGER <dev at marvinroger dot fr>
  * Licensed under GPL-3.0 (https://git.io/vAZsK)
  */
-import BigNumber from 'bignumber.js'
-
-const MIN_INDEX = 0
-const MAX_INDEX = Math.pow(2, 32) - 1
-const MAX_AMOUNT = new BigNumber('0xffffffffffffffffffffffffffffffff')
-
 /** @hidden */
 export function checkString(candidate: {}): boolean {
   return typeof candidate === 'string'

@@ -150,6 +150,11 @@ a:hover, .a:focus {
   width: 140px;
 }
 
+/* Custom width */
+.narrow-prepend {
+  width: 70px;
+}
+
 /* Disabled input  */
 .form-control:disabled {
   background-color: #cacaca;
