@@ -240,6 +240,7 @@ class SigningTool extends Component {
     this.sample = this.sample.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.selectAmount = this.selectAmount.bind(this)
+    this.generateWork = this.generateWork.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
