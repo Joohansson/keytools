@@ -133,6 +133,21 @@ a:hover, .a:focus {
   cursor: pointer;
 }
 
+/* Payment tool */
+.QR-container-payment {
+  width: 148px;
+  height: 148px;
+  padding: 10px;
+  background-color: #EEE;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.QR-img-payment {
+  width: 128px;
+  height: 128px;
+}
+
 /* QR reader style */
 .qr-reader-wrapper {
   text-align: center;
@@ -228,6 +243,11 @@ a:hover, .a:focus {
 .header-radio {
   font-size: calc(10px + 1vmin);
   margin-top: 4px;
+}
+
+/* PoW GENERATOR TOOL */
+.gpu-load-title {
+  margin-right: 30px;
 }
 
 /* Visible content to activate if no javascript */

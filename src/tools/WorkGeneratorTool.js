@@ -10,6 +10,8 @@ class WorkGeneratorTool extends Component {
   constructor(props) {
     super(props)
 
+    this.webGLPower = [256,512,1024,2048,4096,8192,16384]
+
     this.state = {
       workHash: '',
       work: '',
@@ -22,6 +24,7 @@ class WorkGeneratorTool extends Component {
       generating: false,
       output: '',
       savedOutput: '',
+      selectedOption: '3',
     }
 
     this.handleWorkHashChange = this.handleWorkHashChange.bind(this)
@@ -29,6 +32,13 @@ class WorkGeneratorTool extends Component {
     this.generateWork = this.generateWork.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.clearText = this.clearText.bind(this)
+    this.handleOptionChange = this.handleOptionChange.bind(this)
+  }
+
+  // Init component
+  componentDidMount() {
+    window.NanoWebglPow.width = this.webGLPower[3]
+    window.NanoWebglPow.height = 256
   }
 
   //Clear text from input field
@@ -58,7 +68,16 @@ class WorkGeneratorTool extends Component {
     }
   }
 
-  // Any QR button is pressed. Handle active button.
+  // Select GPU load
+  handleOptionChange = changeEvent => {
+    let val = changeEvent.target.value
+    this.setState({
+      selectedOption: val
+    })
+    window.NanoWebglPow.width = this.webGLPower[parseInt(val)]
+    window.NanoWebglPow.height = 256
+  }
+
   // Any QR button is pressed
   handleQRChange = changeEvent => {
     let val = changeEvent.target.value
@@ -146,9 +165,12 @@ class WorkGeneratorTool extends Component {
     if (this.state.validWorkHash) {
       try {
         toast("Started generating PoW...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+        const start = Date.now()
         window.NanoWebglPow(this.state.workHash,
           (work, n) => {
-              toast("Successfully generated PoW!", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+              const hashes = window.NanoWebglPow.width * window.NanoWebglPow.height * n
+              const calcTime = (Date.now() - start) / 1000
+              toast("Successfully generated PoW at " + Math.round(hashes / calcTime / 1000) +" khash/s", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
               this.setState({
                 generating: false
               })
@@ -216,6 +238,7 @@ class WorkGeneratorTool extends Component {
         <ul>
           <li>Output format is INPUT HASH, WORK</li>
           <li>The generator is using the GPU via webGL which is not supported in all browsers</li>
+          <li>Higher GPU Load is not always faster</li>
         </ul>
 
         <InputGroup size="sm" className='mb-3'>
@@ -243,6 +266,38 @@ class WorkGeneratorTool extends Component {
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'work' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='work' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
+        </InputGroup>
+
+        <InputGroup size="sm" className="mb-3">
+          <div className="gpu-load-title">GPU Load:</div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="send-check" value="0" checked={this.state.selectedOption === "0"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="send-check">1x</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="receive-check" value="1" checked={this.state.selectedOption === "1"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="receive-check">2x</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="open-check" value="2" checked={this.state.selectedOption === "2"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="open-check">4x</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="change-check" value="3" checked={this.state.selectedOption === "3"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="change-check">8x</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="change-check" value="4" checked={this.state.selectedOption === "4"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="change-check">16x</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="change-check" value="5" checked={this.state.selectedOption === "5"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="change-check">32x</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="change-check" value="6" checked={this.state.selectedOption === "6"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="change-check">64x</label>
+          </div>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
