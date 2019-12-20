@@ -5,12 +5,16 @@ import * as nano from 'nanocurrency'
 import bigInt from 'big-integer'
 import * as convert from './modules/conversion'
 
-//Constants
+//CONSTANTS
 export const constants = {
   INDEX_MAX: 4294967295, //seed index
   KEYS_MAX: 10000, //max keys to export
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
 }
+
+// QR css
+export const qrClassesContainer = ["QR-container", "QR-container-2x", "QR-container-4x"]
+export const qrClassesImg = ["QR-img", "QR-img-2x", "QR-img-4x"]
 
 // Subtract two big integers
 export function bigSubtract(input,value) {
