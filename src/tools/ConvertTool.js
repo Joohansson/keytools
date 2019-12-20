@@ -16,6 +16,7 @@ class ConvertTool extends Component {
       qrContent: '1',
       qrSize: 512,
       activeQR: '',
+      qrState: 0,  //qr size
       rawBtnActive: false,
       nanoBtnActive: false,
       MnanoBtnActive: false,
@@ -27,6 +28,7 @@ class ConvertTool extends Component {
     this.handleMnanoChange = this.handleMnanoChange.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.clearText = this.clearText.bind(this)
+    this.double = this.double.bind(this)
   }
 
   //Clear text from input field
@@ -38,6 +40,18 @@ class ConvertTool extends Component {
     },
     function() {
       this.updateQR()
+    })
+  }
+
+  // loop qr state 1x, 2x, 4x
+  double() {
+    var state = this.state.qrState
+    state = state + 1
+    if (state >= helpers.qrClassesContainer.length) {
+      state = 0
+    }
+    this.setState({
+      qrState: state
     })
   }
 
@@ -183,8 +197,10 @@ class ConvertTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={ this.state.qrHidden ? "hidden" : "QR-container"}>
-          <QrImageStyle className="QR-img" content={this.state.qrContent} size={this.state.qrSize} />
+        <div className={ this.state.qrHidden ? "hidden" : ""}>
+          <div className={helpers.qrClassesContainer[this.state.qrState]}>
+            <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
+          </div>
         </div>
       </div>
     )

@@ -244,7 +244,7 @@ class SigningTool extends Component {
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
-    this.webGLHeight = 512
+    this.webGLHeight = 1024
   }
 
   // Init component

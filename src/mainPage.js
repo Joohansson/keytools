@@ -138,7 +138,7 @@ class MainPage extends Component {
               height: "2px"
             })}
           />
-
+          <div className="header-wrapper">
             <DropdownButton
               className="tool-dropdown"
               title={this.state.activeTool}
@@ -148,6 +148,7 @@ class MainPage extends Component {
                 return <Dropdown.Item eventKey={index} key={index} onSelect={this.selectTool}>{tool}</Dropdown.Item>;
               }.bind(this))}
             </DropdownButton>
+          </div>
         </header>
         <div className="line noprint"></div>
         <div className="content-wrapper">

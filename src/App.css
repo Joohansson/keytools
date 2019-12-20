@@ -51,6 +51,13 @@ a:hover, .a:focus {
   margin: 0 auto;
 }
 
+
+.header-wrapper {
+  width: 800px;
+  margin: 0 auto;
+  padding: 0 0;
+}
+
 .line {
   height:1px;
   background-color: #3f3c73;
@@ -294,10 +301,25 @@ a:hover, .a:focus {
   }
 }
 
+@media screen and (max-width: 812px) {
+  .header-wrapper {
+    padding: 0 10px;
+  }
+}
+
 @media screen and (max-width: 600px) {
   h1{font-size: 1.8rem;}
   .App {
     font-size: calc(10px + 0.4vmin);
     line-height: calc(10px + 1.0vmin);
+  }
+  .header-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 0;
+  }
+
+  .dropdown-toggle.btn-primary {
+    width: 100%;
   }
 }

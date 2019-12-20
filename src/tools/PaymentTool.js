@@ -3,7 +3,6 @@ import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
-import './PaymentTool.css';
 import MainPage from '../mainPage'
 import $ from 'jquery'
 
