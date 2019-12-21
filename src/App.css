@@ -157,7 +157,7 @@ a:hover, .a:focus {
 
 /* QR reader style */
 .qr-reader-wrapper {
-  text-align: center;
+  text-align: left;
 }
 
 #qr-canvas {
@@ -255,6 +255,14 @@ a:hover, .a:focus {
 /* PoW GENERATOR TOOL */
 .gpu-load-title {
   margin-right: 30px;
+}
+
+/* AUDIO MESSENGER */
+#drop_zone {
+  border: 2px dashed #bbb;
+  padding: 5px;
+  margin-bottom: 14px;
+  color: #bbb;
 }
 
 /* Visible content to activate if no javascript */

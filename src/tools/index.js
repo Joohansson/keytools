@@ -8,6 +8,7 @@ import PaymentTool from './PaymentTool.js'
 import SigningTool from './SigningTool.js'
 import WorkGeneratorTool from './WorkGeneratorTool.js'
 import QRTool from './QRTool.js'
+import MessengerTool from './MessengerTool.js'
 
 export {ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-SigningTool, WorkGeneratorTool, QRTool}
+SigningTool, WorkGeneratorTool, QRTool, MessengerTool}
