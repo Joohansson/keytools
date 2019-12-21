@@ -139,7 +139,6 @@ class KeyGeneratorTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <Button variant="primary" onClick={this.generate} disabled={this.state.generating}>Generate</Button>
-          <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
@@ -149,6 +148,9 @@ class KeyGeneratorTool extends Component {
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
+          </InputGroup.Append>
         </InputGroup>
       </div>
     )

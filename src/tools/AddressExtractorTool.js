@@ -15,6 +15,7 @@ class AddressExtractorTool extends Component {
       endIndex: '10',
       qrContent: '',
       qrSize: 512,
+      qrState: 0,  //qr size
       activeQR: false,
       qrHidden: true,
       indexChecked: false,
@@ -37,6 +38,7 @@ class AddressExtractorTool extends Component {
     this.sample = this.sample.bind(this)
     this.generate = this.generate.bind(this)
     this.updateQR = this.updateQR.bind(this)
+    this.double = this.double.bind(this)
   }
 
   // set min value for start index
@@ -68,6 +70,18 @@ class AddressExtractorTool extends Component {
       default:
         break
     }
+  }
+
+  // loop qr state 1x, 2x, 4x
+  double() {
+    var state = this.state.qrState
+    state = state + 1
+    if (state >= helpers.qrClassesContainer.length) {
+      state = 0
+    }
+    this.setState({
+      qrState: state
+    })
   }
 
   // Any QR button is pressed. Handle active button.
@@ -323,7 +337,6 @@ class AddressExtractorTool extends Component {
         <InputGroup size="sm" className="mb-3">
           <Button variant="primary" onClick={this.generate} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) || this.state.generating}>Generate</Button>
           <Button variant="primary" onClick={this.sample} disabled={this.state.generating}>Random Seed</Button>
-          <Button variant="primary" onClick={helpers.copyOutput} disabled={this.state.generating}>Copy Output</Button>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
@@ -333,10 +346,15 @@ class AddressExtractorTool extends Component {
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
+          </InputGroup.Append>
         </InputGroup>
 
-        <div className={ this.state.qrHidden ? "hidden" : "QR-container"}>
-          <QrImageStyle className="QR-img" content={this.state.qrContent} size={this.state.qrSize} />
+        <div className={ this.state.qrHidden ? "hidden" : ""}>
+          <div className={helpers.qrClassesContainer[this.state.qrState]}>
+            <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
+          </div>
         </div>
       </div>
     )
