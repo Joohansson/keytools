@@ -217,7 +217,7 @@ class SigningTool extends Component {
       qrContent: '',
       qrHidden: true,
       qrSize: 512,
-      qrLarge: false, //double size QR for json block
+      qrState: 0,  //qr size
       text_address: this.addressText[0],
       text_previous: this.previousText[0],
       text_rep: this.repText[0],
@@ -241,6 +241,7 @@ class SigningTool extends Component {
     this.updateQR = this.updateQR.bind(this)
     this.selectAmount = this.selectAmount.bind(this)
     this.generateWork = this.generateWork.bind(this)
+    this.double = this.double.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
@@ -399,6 +400,18 @@ class SigningTool extends Component {
       qrActive: '',
       qrContent: '',
       qrHidden: true,
+    })
+  }
+
+  // loop qr state 1x, 2x, 4x
+  double() {
+    var state = this.state.qrState
+    state = state + 1
+    if (state >= helpers.qrClassesContainer.length) {
+      state = 0
+    }
+    this.setState({
+      qrState: state
     })
   }
 
@@ -818,88 +831,81 @@ class SigningTool extends Component {
   }
 
   updateQR() {
+    this.setState({
+      qrState: 0,
+    })
+
     switch(this.state.qrActive) {
       case 'address':
       this.setState({
         qrContent: this.state.address,
-        qrLarge: false,
       })
       break
 
       case 'link':
       this.setState({
         qrContent: this.state.link,
-        qrLarge: false,
       })
       break
 
       case 'previous':
       this.setState({
         qrContent: this.state.previous,
-        qrLarge: false,
       })
       break
 
       case 'rep':
       this.setState({
         qrContent: this.state.rep,
-        qrLarge: false,
       })
       break
 
       case 'currBalance':
       this.setState({
         qrContent: this.state.currBalance,
-        qrLarge: false,
       })
       break
 
       case 'amount':
       this.setState({
         qrContent: this.state.amount,
-        qrLarge: false,
       })
       break
 
       case 'privKey':
       this.setState({
         qrContent: this.state.privKey,
-        qrLarge: false,
       })
       break
 
       case 'blockHash':
       this.setState({
         qrContent: this.state.blockHash,
-        qrLarge: false,
       })
       break
 
       case 'signature':
       this.setState({
         qrContent: this.state.signature,
-        qrLarge: false,
       })
       break
 
       case 'work':
       this.setState({
         qrContent: this.state.work,
-        qrLarge: false,
       })
       break
 
       case 'output':
       this.setState({
         qrContent: this.state.output,
-        qrLarge: true,
+        qrState: 1,
       })
       break
 
       case 'signWorkHash':
       this.setState({
         qrContent: this.state.signWorkHash,
-        qrLarge: false,
       })
       break
 
@@ -907,7 +913,6 @@ class SigningTool extends Component {
       this.setState({
         qrContent: '',
         qrHidden: true,
-        qrLarge: false,
       })
         break
     }
@@ -1516,8 +1521,10 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={(this.state.qrHidden ? "hidden" : "QR-container") + ' ' + (this.state.qrLarge ? "QR-container-large" : "QR-container")}>
-          <QrImageStyle className={this.state.qrLarge ? "QR-img-large" : "QR-img"} content={this.state.qrContent} size={this.state.qrSize} />
+        <div className={ this.state.qrHidden ? "hidden" : ""}>
+          <div className={helpers.qrClassesContainer[this.state.qrState]}>
+            <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
+          </div>
         </div>
       </div>
     )

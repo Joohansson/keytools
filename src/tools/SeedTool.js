@@ -16,6 +16,7 @@ class SeedTool extends Component {
       pubKey: '',
       address: '',
       qrSize: 512,
+      qrState: 0,  //qr size
       qrContent: '',
       activeQR: '',
       qrHidden: true,
@@ -32,6 +33,7 @@ class SeedTool extends Component {
     this.generatePub = this.generatePub.bind(this)
     this.setMax = this.setMax.bind(this)
     this.clearText = this.clearText.bind(this)
+    this.double = this.double.bind(this)
   }
 
   //Clear text from input field
@@ -72,6 +74,18 @@ class SeedTool extends Component {
       default:
         break
     }
+  }
+
+  // loop qr state 1x, 2x, 4x
+  double() {
+    var state = this.state.qrState
+    state = state + 1
+    if (state >= helpers.qrClassesContainer.length) {
+      state = 0
+    }
+    this.setState({
+      qrState: state
+    })
   }
 
   // set max value for end index
@@ -410,8 +424,10 @@ class SeedTool extends Component {
           <Button variant="primary" onClick={this.generatePub} className="btn-medium">Address</Button>
         </InputGroup>
 
-        <div className={ this.state.qrHidden ? "hidden" : "QR-container"}>
-          <QrImageStyle className="QR-img" content={this.state.qrContent} size={this.state.qrSize}/>
+        <div className={ this.state.qrHidden ? "hidden" : ""}>
+          <div className={helpers.qrClassesContainer[this.state.qrState]}>
+            <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
+          </div>
         </div>
       </div>
     )

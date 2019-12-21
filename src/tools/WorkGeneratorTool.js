@@ -19,6 +19,7 @@ class WorkGeneratorTool extends Component {
       qrSize: 512,
       activeQR: false,
       qrHidden: true,
+      qrState: 0,  //qr size
       validWorkHash: false,
       validWork: false,
       generating: false,
@@ -33,6 +34,7 @@ class WorkGeneratorTool extends Component {
     this.updateQR = this.updateQR.bind(this)
     this.clearText = this.clearText.bind(this)
     this.handleOptionChange = this.handleOptionChange.bind(this)
+    this.double = this.double.bind(this)
   }
 
   // Init component
@@ -66,6 +68,18 @@ class WorkGeneratorTool extends Component {
       default:
         break
     }
+  }
+
+  // loop qr state 1x, 2x, 4x
+  double() {
+    var state = this.state.qrState
+    state = state + 1
+    if (state >= helpers.qrClassesContainer.length) {
+      state = 0
+    }
+    this.setState({
+      qrState: state
+    })
   }
 
   // Select GPU load
@@ -317,8 +331,10 @@ class WorkGeneratorTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={ this.state.qrHidden ? "hidden" : "QR-container"}>
-          <QrImageStyle className="QR-img" content={this.state.qrContent} size={this.state.qrSize} />
+        <div className={ this.state.qrHidden ? "hidden" : ""}>
+          <div className={helpers.qrClassesContainer[this.state.qrState]}>
+            <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
+          </div>
         </div>
       </div>
     )

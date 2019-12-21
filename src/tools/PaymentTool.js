@@ -17,6 +17,7 @@ class PaymentTool extends Component {
       validAmount: false,
       qrContent: '',
       qrSize: 512,
+      qrState: 0,  //qr size
     }
 
     this.handleAddressChange = this.handleAddressChange.bind(this)
@@ -24,6 +25,7 @@ class PaymentTool extends Component {
     this.clearText = this.clearText.bind(this)
     this.sample = this.sample.bind(this)
     this.updateQR = this.updateQR.bind(this)
+    this.double = this.double.bind(this)
   }
 
   //Clear text from input field
@@ -50,6 +52,18 @@ class PaymentTool extends Component {
       default:
         break
     }
+  }
+
+  // loop qr state 1x, 2x, 4x
+  double() {
+    var state = this.state.qrState
+    state = state + 1
+    if (state >= helpers.qrClassesContainer.length) {
+      state = 0
+    }
+    this.setState({
+      qrState: state
+    })
   }
 
   handleAddressChange(event) {
@@ -193,8 +207,11 @@ class PaymentTool extends Component {
           <a className="btn btn-primary" id="wallet-btn" href="https://keytools.nanos.cc" role="button">Open in Wallet</a>
           <Button variant="primary" onClick={this.print}>Print QR</Button>
         </div>
-        <div className="QR-container-payment">
-          <QrImageStyle className="QR-img-payment" content={this.state.qrContent} size={this.state.qrSize} />
+        
+        <div className={ this.state.qrHidden ? "hidden" : ""}>
+          <div className={helpers.qrClassesContainer[this.state.qrState]}>
+            <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
+          </div>
         </div>
       </div>
     )
