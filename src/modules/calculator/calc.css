@@ -1,0 +1,23 @@
+.input-button {
+  width: 35px;
+  height: 30px;
+  margin: 1px;
+  color: #000034;
+}
+
+.action-button {
+  width: 50px;
+  height: 30px;
+  margin: 1px;
+  color: #000034;
+}
+
+.dummy-button {
+  width: 35px;
+  margin: 1px;
+  display: inline-block;
+}
+
+.calc-input {
+  margin-bottom: 6px !important;
+}

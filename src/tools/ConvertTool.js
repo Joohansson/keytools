@@ -4,6 +4,7 @@ import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
 import * as nano from 'nanocurrency'
+import Calculator from '../modules/calculator/frame.jsx'
 
 class ConvertTool extends Component {
   constructor(props) {
@@ -196,6 +197,9 @@ class ConvertTool extends Component {
             <Button variant="outline-secondary" className={this.state.qrActive === 'Mnano' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='Mnano' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
         </InputGroup>
+
+        <p>Calculator</p>
+        <Calculator/>
 
         <div className={ this.state.qrHidden ? "hidden" : ""}>
           <div className={helpers.qrClassesContainer[this.state.qrState]}>

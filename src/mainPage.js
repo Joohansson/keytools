@@ -12,7 +12,7 @@ const tools = [ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, Address
 class MainPage extends Component {
   constructor(props) {
     super(props)
-    this.tools = ['1: Nano Units Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed', '4: Keypair Generator',
+    this.tools = ['1: Unit Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed', '4: Keypair Generator',
     '5: Address Extractor', '6: Paper Wallet Generator', '7: Payment Card', '8: Off-chain Signing', '9: PoW Generator',
     '10: QR Generator / Reader', '11: Offline Audio Messenger']
     this.state = {
