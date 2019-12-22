@@ -5,16 +5,16 @@ import { Dropdown, DropdownButton, InputGroup, FormControl} from 'react-bootstra
 import { css } from 'glamor';
 import * as helpers from './helpers'
 import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-  SigningTool, WorkGeneratorTool, QRTool, MessengerTool} from './tools'
+  SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool} from './tools'
 const tools = [ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-  SigningTool, WorkGeneratorTool, QRTool, MessengerTool]
+  SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool]
 
 class MainPage extends Component {
   constructor(props) {
     super(props)
     this.tools = ['1: Unit Converter', '2: Seed & Account Toolbox', '3: Find Address in Seed', '4: Keypair Generator',
     '5: Address Extractor', '6: Paper Wallet Generator', '7: Payment Card', '8: Off-chain Signing', '9: PoW Generator',
-    '10: QR Generator / Reader', '11: Offline Audio Messenger']
+    '10: Vanity Address', '11: QR Generator / Reader', '12: Offline Audio Messenger']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,
