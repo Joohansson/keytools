@@ -59,11 +59,16 @@ class Calculator extends React.Component {
       case '=': { // if it's an equal sign, use the eval module to evaluate the question
         // convert the answer (in number) to String
         var answer
-        if (eval(this.state.question) !== undefined) {
-          answer = eval(this.state.question).toString();
+        try {
+          if (eval(this.state.question) !== undefined) {
+            answer = eval(this.state.question).toString();
+          }
+          else {
+            return //no value to calculate
+          }
         }
-        else {
-          return //no value to calculate
+        catch(err) {
+          answer = ''
         }
         // update answer in our state.
         this.setState({ answer });

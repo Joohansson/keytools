@@ -29,6 +29,7 @@ class FindAddressTool extends Component {
     this.setMax = this.setMax.bind(this)
     this.search = this.search.bind(this)
     this.sample = this.sample.bind(this)
+    this.clearText = this.clearText.bind(this)
   }
 
   //Clear text from input field
@@ -238,7 +239,7 @@ class FindAddressTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
           </InputGroup.Append>
         </InputGroup>
 
@@ -250,7 +251,7 @@ class FindAddressTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="address" aria-describedby="address" value={this.state.address} title="Address to find in the seed. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." maxLength="65" onChange={this.handleAddressChange}/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText.bind(this)}></Button>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
           </InputGroup.Append>
         </InputGroup>
 
