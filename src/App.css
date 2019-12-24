@@ -43,6 +43,10 @@ a:hover, .a:focus {
   cursor: pointer;
 }
 
+#input, #output-area {
+  font-size: calc(10px + 0.3vmin);
+}
+
 .header {
   height: 80px;
   display: flex;
@@ -210,6 +214,11 @@ a:hover, .a:focus {
   width: 70px;
 }
 
+/* Multiple input group on one row */
+.multi-group {
+  margin-left: 20px;
+}
+
 /* Disabled input  */
 .form-control:disabled {
   background-color: #cacaca;
@@ -242,6 +251,10 @@ a:hover, .a:focus {
   line-height: 1.5;
 }
 
+.dropdown-prepend-narrow .dropdown-toggle {
+  width: 70px;
+}
+
 .index-checkbox {
   margin-bottom: 13px;
 }
@@ -263,6 +276,21 @@ a:hover, .a:focus {
   padding: 5px;
   margin-bottom: 14px;
   color: #bbb;
+}
+
+/* VANITY TOOLS */
+.vanity-stats {
+  font-size: calc(10px + 0.6vmin);
+  margin-bottom: 10px;
+}
+
+.vanity-stats td {
+  padding-right: 20px;
+}
+
+.vanity-number {
+  color: #4a90e2;
+  font-weight: bold;
 }
 
 /* Visible content to activate if no javascript */

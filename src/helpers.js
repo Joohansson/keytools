@@ -4,6 +4,10 @@ import $ from 'jquery'
 import * as nano from 'nanocurrency'
 import bigInt from 'big-integer'
 import * as convert from './modules/conversion'
+import namedNumber from 'hsimp-named-number'
+import namedNumberDictionary from 'hsimp-named-number/named-number-dictionary.json'
+
+namedNumber.setDictionary(namedNumberDictionary)
 
 //CONSTANTS
 export const constants = {
@@ -65,7 +69,7 @@ export function MnanoTonano(input) {
   return isNumeric(input) ? convert.convert(input, {from: nano.Unit.NANO, to: nano.Unit.nano}) : 'N/A'
 }
 
-//Check if numeric string
+// Check if numeric string
 export function isNumeric(val) {
   //numerics and last character is not a dot and number of dots is 0 or 1
   let isnum = /(?<=^| )\d+(\.\d+)?(?=$| )/.test(val)
@@ -75,6 +79,11 @@ export function isNumeric(val) {
   else {
     return false
   }
+}
+
+// Return number of logical processors
+export function getHardwareConcurrency() {
+  return window.navigator.hardwareConcurrency || 1;
 }
 
 //Copy any text to clipboard
@@ -179,4 +188,43 @@ export function addCommas(nStr) {
       x1 = x1.replace(rgx, '$1,$2');
   }
   return x1 + x2;
+}
+
+export const MS_S = 1000;
+export const MS_M = MS_S * 60;
+export const MS_H = MS_M * 60;
+export const MS_D = MS_H * 24;
+export const MS_W = MS_D * 7;
+export const MS_Y = MS_D * 365.25;
+
+export function plural(n: number, text1: string, textn: string): string {
+  return n > 1 ? textn : text1;
+}
+
+function formatDurationWord(ms: number, ref: number, word1: string, wordn: string): string {
+  const value = Math.round(ms / ref);
+  return `${value} ${plural(value, word1, wordn)}`;
+}
+
+export function formatDurationEstimation(ms: number): string {
+  if (ms >= MS_Y * 1000) {
+    const name = namedNumber(Math.round(ms / MS_Y));
+    return `${name.getName()} years`;
+  }
+  if (ms >= MS_Y) {
+    return formatDurationWord(ms, MS_Y, 'year', 'years');
+  }
+  if (ms >= MS_W) {
+    return formatDurationWord(ms, MS_W, 'week', 'weeks');
+  }
+  if (ms >= MS_D) {
+    return formatDurationWord(ms, MS_D, 'day', 'days');
+  }
+  if (ms >= MS_H) {
+    return formatDurationWord(ms, MS_H, 'hour', 'hours');
+  }
+  if (ms >= MS_M) {
+    return formatDurationWord(ms, MS_M, 'minute', 'minutes');
+  }
+  return formatDurationWord(ms, MS_S, 'second', 'seconds');
 }

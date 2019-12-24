@@ -1,38 +1,89 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
-import { InputGroup, FormControl, Button} from 'react-bootstrap'
+import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
-
+import SeedWorker from '../modules/seed.worker'
 
 class VanityTool extends Component {
   constructor(props) {
     super(props)
+    this.workers = []
+    this.addressesCount = 0
+    this.countDiff = 0
+    this.nextReport = 0
+
+    // Address init dropdown titles
+    this.inits = [
+      '1 or 3',
+      '1',
+      '3',
+    ]
 
     this.state = {
+      initChar: '', // 1 or 3
       prefix: '',
-      privKeyChecked: false,
+      suffix: '',
       validPrefix: false,
+      validSuffix: false,
       prepend: true,
       generating: false,
-      found: false,
+      outputArray: [],
       output: '',
+      prefixMultiplier: 1, // 2 if the initChar is 1 or 3
+      addressesFound: 0,
+      activeInit: this.inits[0],
+      activeInitId: '0', // 0=Begin address with 1 or 3, 1=begin with 1, 2=begin with 3
+      workersRunning: 0,
+      generateText: 'Generate',
+      stats: {
+        aps: 0, //speed addresses per second
+        estimatedDuration: 0, //estimated time to find address
+        addressesCount: 0,  //total checked addresses
+      }
     }
 
     this.handlePrefixChange = this.handlePrefixChange.bind(this)
-    this.handlePrivKeyCheck = this.handlePrivKeyCheck.bind(this)
+    this.handleSuffixChange = this.handleSuffixChange.bind(this)
     this.generate = this.generate.bind(this)
-    this.matchedPrefix = this.matchedPrefix.bind(this)
-    this.checkPrefix = this.checkPrefix.bind(this)
+    this.postMessage = this.postMessage.bind(this)
+    this.checkTerm = this.checkTerm.bind(this)
     this.reset = this.reset.bind(this)
     this.stop = this.stop.bind(this)
     this.clearText = this.clearText.bind(this)
+    this.getStats = this.getStats.bind(this)
+    this.selectInit = this.selectInit.bind(this)
+    this.workerListener = this.workerListener.bind(this)
   }
 
   componentDidMount = () => {
-    //this.worker = new Worker();
-  };
+    if (window.Worker) {
+      /*
+      this.worker = new SeedWorker()
+
+      this.worker.addEventListener("message", event => {
+        this.workerListener(event)
+      })
+      */
+      var cores = helpers.getHardwareConcurrency()
+      if (cores > 4) {
+        cores-- //save one thread for handling the site
+      }
+
+      for (let i = 0; i < cores; i += 1) {
+        let worker = new SeedWorker()
+        worker.addEventListener("message", event => {
+          this.workerListener(event)
+        })
+        this.workers.push(worker);
+      }
+    }
+    else {
+      console.log("Web workers not supported")
+      toast("Web workers not supported", helpers.getToast(helpers.toastType.ERROR))
+      return
+    }
+  }
 
   //Clear text from input field
   clearText(event) {
@@ -41,9 +92,12 @@ class VanityTool extends Component {
         this.setState({
           prefix: '',
           validPrefix: false
-        },
-        function() {
-          this.updateQR()
+        })
+        break
+      case 'suffix':
+        this.setState({
+          suffix: '',
+          validSuffix: false
         })
         break
       default:
@@ -51,8 +105,43 @@ class VanityTool extends Component {
     }
   }
 
+  // Change active address init char
+  selectInit(eventKey, event) {
+    this.setState({
+      activeInit: this.inits[eventKey],
+      activeInitId: eventKey,
+    },
+    function() {
+      this.initChange(eventKey)
+    })
+  }
+
+  // The address init character has changed
+  initChange(key) {
+
+    var char = ''
+    if (key === '1') {
+      char = '1'
+    }
+    else if (key === '2') {
+      char = '3'
+    }
+    else {
+      this.setState({
+        initChar: '',
+        prefixMultiplier: 1,
+      })
+      return
+    }
+
+    this.setState({
+      initChar: char,
+      prefixMultiplier: 2,
+    })
+  }
+
   // Check if a prefix is valid (0, 2, l, v is not allowed)
-  checkPrefix(input) {
+  checkTerm(input) {
     if (/^[a-z0-9]+$/i.test(input) && !(/[02lv]/i.test(input))) {
       return true
     }
@@ -65,13 +154,13 @@ class VanityTool extends Component {
 
   prefixChange(prefix) {
     prefix = prefix.toLowerCase()
-    if (!this.checkPrefix(prefix)) {
+    if (!this.checkTerm(prefix)) {
       this.setState({
         prefix: prefix,
         validPrefix: false
       })
       if (prefix !== '') {
-        toast("Prefix can only be a-z and 0-9 but can't contain 0,2,L or V", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        toast("Prefix must be a-z and 0-9 but can't contain 0,2,L or V", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
       }
       return
     }
@@ -81,28 +170,46 @@ class VanityTool extends Component {
     })
   }
 
-  handlePrivKeyCheck(event) {
-    this.setState({
-      privKeyChecked: event.target.checked
-    })
+  handleSuffixChange(event) {
+    this.suffixChange(event.target.value)
   }
 
-  // Check if address (without nano_) matches the prefix
-  matchedPrefix(address) {
-    if (address.substr(6).startsWith(this.state.prefix)) {
-      return true
+  suffixChange(suffix) {
+    suffix = suffix.toLowerCase()
+    if (!this.checkTerm(suffix)) {
+      this.setState({
+        suffix: suffix,
+        validSuffix: false
+      })
+      if (suffix !== '') {
+        toast("Suffix must be a-z and 0-9 but can't contain 0,2,L or V", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+      return
     }
-    return false
+    this.setState({
+      suffix: suffix,
+      validSuffix: true,
+    })
   }
 
   // Reset and star over
   reset() {
     this.setState({
       generating: false,
-      found: false,
       validPrefix: false,
       output: '',
+      addressesFound: 0,
+      stats: {
+        aps: 0,
+        estimatedDuration: 0,
+        addressesCount: 0,
+      }
     })
+    this.nextReport = 0
+    this.addressesCount = 0
+    this.countDiff = 0
+    this.workersRunning = 0
+    this.generateText = 'Generate'
   }
 
   // Stop the generation
@@ -112,111 +219,196 @@ class VanityTool extends Component {
     })
   }
 
-  fetchWebWorker = () => {
-    this.worker.postMessage("Seed");
+  getStats() {
+    const addressesCount = this.addressesCount
+    const aps = this.countDiff
+    // Number of estimated attempts is 32 to the power of number of characters
+    // prefixMultiplier tells if the address is forced to start at 1 or 3, ie. multiply by 2
+    // 1000 means milliseconds
+    const estimatedDuration = aps > 0 ? 1000 * this.state.prefixMultiplier * (Math.pow(32, (this.state.prefix.length + this.state.suffix.length)) / aps) : 0
+    this.countDiff = 0 // reset
+    this.setState({
+      stats: {
+        addressesCount: addressesCount,
+        estimatedDuration: estimatedDuration,
+        aps: aps,
+      }
+    })
+  }
 
-    this.worker.addEventListener("message", event => {
-      console.log(event.data)
-    });
-  };
+  // getting message from web worker
+  workerListener(event) {
+    let type = event.data.type
+    switch(type) {
+      case "match":
+
+      let seed = event.data.payload.wallet.seed
+      let secretKey = event.data.payload.wallet.secretKey
+      //let publicKey = event.data.payload.wallet.publicKey
+      let address = event.data.payload.wallet.address
+      var output = this.state.outputArray
+
+      // save result in array
+      output.push({address: address, seed: seed, privKey: secretKey})
+
+      this.setState({
+        outputArray: output,
+        output: JSON.stringify(output, null, 2),
+        addressesFound: parseInt(this.state.addressesFound) + 1
+      })
+      break
+
+      case "stats":
+      this.addressesCount += event.data.payload.addresses
+      this.countDiff += event.data.payload.addresses
+
+      // This will be called by multiple workers, make sure it only get reported to DOM every second
+      const now = Date.now()
+      if (now >= this.nextReport) {
+        this.nextReport = now + 1000;
+        this.getStats()
+      }
+      break
+
+      case "stopped":
+      this.setState({
+        workersRunning: this.state.workersRunning - 1
+      },
+      function() {
+        if (this.state.workersRunning === 0) {
+          toast("Successfully stopped workers", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+          this.setState({
+            generateText: 'Generate'
+          })
+        }
+      })
+      break
+
+      default:
+      break
+    }
+  }
+
+  postMessage(message) {
+    this.workers.forEach(worker => worker.postMessage(message))
+    this.setState({
+      workersRunning: this.workers.length
+    })
+  }
 
   /* Start generation of addresses */
-  async generate() {
+  generate() {
     if (this.state.generating) {
+      toast("Stopping...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+      // Stop the web workers
+      this.postMessage({
+        type: 'stop',
+      })
       this.setState({
         generating: false,
-        found: true,
+        generateText: 'Stopping...'
       })
       return
     }
 
-    if (this.state.validPrefix) {
+    if (this.state.validPrefix || this.state.validSuffix) {
+      toast("Started searching for addresses...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+      this.nextReport = 0
+      this.countDiff = 0
+
       this.setState({
         generating: true,
-        found: false,
-      },
-      function() {
-        var output = this.state.output
-        var i = 0
-        const start = Date.now()
-        this.fetchWebWorker()
-        /*
-        while (!this.state.found) {
-          i++
-          const seed = await nano.generateSeed()
-          const privKey = nano.deriveSecretKey(seed, 0)
-          const pubKey = nano.derivePublicKey(privKey)
-          const address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
-
-          if (this.matchedPrefix(address)) {
-            // save result in array
-            if (this.state.privKeyChecked) {
-              output = output + address + ',' + seed + ',' + privKey + '\r'
-            }
-
-            else {
-              output = output + address + ',' + seed + '\r'
-            }
-
-            //stop the loop
-            this.setState ({
-              found: true
-            })
-          }
-        }
-        this.setState({
-          output: output,
-        })
-        const calcTime = (Date.now() - start) / 1000
-        toast("Found vanity address at " + i/calcTime + " guesses/s", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
-        */
+        generateText: 'Stop'
       })
+
+      // Start the web workers
+      this.postMessage({
+        type: 'start',
+        payload: {
+          initChar: this.state.initChar,
+          prefix: this.state.prefix,
+          suffix: this.state.suffix,
+        },
+      });
     }
     else {
       new MainPage().notifyInvalidFormat()
     }
-
-    this.setState({
-      generating: false,
-      found: false,
-    })
   }
 
   render() {
     return (
       <div>
-        <p>Generates Nano addresses that matches the prefix you specify</p>
+        <p>Generates Nano addresses that matches the PREFIX/SUFFIX you specify</p>
         <ul>
-          <li>Output format is ADDRESS, SEED, PRIVATE KEY</li>
-          <li>Not recommended running more than 6 chars. See this <a href="https://medium.com/nanocurrency/how-to-create-a-custom-nano-account-at-maximum-speed-cd9be0045ead">guide</a> for how to obtain higher speed.</li>
+          <li>See this <a href="https://medium.com/nanocurrency/how-to-create-a-custom-nano-account-at-maximum-speed-cd9be0045ead">guide</a> for how to obtain higher speed.</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
-            <InputGroup.Text id="prefix">
-              Prefix
-            </InputGroup.Text>
+          <InputGroup.Prepend className="narrow-prepend">
+            <DropdownButton
+              variant="light"
+              className="dropdown-prepend dropdown-prepend-narrow"
+              title={this.state.activeInit}
+              key={this.state.activeInitId}
+              id={`dropdown-basic-${this.state.activeInitId}`}>
+              {this.inits.map(function(init, index){
+                return <Dropdown.Item eventKey={index} key={index} onSelect={this.selectInit}>{init}</Dropdown.Item>;
+              }.bind(this))}
+            </DropdownButton>
           </InputGroup.Prepend>
-          <FormControl id="prefix" aria-describedby="prefix" value={this.state.prefix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V" placeholder="" maxLength="20" onChange={this.handlePrefixChange}/>
+          <FormControl id="prefix" aria-describedby="prefix" value={this.state.prefix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address start" maxLength="20" onChange={this.handlePrefixChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='prefix' onClick={this.clearText}></Button>
           </InputGroup.Append>
+
+          <InputGroup.Prepend className="multi-group narrow-prepend">
+            <InputGroup.Text id="suffix">
+              Suffix
+            </InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl id="suffix" aria-describedby="suffix" value={this.state.suffix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address end" maxLength="20" onChange={this.handleSuffixChange}/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='suffix' onClick={this.clearText}></Button>
+          </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup size="sm" className="mb-3">
-          <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck}/>
-            <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
-          </div>
-        </InputGroup>
+        <table className="vanity-stats">
+          <tbody>
+            <tr>
+              <td className="vanity-number">nano_{this.state.activeInitId === '0' ? '(':''}{this.state.activeInit}{this.state.activeInitId === '0' ? ')':''}{this.state.prefix + '......' + this.state.suffix}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.generate} disabled={!this.state.validPrefix}>{this.state.generating ? 'Stop':'Generate'}</Button>
+          <Button variant="primary" onClick={this.generate} disabled={(!this.state.validPrefix && !this.state.validSuffix) || (!this.state.generating && this.state.workersRunning !== 0)}>{this.state.generateText}</Button>
           <Button variant="primary" onClick={this.reset} disabled={this.state.generating}>Reset</Button>
         </InputGroup>
 
+        <table className="vanity-stats">
+          <tbody>
+            <tr>
+              <td>Speed [checks/s]</td>
+              <td className="vanity-number">{this.state.stats.aps}</td>
+            </tr>
+            <tr>
+              <td>Addresses Checked</td>
+              <td className="vanity-number">{this.state.stats.addressesCount}</td>
+            </tr>
+            <tr>
+              <td>Estimated time per address</td>
+              <td className="vanity-number">{helpers.formatDurationEstimation(this.state.stats.estimatedDuration)}</td>
+            </tr>
+            <tr>
+              <td>Addresses Found</td>
+              <td className="vanity-number">{this.state.addressesFound}</td>
+            </tr>
+          </tbody>
+        </table>
+
         <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className="narrow-prepend">
             <InputGroup.Text id="output">
               Output
             </InputGroup.Text>
