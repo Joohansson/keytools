@@ -69,6 +69,7 @@
     "nano-webgl-pow": "^1.0.0",
     "nanocurrency": "^2.3.0",
     "nanocurrency-web": "^1.0.6",
+    "nanocurrency174": "npm:nanocurrency@^1.7.4",
     "node-sass": "^4.13.0",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
@@ -78,6 +79,7 @@
     "react-toastify": "^5.4.1",
     "sass": "^1.24.0",
     "simple-crypto-js": "^2.2.0",
+    "tweetnacl": "^1.0.1",
     "typescript": "^3.7.4"
   },
   "devDependencies": {

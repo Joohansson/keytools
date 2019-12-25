@@ -1,6 +1,8 @@
 import * as nano from 'nanocurrency'
+import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
+import nacl from 'tweetnacl/nacl';
 
-const BATCH_SIZE = 1000
+const BATCH_SIZE = 10000
 let running = false
 let currentAddressesCount = 0
 let nextReport = 0
@@ -23,7 +25,7 @@ function reportStats(addresses) {
 
 // Check if address (without nano_) matches the prefix
 function isMatch(address) {
-  if (address.substr(6-initCharInt).startsWith(prefix) && address.endsWith(suffix)) {
+  if (address.substr(5-initCharInt).startsWith(prefix) && address.endsWith(suffix)) {
     return true
   }
   return false
@@ -31,20 +33,18 @@ function isMatch(address) {
 
 function search() {
   currentAddressesCount += 1
-  const array = new Uint8Array(32)
-  // eslint-disable-next-line no-restricted-globals
-  self.crypto.getRandomValues(array)
-  const seed = array.reduce((hex, idx) => hex + (`0${idx.toString(16)}`).slice(-2), '')
-  const secretKey = nano.deriveSecretKey(seed, 0)
-  const publicKey = nano.derivePublicKey(secretKey)
-  const address = nano.deriveAddress(publicKey, {useNanoPrefix: true})
+  const rand = nacl.randomBytes(32)
+  const seed = rand.reduce((hex, idx) => hex + (`0${idx.toString(16)}`).slice(-2), '')
+  const secretKey = nano_old.deriveSecretKey(seed, 0)
+  const publicKey = nano_old.derivePublicKey(secretKey)
+  const address = nano_old.deriveAddress(publicKey)
 
   if (isMatch(address)) {
     const wallet = {
       seed,
       secretKey,
       publicKey,
-      address,
+      address: address.replace('xrb','nano'),
     }
     postMessage({
       type: 'match',
@@ -55,7 +55,7 @@ function search() {
   }
 }
 
-function searching() {
+async function searching() {
   setTimeout(() => {
     if (running) {
       for (let i = 0; i < BATCH_SIZE; i += 1) {
@@ -72,12 +72,13 @@ function searching() {
   }, 0);
 }
 
-function getMessage(event) {
+async function getMessage(event) {
   let message = event.data
   switch (message.type) {
     case 'start': {
       if (!running) {
         running = true
+        await nano_old.init()
         nextReport = Date.now() + 1000
         currentAddressesCount = 0
         initChar = message.payload.initChar

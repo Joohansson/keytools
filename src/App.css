@@ -280,7 +280,7 @@ a:hover, .a:focus {
 
 /* VANITY TOOLS */
 .vanity-stats {
-  font-size: calc(10px + 0.6vmin);
+  font-size: calc(10px + 0.4vmin);
   margin-bottom: 10px;
 }
 

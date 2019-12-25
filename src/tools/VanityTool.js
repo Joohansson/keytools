@@ -12,6 +12,10 @@ class VanityTool extends Component {
     this.addressesCount = 0
     this.countDiff = 0
     this.nextReport = 0
+    this.stopped = false
+    this.maxThreads = 0 //m ax allowed threads: logical cores minus 1
+    this.threads = 0
+    this.cpuPower = [0.25, 0.5, 0.75, 1]
 
     // Address init dropdown titles
     this.inits = [
@@ -36,6 +40,9 @@ class VanityTool extends Component {
       activeInitId: '0', // 0=Begin address with 1 or 3, 1=begin with 1, 2=begin with 3
       workersRunning: 0,
       generateText: 'Generate',
+      maxWallets: 100,
+      validMaxWallets: true,
+      selectedOption: '3',
       stats: {
         aps: 0, //speed addresses per second
         estimatedDuration: 0, //estimated time to find address
@@ -45,6 +52,7 @@ class VanityTool extends Component {
 
     this.handlePrefixChange = this.handlePrefixChange.bind(this)
     this.handleSuffixChange = this.handleSuffixChange.bind(this)
+    this.handleMaxWalletsChange = this.handleMaxWalletsChange.bind(this)
     this.generate = this.generate.bind(this)
     this.postMessage = this.postMessage.bind(this)
     this.checkTerm = this.checkTerm.bind(this)
@@ -54,6 +62,8 @@ class VanityTool extends Component {
     this.getStats = this.getStats.bind(this)
     this.selectInit = this.selectInit.bind(this)
     this.workerListener = this.workerListener.bind(this)
+    this.setMax = this.setMax.bind(this)
+    this.handleOptionChange = this.handleOptionChange.bind(this)
   }
 
   componentDidMount = () => {
@@ -65,18 +75,21 @@ class VanityTool extends Component {
         this.workerListener(event)
       })
       */
-      var cores = helpers.getHardwareConcurrency()
-      if (cores > 4) {
-        cores-- //save one thread for handling the site
+      var threads = helpers.getHardwareConcurrency()
+      if (threads > 4) {
+        threads-- //save one thread for handling the site
       }
 
-      for (let i = 0; i < cores; i += 1) {
+      for (let i = 0; i < threads; i += 1) {
         let worker = new SeedWorker()
         worker.addEventListener("message", event => {
           this.workerListener(event)
         })
         this.workers.push(worker);
       }
+
+      this.maxThreads = threads
+      this.threads = threads
     }
     else {
       console.log("Web workers not supported")
@@ -103,6 +116,23 @@ class VanityTool extends Component {
       default:
         break
     }
+  }
+
+  setMax() {
+    this.setState({
+      maxWallets: helpers.constants.KEYS_MAX
+    })
+  }
+
+  // Select CPU load
+  handleOptionChange = changeEvent => {
+    let val = changeEvent.target.value
+    this.setState({
+      selectedOption: val
+    })
+
+    // recalculate threads
+    this.threads = Math.ceil(this.cpuPower[parseInt(val)]*this.maxThreads)
   }
 
   // Change active address init char
@@ -192,13 +222,40 @@ class VanityTool extends Component {
     })
   }
 
+  handleMaxWalletsChange(event) {
+    let count = event.target.value
+    this.setState({
+      maxWallets: count
+    },
+    function() {
+      if (!helpers.isNumeric(count) || count > helpers.constants.KEYS_MAX) {
+        this.setState({
+          validMaxWallets: false
+        })
+        if (count !== '') {
+          new MainPage().notifyInvalidFormat()
+        }
+      }
+      else {
+        this.setState({
+          validMaxWallets: true
+        })
+      }
+    })
+  }
+
   // Reset and star over
   reset() {
     this.setState({
       generating: false,
       validPrefix: false,
+      validSufix: false,
       output: '',
+      outputArray: [],
       addressesFound: 0,
+      workersRunning: 0,
+      generateText: 'Generate',
+      selectedOption: '3',
       stats: {
         aps: 0,
         estimatedDuration: 0,
@@ -208,8 +265,17 @@ class VanityTool extends Component {
     this.nextReport = 0
     this.addressesCount = 0
     this.countDiff = 0
-    this.workersRunning = 0
-    this.generateText = 'Generate'
+
+    this.prefixChange(this.state.prefix)
+    this.suffixChange(this.state.suffix)
+
+    // Force stop
+    this.postMessage({
+      type: 'stop',
+    },
+    function() {
+      this.threads = this.maxThreads
+    })
   }
 
   // Stop the generation
@@ -239,25 +305,41 @@ class VanityTool extends Component {
   // getting message from web worker
   workerListener(event) {
     let type = event.data.type
+    // Mathced address
     switch(type) {
       case "match":
 
-      let seed = event.data.payload.wallet.seed
-      let secretKey = event.data.payload.wallet.secretKey
-      //let publicKey = event.data.payload.wallet.publicKey
-      let address = event.data.payload.wallet.address
-      var output = this.state.outputArray
+      // stop generating if max wallets reached
+      if (this.state.addressesFound >= this.state.maxWallets && !this.stopped) {
+        this.stopped = true
+        this.postMessage({
+          type: 'stop',
+        })
+        this.setState({
+          generating: false,
+          generateText: 'Stopping...'
+        })
+      }
+      else if (this.state.addressesFound < this.state.maxWallets) {
+        let seed = event.data.payload.wallet.seed
+        let secretKey = event.data.payload.wallet.secretKey
+        //let publicKey = event.data.payload.wallet.publicKey
+        let address = event.data.payload.wallet.address
+        var output = this.state.outputArray
 
-      // save result in array
-      output.push({address: address, seed: seed, privKey: secretKey})
+        // save result in array
+        output.push({wallet: this.state.addressesFound, seed: seed, privKey: secretKey, address: address})
 
-      this.setState({
-        outputArray: output,
-        output: JSON.stringify(output, null, 2),
-        addressesFound: parseInt(this.state.addressesFound) + 1
-      })
+        this.setState({
+          outputArray: output,
+          output: JSON.stringify(output, null, 2),
+          addressesFound: parseInt(this.state.addressesFound) + 1
+        })
+      }
+
       break
 
+      // Getting back statistics each second
       case "stats":
       this.addressesCount += event.data.payload.addresses
       this.countDiff += event.data.payload.addresses
@@ -270,6 +352,7 @@ class VanityTool extends Component {
       }
       break
 
+      // Worker has stopped
       case "stopped":
       this.setState({
         workersRunning: this.state.workersRunning - 1
@@ -290,9 +373,11 @@ class VanityTool extends Component {
   }
 
   postMessage(message) {
-    this.workers.forEach(worker => worker.postMessage(message))
+    // limit number of workers to defined thread count
+    const workerArray = this.workers.filter((worker, idx) => idx < this.threads)
+    workerArray.forEach(worker => worker.postMessage(message))
     this.setState({
-      workersRunning: this.workers.length
+      workersRunning: workerArray.length
     })
   }
 
@@ -312,7 +397,8 @@ class VanityTool extends Component {
     }
 
     if (this.state.validPrefix || this.state.validSuffix) {
-      toast("Started searching for addresses...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+      this.stopped = false
+      toast("Started search...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
       this.nextReport = 0
       this.countDiff = 0
 
@@ -339,12 +425,12 @@ class VanityTool extends Component {
   render() {
     return (
       <div>
-        <p>Generates Nano addresses that matches the PREFIX/SUFFIX you specify</p>
+        <p>Generates wallets that matches the address PREFIX/SUFFIX specified</p>
         <ul>
           <li>See this <a href="https://medium.com/nanocurrency/how-to-create-a-custom-nano-account-at-maximum-speed-cd9be0045ead">guide</a> for how to obtain higher speed.</li>
         </ul>
 
-        <InputGroup size="sm" className="mb-3">
+        <InputGroup size="sm" className="mb-2">
           <InputGroup.Prepend className="narrow-prepend">
             <DropdownButton
               variant="light"
@@ -357,7 +443,7 @@ class VanityTool extends Component {
               }.bind(this))}
             </DropdownButton>
           </InputGroup.Prepend>
-          <FormControl id="prefix" aria-describedby="prefix" value={this.state.prefix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address start" maxLength="20" onChange={this.handlePrefixChange}/>
+          <FormControl id="prefix" aria-describedby="prefix" value={this.state.prefix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address start" maxLength="30" onChange={this.handlePrefixChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='prefix' onClick={this.clearText}></Button>
           </InputGroup.Append>
@@ -367,7 +453,7 @@ class VanityTool extends Component {
               Suffix
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="suffix" aria-describedby="suffix" value={this.state.suffix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address end" maxLength="20" onChange={this.handleSuffixChange}/>
+          <FormControl id="suffix" aria-describedby="suffix" value={this.state.suffix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address end" maxLength="30" onChange={this.handleSuffixChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='suffix' onClick={this.clearText}></Button>
           </InputGroup.Append>
@@ -381,8 +467,40 @@ class VanityTool extends Component {
           </tbody>
         </table>
 
+        <InputGroup size="sm" className="mb-3 count-input">
+          <InputGroup.Prepend className="narrow-prepend">
+            <InputGroup.Text id="maxwallets">
+              Wallets
+            </InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl id="maxwallets" aria-describedby="maxwallets" value={this.state.maxWallets} title="Number of key pairs to generate." maxLength="5" onChange={this.handleMaxWalletsChange}/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
+          </InputGroup.Append>
+        </InputGroup>
+
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.generate} disabled={(!this.state.validPrefix && !this.state.validSuffix) || (!this.state.generating && this.state.workersRunning !== 0)}>{this.state.generateText}</Button>
+          <div className="gpu-load-title">CPU Load:</div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="send-check" value="0" disabled={this.state.generating} checked={this.state.selectedOption === "0"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="send-check">25%</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="receive-check" value="1" disabled={this.state.generating} checked={this.state.selectedOption === "1"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="receive-check">50%</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="open-check" value="2" disabled={this.state.generating} checked={this.state.selectedOption === "2"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="open-check">75%</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="change-check" value="3" disabled={this.state.generating} checked={this.state.selectedOption === "3"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="change-check">100%</label>
+          </div>
+        </InputGroup>
+
+        <InputGroup size="sm" className="mb-3">
+          <Button variant="primary" onClick={this.generate} disabled={(!this.state.validPrefix && !this.state.validSuffix) || (!this.state.generating && this.state.workersRunning > 0) || this.state.addressesFound >= this.state.maxWallets}>{this.state.generateText}</Button>
           <Button variant="primary" onClick={this.reset} disabled={this.state.generating}>Reset</Button>
         </InputGroup>
 
@@ -390,11 +508,11 @@ class VanityTool extends Component {
           <tbody>
             <tr>
               <td>Speed [checks/s]</td>
-              <td className="vanity-number">{this.state.stats.aps}</td>
+              <td className="vanity-number">{helpers.addCommas(String(this.state.stats.aps))}</td>
             </tr>
             <tr>
               <td>Addresses Checked</td>
-              <td className="vanity-number">{this.state.stats.addressesCount}</td>
+              <td className="vanity-number">{helpers.addCommas(String(this.state.stats.addressesCount))}</td>
             </tr>
             <tr>
               <td>Estimated time per address</td>
@@ -402,7 +520,7 @@ class VanityTool extends Component {
             </tr>
             <tr>
               <td>Addresses Found</td>
-              <td className="vanity-number">{this.state.addressesFound}</td>
+              <td className="vanity-number">{helpers.addCommas(String(this.state.addressesFound))}</td>
             </tr>
           </tbody>
         </table>
