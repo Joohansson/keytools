@@ -375,16 +375,17 @@ class VanityTool extends Component {
   postMessage(message) {
     // limit number of workers to defined thread count
     const workerArray = this.workers.filter((worker, idx) => idx < this.threads)
-    workerArray.forEach(worker => worker.postMessage(message))
     this.setState({
       workersRunning: workerArray.length
+    },
+    function() {
+      workerArray.forEach(worker => worker.postMessage(message))
     })
   }
 
   /* Start generation of addresses */
   generate() {
     if (this.state.generating) {
-      toast("Stopping...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
       // Stop the web workers
       this.postMessage({
         type: 'stop',
@@ -398,7 +399,7 @@ class VanityTool extends Component {
 
     if (this.state.validPrefix || this.state.validSuffix) {
       this.stopped = false
-      toast("Started search...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+      toast("Search started...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
       this.nextReport = 0
       this.countDiff = 0
 

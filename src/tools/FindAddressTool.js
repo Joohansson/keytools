@@ -4,10 +4,19 @@ import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
+import FindWorker from '../modules/find.worker'
 
 class FindAddressTool extends Component {
   constructor(props) {
     super(props)
+
+    this.workers = []
+    this.addressesCount = 0
+    this.countDiff = 0
+    this.nextReport = 0
+    this.maxThreads = 0 //m ax allowed threads: logical cores minus 1
+    this.threads = 0
+    this.cpuPower = [0.25, 0.5, 0.75, 1]
 
     this.state = {
       seed: '',
@@ -19,17 +28,57 @@ class FindAddressTool extends Component {
       validEndIndex: true,
       validAddress: false,
       searching: false,
+      workersRunning: 0,
+      found: false,
+      generateText: 'Search',
+      selectedOption: '3',
+      stats: {
+        aps: 0, //speed addresses per second
+        estimatedDuration: 0, //estimated time to find address
+        addressesCount: 0,  //total checked addresses
+      }
     }
 
     this.handleSeedChange = this.handleSeedChange.bind(this)
     this.handleStartIndexChange = this.handleStartIndexChange.bind(this)
     this.handleEndIndexChange = this.handleEndIndexChange.bind(this)
     this.handleAddressChange = this.handleAddressChange.bind(this)
+    this.postMessage = this.postMessage.bind(this)
+    this.getStats = this.getStats.bind(this)
     this.setMin = this.setMin.bind(this)
     this.setMax = this.setMax.bind(this)
     this.search = this.search.bind(this)
     this.sample = this.sample.bind(this)
     this.clearText = this.clearText.bind(this)
+    this.workerListener = this.workerListener.bind(this)
+    this.handleOptionChange = this.handleOptionChange.bind(this)
+  }
+
+  componentDidMount = () => {
+    if (window.Worker) {
+      var threads = helpers.getHardwareConcurrency()
+      if (threads > 4) {
+        threads-- //save one thread for handling the site
+      }
+      threads = 1
+
+      for (let i = 0; i < threads; i += 1) {
+        let worker = new FindWorker()
+        worker.addEventListener("message", event => {
+          this.workerListener(event)
+        })
+        this.workers.push(worker);
+      }
+
+      console.log(this.workers.length)
+      this.maxThreads = threads
+      this.threads = threads
+    }
+    else {
+      console.log("Web workers not supported")
+      toast("Web workers not supported", helpers.getToast(helpers.toastType.ERROR))
+      return
+    }
   }
 
   //Clear text from input field
@@ -52,6 +101,17 @@ class FindAddressTool extends Component {
     }
   }
 
+  // Select CPU load
+  handleOptionChange = changeEvent => {
+    let val = changeEvent.target.value
+    this.setState({
+      selectedOption: val
+    })
+
+    // recalculate threads
+    this.threads = Math.ceil(this.cpuPower[parseInt(val)]*this.maxThreads)
+  }
+
   sample() {
     this.setState({
       seed: 'AC0FF1422C1C31145FDA5DD6D2A629B81C3E452B856A56E26E576B4076F839D4',
@@ -62,6 +122,23 @@ class FindAddressTool extends Component {
       validStartIndex: true,
       validEndIndex: true,
       validAddress: true,
+    })
+  }
+
+  getStats() {
+    const addressesCount = this.addressesCount
+    const aps = this.countDiff
+    // Number of estimated attempts is 32 to the power of number of characters
+    // prefixMultiplier tells if the address is forced to start at 1 or 3, ie. multiply by 2
+    // 1000 means milliseconds
+    const estimatedDuration = aps > 0 ? 1000 * (parseInt(this.state.endIndex) - parseInt(this.state.startIndex)) / aps : 0
+    this.countDiff = 0 // reset
+    this.setState({
+      stats: {
+        addressesCount: addressesCount,
+        estimatedDuration: estimatedDuration,
+        aps: aps,
+      }
     })
   }
 
@@ -185,40 +262,138 @@ class FindAddressTool extends Component {
     })
   }
 
+  // getting message from web worker
+  workerListener(event) {
+    let type = event.data.type
+    // Mathced address
+    switch(type) {
+      case "match":
+
+      // stop searching if max wallets reached
+      this.postMessage({
+        type: 'stop',
+      })
+      this.setState({
+        searching: false,
+        generateText: 'Stopping...',
+      })
+      this.found = true
+
+      toast("Found the address at index: " + event.data.payload.index, helpers.getToast(helpers.toastType.SUCCESS))
+      break
+
+      // Getting back statistics each second
+      case "stats":
+      this.addressesCount += event.data.payload.addresses
+      this.countDiff += event.data.payload.addresses
+
+      // This will be called by multiple workers, make sure it only get reported to DOM every second
+      const now = Date.now()
+      if (now >= this.nextReport) {
+        this.nextReport = now + 1000;
+        this.getStats()
+      }
+      break
+
+      // Worker has stopped
+      case "stopped":
+      console.log("workers left1 " + this.state.workersRunning)
+      this.setState({
+        workersRunning: this.state.workersRunning - 1
+      },
+      function() {
+        console.log("workers left" + this.state.workersRunning)
+        if (this.state.workersRunning === 0) {
+          toast("Successfully stopped workers", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+          this.setState({
+            generateText: 'Search',
+          })
+        }
+      })
+      break
+
+      // Worker reached the end
+      case "end":
+        if (!this.found) {
+          toast("Searched full range but no match found.", helpers.getToast(helpers.toastType.ERROR))
+        }
+        this.setState({
+          generateText: 'Search',
+          searching: false,
+        })
+      break
+
+      default:
+      break
+    }
+  }
+
+  postMessage(message) {
+    // limit number of workers to defined thread count
+    const workerArray = this.workers.filter((worker, idx) => idx < this.threads)
+    this.setState({
+      workersRunning: workerArray.length
+    },
+    function() {
+      console.log("workers:" + this.state.workersRunning)
+      workerArray.forEach(worker => worker.postMessage(message))
+    })
+  }
+
   search() {
     this.setState({
       searching: true
     })
-    var i
-    var found = false
-    // replace xrb with nano for old addresses
-    let checkAddress = this.state.address.replace('xrb', 'nano')
+    if (this.state.searching) {
+      // Stop the web workers
+      this.postMessage({
+        type: 'stop',
+      })
+      this.setState({
+        searching: false,
+        generateText: 'Stopping...'
+      })
+      return
+    }
+
+    if (this.state.searching) {
+      toast("Stopping...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+      // Stop the web workers
+      this.postMessage({
+        type: 'stop',
+      })
+      this.setState({
+        searching: false,
+        generateText: 'Stopping...'
+      })
+      return
+    }
 
     if (this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) {
-      for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
-        let privKey = nano.deriveSecretKey(this.state.seed, i)
-        let pubKey = nano.derivePublicKey(privKey)
-        let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
+      this.stopped = false
+      this.found = false
+      this.nextReport = 0
+      this.countDiff = 0
+      toast("Search started...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
 
-        // check for match
-        if (address === checkAddress) {
-          found = true
-          break
-        }
-      }
+      this.setState({
+        searching: true,
+        generateText: 'Stop'
+      })
+
+      // Start the web workers
+      this.postMessage({
+        type: 'start',
+        payload: {
+          seed: this.state.seed,
+          address: this.state.address,
+          indexStart: this.state.startIndex,
+          indexEnd: this.state.endIndex,
+        },
+      });
     }
     else {
       new MainPage().notifyInvalidFormat()
-    }
-
-    this.setState({
-      searching: false
-    })
-    if (found) {
-      toast("Found the address at index: " + i, helpers.getToast(helpers.toastType.SUCCESS))
-    }
-    else {
-      toast("Finished but no address found", helpers.getToast(helpers.toastType.ERROR))
     }
   }
 
@@ -228,7 +403,6 @@ class FindAddressTool extends Component {
         <p>Find out if an address belongs to a seed</p>
         <ul>
           <li>Could be useful if a wallet does not import an address at correct index</li>
-          <li>A large search range may take a very long time and browser freezing</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
@@ -280,7 +454,7 @@ class FindAddressTool extends Component {
         </InputGroup>
 
         <InputGroup className="mb-3">
-          <Button variant="primary" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || this.state.searching}>Search for Address</Button>
+          <Button variant="primary" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || (!this.state.searching && this.state.workersRunning > 0)}>{this.state.generateText}</Button>
           <Button variant="primary" onClick={this.sample} disabled={this.state.searching}>Sample</Button>
         </InputGroup>
       </div>
