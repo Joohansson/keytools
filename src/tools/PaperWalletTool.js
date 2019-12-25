@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
+import * as nano_old from 'nanocurrency174'
 import { Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import { ReactComponent as NanoLogo } from '../img/nano.svg';
@@ -19,15 +20,16 @@ class PaperWalletTool extends Component {
     this.generate = this.generate.bind(this)
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    await nano_old.init()
     this.generate()
   }
 
   async generate() {
-    var seed = await nano.generateSeed()
+    var seed = await nano_old.generateSeed()
     seed = seed.toUpperCase()
-    let privKey = nano.deriveSecretKey(seed, 0)
-    let pubKey = nano.derivePublicKey(privKey)
+    let privKey = nano_old.deriveSecretKey(seed, 0)
+    let pubKey = nano_old.derivePublicKey(privKey)
     let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
     this.setState ({

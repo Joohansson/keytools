@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
+import * as nano_old from 'nanocurrency174'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
@@ -34,6 +35,10 @@ class SeedTool extends Component {
     this.setMax = this.setMax.bind(this)
     this.clearText = this.clearText.bind(this)
     this.double = this.double.bind(this)
+  }
+
+  async componentDidMount() {
+    await nano_old.init()
   }
 
   //Clear text from input field
@@ -181,8 +186,8 @@ class SeedTool extends Component {
       return
     }
 
-    let privKey = nano.deriveSecretKey(seed, parseInt(this.state.index))
-    let pubKey = nano.derivePublicKey(privKey)
+    let privKey = nano_old.deriveSecretKey(seed, parseInt(this.state.index))
+    let pubKey = nano_old.derivePublicKey(privKey)
     this.setState({
       seed: seed,
       privKey: privKey,
@@ -219,8 +224,8 @@ class SeedTool extends Component {
       return
     }
 
-    let privKey = nano.deriveSecretKey(this.state.seed, index)
-    let pubKey = nano.derivePublicKey(privKey)
+    let privKey = nano_old.deriveSecretKey(this.state.seed, index)
+    let pubKey = nano_old.derivePublicKey(privKey)
     this.setState({
       index: index,
       privKey: privKey,
@@ -250,7 +255,7 @@ class SeedTool extends Component {
       return
     }
 
-    let pubKey = nano.derivePublicKey(priv)
+    let pubKey = nano_old.derivePublicKey(priv)
     this.setState({
       seed: '',
       privKey: priv,
@@ -322,19 +327,19 @@ class SeedTool extends Component {
 
   // Generate a new secure seed
   async generateSeed() {
-    let key = await nano.generateSeed()
+    let key = await nano_old.generateSeed()
     this.seedChange(key.toUpperCase())
   }
 
   // Generate a new secure private key
   async generatePriv() {
-    let key = await nano.generateSeed()
+    let key = await nano_old.generateSeed()
     this.privChange(key.toUpperCase())
   }
 
   // Generate a new demo account
   async generatePub() {
-    let key = await nano.generateSeed()
+    let key = await nano_old.generateSeed()
     this.pubChange(key.toUpperCase())
   }
 
@@ -417,7 +422,7 @@ class SeedTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <p>Generate secure random key pairs or demo addresses</p>
+        <p>Generate secure random keypairs or demo addresses</p>
         <InputGroup className="mb-3">
           <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Nano Seed</Button>
           <Button variant="primary" onClick={this.generatePriv} className="btn-medium">Private Key</Button>

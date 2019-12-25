@@ -12,13 +12,17 @@ class KeyGeneratorTool extends Component {
       count: '10',
       generating: false,
       validCount: true,
-      privKeyChecked: false,
-      addressChecked: false,
-      output: ''
+      privKeyChecked: true,
+      addressChecked: true,
+      pubKeyChecked: true,
+      output: '',
     }
 
     this.setMax = this.setMax.bind(this)
     this.handleCountChange = this.handleCountChange.bind(this)
+    this.handlePrivKeyCheck = this.handlePrivKeyCheck.bind(this)
+    this.handlePubKeyCheck = this.handlePubKeyCheck.bind(this)
+    this.handleAddressCheck = this.handleAddressCheck.bind(this)
     this.generate = this.generate.bind(this)
   }
 
@@ -56,20 +60,26 @@ class KeyGeneratorTool extends Component {
     })
   }
 
+  handlePubKeyCheck(event) {
+    this.setState({
+      pubKeyChecked: event.target.checked
+    })
+  }
+
   handleAddressCheck(event) {
     this.setState({
       addressChecked: event.target.checked
     })
   }
 
-  /* Start generation of key pairs */
+  /* Start generation of keypairs */
   async generate() {
     this.setState({
       generating: true
     })
 
     var i
-    var output = ''
+    var output = []
     if (this.state.validCount) {
       for (i=0; i < parseInt(this.state.count); i++) {
         var seed = await nano.generateSeed()
@@ -79,22 +89,23 @@ class KeyGeneratorTool extends Component {
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
         // save result in array
-        if (this.state.privKeyChecked && this.state.addressChecked) {
-          output = output + seed + ',' + privKey + ',' + address + '\r'
+        var obj = {seed: seed}
+
+        if (this.state.privKeyChecked) {
+          obj.privKey = privKey
         }
-        else if (this.state.privKeyChecked && !this.state.addressChecked ) {
-          output = output + seed + ',' + privKey + '\r'
+        if (this.state.pubKeyChecked) {
+          obj.pubKey = pubKey
         }
-        else if (!this.state.privKeyChecked && this.state.addressChecked) {
-          output = output + seed + ',' + address + '\r'
+        if (this.state.addressChecked) {
+          obj.address = address
         }
-        else {
-          output = output + seed + '\r'
-        }
+
+        output.push(obj)
 
       }
       this.setState({
-        output: output
+        output: JSON.stringify(output, null, 2)
       })
     }
     else {
@@ -109,18 +120,15 @@ class KeyGeneratorTool extends Component {
   render() {
     return (
       <div>
-        <p>Mass generate secure key pairs using seed index 0</p>
-        <ul>
-          <li>Output format is SEED, PRIVKEY, ADDRESS</li>
-        </ul>
+        <p>Mass generate wallets using seed index 0</p>
 
         <InputGroup size="sm" className="mb-3 count-input">
           <InputGroup.Prepend>
-            <InputGroup.Text id="raw">
+            <InputGroup.Text id="count">
               Pair Count
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="count" aria-describedby="count" value={this.state.count} title="Number of key pairs to generate." maxLength="5" onChange={this.handleCountChange}/>
+          <FormControl id="count" aria-describedby="count" value={this.state.count} title="Number of keypairs to generate." maxLength="5" onChange={this.handleCountChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
@@ -129,11 +137,15 @@ class KeyGeneratorTool extends Component {
         <InputGroup size="sm" className="mb-3">
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck}/>
-            <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
+            <label className="form-check-label" htmlFor="privKey-check">Private Key</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="pubKey-check" value="pubKey" checked={this.state.pubKeyChecked} onChange={this.handlePubKeyCheck}/>
+            <label className="form-check-label" htmlFor="pubKey-check">Public Key</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="checkbox" id="address-check" value="address" checked={this.state.addressChecked} onChange={this.handleAddressCheck}/>
-            <label className="form-check-label" htmlFor="address-check">Include Address</label>
+            <label className="form-check-label" htmlFor="address-check">Address</label>
           </div>
         </InputGroup>
 

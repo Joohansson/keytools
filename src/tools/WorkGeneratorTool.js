@@ -35,6 +35,7 @@ class WorkGeneratorTool extends Component {
     this.clearText = this.clearText.bind(this)
     this.handleOptionChange = this.handleOptionChange.bind(this)
     this.double = this.double.bind(this)
+    this.clearOutput = this.clearOutput.bind(this)
   }
 
   // Init component
@@ -68,6 +69,12 @@ class WorkGeneratorTool extends Component {
       default:
         break
     }
+  }
+
+  clearOutput() {
+    this.setState({
+      output: ''
+    })
   }
 
   // loop qr state 1x, 2x, 4x
@@ -286,37 +293,38 @@ class WorkGeneratorTool extends Component {
           <div className="gpu-load-title">GPU Load:</div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="send-check" value="0" checked={this.state.selectedOption === "0"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="send-check">1x</label>
+            <label className="form-check-label" htmlFor="send-check">1</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="receive-check" value="1" checked={this.state.selectedOption === "1"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="receive-check">2x</label>
+            <label className="form-check-label" htmlFor="receive-check">2</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="open-check" value="2" checked={this.state.selectedOption === "2"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="open-check">4x</label>
+            <label className="form-check-label" htmlFor="open-check">4</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="change-check" value="3" checked={this.state.selectedOption === "3"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="change-check">8x</label>
+            <label className="form-check-label" htmlFor="change-check">8</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="change-check" value="4" checked={this.state.selectedOption === "4"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="change-check">16x</label>
+            <label className="form-check-label" htmlFor="change-check">16</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="change-check" value="5" checked={this.state.selectedOption === "5"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="change-check">32x</label>
+            <label className="form-check-label" htmlFor="change-check">32</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="change-check" value="6" checked={this.state.selectedOption === "6"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="change-check">64x</label>
+            <label className="form-check-label" htmlFor="change-check">64</label>
           </div>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
           <Button variant="primary" onClick={this.generateWork} disabled={!this.state.validWorkHash || this.state.generating}>Generate PoW</Button>
           <Button variant="primary" onClick={this.sample}>Sample</Button>
+          <Button variant="primary" onClick={this.clearOutput}>Clear</Button>
         </InputGroup>
 
         <InputGroup size="sm" className='mb-3'>

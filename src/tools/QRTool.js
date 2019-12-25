@@ -184,7 +184,7 @@ class QRTool extends Component {
             </div>
           </InputGroup>
 
-          <ul>
+          <ul className={this.state.selectedOption !== '0' ? "hidden":""}>
             <li>Click on QR to toggle size, if using large data</li>
           </ul>
 

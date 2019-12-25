@@ -427,7 +427,7 @@ class VanityTool extends Component {
       <div>
         <p>Generates wallets that matches the address PREFIX/SUFFIX specified</p>
         <ul>
-          <li>See this <a href="https://medium.com/nanocurrency/how-to-create-a-custom-nano-account-at-maximum-speed-cd9be0045ead">guide</a> for how to obtain higher speed.</li>
+          <li>See this <a href="https://medium.com/nanocurrency/how-to-create-a-custom-nano-account-at-maximum-speed-cd9be0045ead">guide</a> for how to obtain higher speed</li>
         </ul>
 
         <InputGroup size="sm" className="mb-2">
@@ -473,7 +473,7 @@ class VanityTool extends Component {
               Wallets
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="maxwallets" aria-describedby="maxwallets" value={this.state.maxWallets} title="Number of key pairs to generate." maxLength="5" onChange={this.handleMaxWalletsChange}/>
+          <FormControl id="maxwallets" aria-describedby="maxwallets" value={this.state.maxWallets} title="Number of keypairs to generate." maxLength="5" onChange={this.handleMaxWalletsChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>

@@ -162,7 +162,7 @@ class ConvertTool extends Component {
               raw
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="raw" aria-describedby="raw" value={this.state.raw} title="Smallest possible unit" maxLength="48" onChange={this.handleRawChange}/>
+          <FormControl id="raw" aria-describedby="raw" value={this.state.raw} title="Smallest possible unit" maxLength="39" onChange={this.handleRawChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='raw' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.raw} onClick={helpers.copyText}></Button>

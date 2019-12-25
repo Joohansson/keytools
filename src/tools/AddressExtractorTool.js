@@ -4,6 +4,7 @@ import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import QrImageStyle from '../modules/qrImageStyle'
+import {toast } from 'react-toastify'
 
 class AddressExtractorTool extends Component {
   constructor(props) {
@@ -18,8 +19,10 @@ class AddressExtractorTool extends Component {
       qrState: 0,  //qr size
       activeQR: false,
       qrHidden: true,
-      indexChecked: false,
-      privKeyChecked: false,
+      indexChecked: true,
+      privKeyChecked: true,
+      pubKeyChecked: true,
+      addressChecked: true,
       validSeed: false,
       validStartIndex: true,
       validEndIndex: true,
@@ -35,6 +38,8 @@ class AddressExtractorTool extends Component {
     this.handleEndIndexChange = this.handleEndIndexChange.bind(this)
     this.handleIndexCheck = this.handleIndexCheck.bind(this)
     this.handlePrivKeyCheck = this.handlePrivKeyCheck.bind(this)
+    this.handlePubKeyCheck = this.handlePubKeyCheck.bind(this)
+    this.handleAddressCheck = this.handleAddressCheck.bind(this)
     this.sample = this.sample.bind(this)
     this.generate = this.generate.bind(this)
     this.updateQR = this.updateQR.bind(this)
@@ -236,14 +241,36 @@ class AddressExtractorTool extends Component {
     })
   }
 
+  handlePubKeyCheck(event) {
+    this.setState({
+      pubKeyChecked: event.target.checked
+    })
+  }
+
+  handleAddressCheck(event) {
+    this.setState({
+      addressChecked: event.target.checked
+    })
+  }
+
   /* Start generation of addresses */
   async generate() {
+    // check that max number is not exceeded
+    if (parseInt(this.state.endIndex) - parseInt(this.state.startIndex) > helpers.constants.KEYS_MAX) {
+      toast("The total range can't exceed " + helpers.addCommas(String(helpers.constants.KEYS_MAX)), helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      return
+    }
+    if (parseInt(this.state.endIndex) < parseInt(this.state.startIndex)) {
+      toast("End index can't be smaller than start index", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      return
+    }
+
     this.setState({
       generating: true
     })
 
     var i
-    var output = ''
+    var output = []
     if (this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) {
       for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
         let privKey = nano.deriveSecretKey(this.state.seed, i)
@@ -251,21 +278,25 @@ class AddressExtractorTool extends Component {
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
         // save result in array
-        if (this.state.indexChecked && this.state.privKeyChecked) {
-          output = output + i + ',' + privKey + ',' + address + '\r'
+        var obj = {}
+        if (this.state.indexChecked) {
+          obj.index = i
         }
-        else if (this.state.indexChecked && !this.state.privKeyChecked) {
-          output = output + i + ',' + address + '\r'
+        if (this.state.privKeyChecked) {
+          obj.privKey = privKey
         }
-        else if (!this.state.indexChecked && this.state.privKeyChecked) {
-          output = output + privKey + ',' + address + '\r'
+        if (this.state.pubKeyChecked) {
+          obj.pubKey = pubKey
         }
-        else {
-          output = output + address + '\r'
+        if (this.state.addressChecked) {
+          obj.address = address
         }
+
+        output.push(obj)
       }
+
       this.setState({
-        output: output
+        output: JSON.stringify(output, null, 2)
       })
     }
     else {
@@ -280,10 +311,9 @@ class AddressExtractorTool extends Component {
   render() {
     return (
       <div>
-        <p>Mass extract addresses in a range of indexes using a fixed seed</p>
+        <p>Mass extract keypairs in a range of indexes using a fixed seed</p>
         <ul>
-          <li>Output format is INDEX, PRIVATE KEY, ADDRESS</li>
-          <li>A large index range may take a very long time and browser freezing</li>
+          <li>A large index range may take a very long time</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
@@ -327,11 +357,19 @@ class AddressExtractorTool extends Component {
         <InputGroup size="sm" className="mb-3">
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="checkbox" id="index-check" value="index" checked={this.state.indexChecked} onChange={this.handleIndexCheck}/>
-            <label className="form-check-label" htmlFor="index-check">Include Index</label>
+            <label className="form-check-label" htmlFor="index-check">Index</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck}/>
-            <label className="form-check-label" htmlFor="privKey-check">Include Private Key</label>
+            <label className="form-check-label" htmlFor="privKey-check">Private Key</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="pubKey-check" value="pubKey" checked={this.state.pubKeyChecked} onChange={this.handlePubKeyCheck}/>
+            <label className="form-check-label" htmlFor="pubKey-check">Public Key</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="address-check" value="address" checked={this.state.addressChecked} onChange={this.handleAddressCheck}/>
+            <label className="form-check-label" htmlFor="address-check">Address</label>
           </div>
         </InputGroup>
 
