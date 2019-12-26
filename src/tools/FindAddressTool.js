@@ -6,6 +6,10 @@ import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import FindWorker from '../modules/find.worker'
 
+Object.defineProperty(Array.prototype, 'chunk', {value: function(n) {
+  return Array(Math.ceil(this.length/n)).fill().map((_,i) => this.slice(i*n,i*n+n))
+}})
+
 class FindAddressTool extends Component {
   constructor(props) {
     super(props)
@@ -57,10 +61,6 @@ class FindAddressTool extends Component {
   componentDidMount = () => {
     if (window.Worker) {
       var threads = helpers.getHardwareConcurrency()
-      if (threads > 4) {
-        threads-- //save one thread for handling the site
-      }
-      threads = 1
 
       for (let i = 0; i < threads; i += 1) {
         let worker = new FindWorker()
@@ -70,7 +70,6 @@ class FindAddressTool extends Component {
         this.workers.push(worker);
       }
 
-      console.log(this.workers.length)
       this.maxThreads = threads
       this.threads = threads
     }
@@ -80,7 +79,6 @@ class FindAddressTool extends Component {
       return
     }
   }
-
   //Clear text from input field
   clearText(event) {
     switch(event.target.value) {
@@ -114,10 +112,10 @@ class FindAddressTool extends Component {
 
   sample() {
     this.setState({
-      seed: 'AC0FF1422C1C31145FDA5DD6D2A629B81C3E452B856A56E26E576B4076F839D4',
-      address: 'nano_157tpyfy3d8xxa8mnz7atj38xmra6xnkkhamnase14cu3dzcxi1pc9z8izi5',
+      seed: '67FEF0332A077CFA26107581C16829CF6DF2CADCB2F2F2471144CC59182A8903',
+      address: 'nano_35tijbej54ezndra9ohuzi8mwae7gb4shoq36mb4e87cxahbacg3rtcsifkj',
       startIndex: '0',
-      endIndex: '100',
+      endIndex: '100000',
       validSeed: true,
       validStartIndex: true,
       validEndIndex: true,
@@ -128,10 +126,9 @@ class FindAddressTool extends Component {
   getStats() {
     const addressesCount = this.addressesCount
     const aps = this.countDiff
-    // Number of estimated attempts is 32 to the power of number of characters
-    // prefixMultiplier tells if the address is forced to start at 1 or 3, ie. multiply by 2
+    // Number of estimated time left
     // 1000 means milliseconds
-    const estimatedDuration = aps > 0 ? 1000 * (parseInt(this.state.endIndex) - parseInt(this.state.startIndex)) / aps : 0
+    const estimatedDuration = aps > 0 ? 1000 * (parseInt(this.state.endIndex) - parseInt(this.state.startIndex) - addressesCount) / aps : 0
     this.countDiff = 0 // reset
     this.setState({
       stats: {
@@ -269,13 +266,20 @@ class FindAddressTool extends Component {
     switch(type) {
       case "match":
 
-      // stop searching if max wallets reached
-      this.postMessage({
-        type: 'stop',
-      })
       this.setState({
         searching: false,
         generateText: 'Stopping...',
+        stats: {
+          addressesCount: event.data.payload.index, //report last found
+          estimatedDuration: 0,
+          aps: this.state.stats.aps,
+        },
+      },
+      function() {
+        // stop searching
+        this.postMessage({
+          type: 'stop',
+        })
       })
       this.found = true
 
@@ -289,7 +293,7 @@ class FindAddressTool extends Component {
 
       // This will be called by multiple workers, make sure it only get reported to DOM every second
       const now = Date.now()
-      if (now >= this.nextReport) {
+      if (now >= this.nextReport && this.state.searching) { // block report when process has stopped, don't want stat to override final stats
         this.nextReport = now + 1000;
         this.getStats()
       }
@@ -297,30 +301,47 @@ class FindAddressTool extends Component {
 
       // Worker has stopped
       case "stopped":
-      console.log("workers left1 " + this.state.workersRunning)
-      this.setState({
-        workersRunning: this.state.workersRunning - 1
-      },
-      function() {
-        console.log("workers left" + this.state.workersRunning)
-        if (this.state.workersRunning === 0) {
+      var workersRunning = this.state.workersRunning
+      if (workersRunning > 0) {
+        workersRunning--
+        this.setState({
+          workersRunning: workersRunning
+        })
+      }
+      if (workersRunning === 0) {
+        // block message from apearing multiple times
+        if (!this.stopped) {
           toast("Successfully stopped workers", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
-          this.setState({
-            generateText: 'Search',
-          })
+          this.stopped = true
         }
-      })
+
+        this.setState({
+          generateText: 'Search',
+        })
+      }
       break
 
       // Worker reached the end
       case "end":
-        if (!this.found) {
-          toast("Searched full range but no match found.", helpers.getToast(helpers.toastType.ERROR))
+      this.setState({
+        workersRunning: this.state.workersRunning - 1
+      },
+      function() {
+        if (this.state.workersRunning === 0) {
+          if (!this.found) {
+            toast("Searched full range but no match found.", helpers.getToast(helpers.toastType.ERROR))
+          }
+          this.setState({
+            generateText: 'Search',
+            searching: false,
+            stats: {
+              addressesCount: (parseInt(this.state.endIndex) - parseInt(this.state.startIndex)), //report full range
+              estimatedDuration: 0,
+              aps: this.state.stats.aps,
+            }
+          })
         }
-        this.setState({
-          generateText: 'Search',
-          searching: false,
-        })
+      })
       break
 
       default:
@@ -331,12 +352,34 @@ class FindAddressTool extends Component {
   postMessage(message) {
     // limit number of workers to defined thread count
     const workerArray = this.workers.filter((worker, idx) => idx < this.threads)
+    // With low range the available chunks will be smaller than max workers
+
+    var realWorkerCount = workerArray.length
+    var rangeChunks
+    if (message.type === 'start') {
+      //rangeChunks = this.getIndexChunks(this.threads)
+      rangeChunks = helpers.getIndexChunks(parseInt(this.state.startIndex), parseInt(this.state.endIndex), this.threads)
+      realWorkerCount = Math.min(workerArray.length,rangeChunks.length)
+    }
+
     this.setState({
-      workersRunning: workerArray.length
+      workersRunning: realWorkerCount
     },
     function() {
-      console.log("workers:" + this.state.workersRunning)
-      workerArray.forEach(worker => worker.postMessage(message))
+      if (message.type === 'start') {
+        workerArray.forEach(function(worker,index) {
+          if (index < realWorkerCount) {
+            message.payload.indexStart = rangeChunks[index].indexStart
+            message.payload.indexEnd = rangeChunks[index].indexEnd
+            worker.postMessage(message)
+          }
+        })
+      }
+      else {
+        workerArray.forEach(function(worker,index) {
+          worker.postMessage(message)
+        })
+      }
     })
   }
 
@@ -378,7 +421,12 @@ class FindAddressTool extends Component {
 
       this.setState({
         searching: true,
-        generateText: 'Stop'
+        generateText: 'Stop',
+        stats: {
+          addressesCount: 0,
+          estimatedDuration: 0,
+          aps: 0,
+        }
       })
 
       // Start the web workers
@@ -387,8 +435,8 @@ class FindAddressTool extends Component {
         payload: {
           seed: this.state.seed,
           address: this.state.address,
-          indexStart: this.state.startIndex,
-          indexEnd: this.state.endIndex,
+          indexStart: '',
+          indexEnd: '',
         },
       });
     }
@@ -452,6 +500,43 @@ class FindAddressTool extends Component {
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
         </InputGroup>
+
+        <InputGroup size="sm" className="mb-3">
+          <div className="gpu-load-title">CPU Load:</div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="send-check" value="0" disabled={this.state.searching} checked={this.state.selectedOption === "0"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="send-check">25%</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="receive-check" value="1" disabled={this.state.searching} checked={this.state.selectedOption === "1"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="receive-check">50%</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="open-check" value="2" disabled={this.state.searching} checked={this.state.selectedOption === "2"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="open-check">75%</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="change-check" value="3" disabled={this.state.searching} checked={this.state.selectedOption === "3"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="change-check">100%</label>
+          </div>
+        </InputGroup>
+
+        <table className="vanity-stats">
+          <tbody>
+            <tr>
+              <td>Speed [checks/s]</td>
+              <td className="vanity-number">{helpers.addCommas(String(this.state.stats.aps))}</td>
+            </tr>
+            <tr>
+              <td>Indexes Checked</td>
+              <td className="vanity-number">{helpers.addCommas(String(this.state.stats.addressesCount))}</td>
+            </tr>
+            <tr>
+              <td>Max time left</td>
+              <td className="vanity-number">{helpers.formatDurationEstimation(this.state.stats.estimatedDuration)}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <InputGroup className="mb-3">
           <Button variant="primary" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || (!this.state.searching && this.state.workersRunning > 0)}>{this.state.generateText}</Button>

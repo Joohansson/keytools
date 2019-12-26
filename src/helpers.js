@@ -83,7 +83,14 @@ export function isNumeric(val) {
 
 // Return number of logical processors
 export function getHardwareConcurrency() {
-  return window.navigator.hardwareConcurrency || 1;
+  var threads =  window.navigator.hardwareConcurrency || 1;
+  if (threads >= 12) {
+    threads-=2 //save one thread for handling the site
+  }
+  else if (threads >= 6) {
+    threads-=1 //save two threads for handling the site
+  }
+  return threads
 }
 
 //Copy any text to clipboard
@@ -227,4 +234,25 @@ export function formatDurationEstimation(ms: number): string {
     return formatDurationWord(ms, MS_M, 'minute', 'minutes');
   }
   return formatDurationWord(ms, MS_S, 'second', 'seconds');
+}
+
+// From a range of numbers, return start and end values of the numerous chunks specified by the count
+export function getIndexChunks(start, end, count) {
+  var rangeChunks = []
+  var i = start
+  var len = Math.ceil((end-start)/count)
+  var chunkEnd = 0
+  while (i <= end-start) {
+    chunkEnd = i + len
+    if (chunkEnd > end) {
+      chunkEnd = end
+    }
+    rangeChunks.push({indexStart: i, indexEnd: chunkEnd})
+    i += len + 1
+  }
+  // special case if zero
+  if (len === 0) {
+    rangeChunks = [{indexStart: 0, indexEnd: 0}]
+  }
+  return rangeChunks
 }

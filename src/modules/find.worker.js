@@ -44,7 +44,7 @@ async function searching() {
   setTimeout(() => {
     if (running) {
       const end = indexStart + batchSize
-      for (let k = indexStart; k < end; k+=1) {
+      for (let k = indexStart; k <= end; k+=1) {
         search(k);
         const now = Date.now();
         if (now > nextReport) {
@@ -55,7 +55,6 @@ async function searching() {
         indexStart++
       }
       if (indexStart < indexEnd) {
-        console.log("loop"+indexStart)
         searching();
       }
       else {
@@ -85,7 +84,6 @@ async function getMessage(event) {
         // make sure the batch size is not larger than the actual interval
         if (indexEnd - indexStart < 10000) {
           batchSize = indexEnd - indexStart
-          console.log("batch:" + batchSize)
         }
 
         searching()
@@ -95,7 +93,6 @@ async function getMessage(event) {
 
     case 'stop': {
       running = false
-      console.log("now we stop worker")
       postMessage({
         type: 'stopped'
       })
