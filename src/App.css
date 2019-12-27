@@ -88,6 +88,8 @@ a:hover, .a:focus {
 
 .dropdown-toggle {
   font-size: calc(10px + 1.1vmin);
+  width: 400px;
+  text-align: left;
 }
 
 /* Special input width */

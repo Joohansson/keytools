@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
+import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
@@ -128,8 +129,8 @@ class AddressExtractorTool extends Component {
     }
   }
 
-  async sample() {
-    var seed = await nano.generateSeed()
+  sample() {
+    var seed = helpers.genSecureKey()
     seed = seed.toUpperCase()
     this.setState({
       seed: seed,
@@ -272,9 +273,10 @@ class AddressExtractorTool extends Component {
     var i
     var output = []
     if (this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) {
+      await nano_old.init()
       for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
-        let privKey = nano.deriveSecretKey(this.state.seed, i)
-        let pubKey = nano.derivePublicKey(privKey)
+        let privKey = nano_old.deriveSecretKey(this.state.seed, i)
+        let pubKey = nano_old.derivePublicKey(privKey)
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
         // save result in array

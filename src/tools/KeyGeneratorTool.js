@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
+import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
@@ -81,11 +82,12 @@ class KeyGeneratorTool extends Component {
     var i
     var output = []
     if (this.state.validCount) {
+      await nano_old.init()
       for (i=0; i < parseInt(this.state.count); i++) {
-        var seed = await nano.generateSeed()
+        var seed = helpers.genSecureKey()
         seed = seed.toUpperCase()
-        let privKey = nano.deriveSecretKey(seed, i)
-        let pubKey = nano.derivePublicKey(privKey)
+        let privKey = nano_old.deriveSecretKey(seed, i)
+        let pubKey = nano_old.derivePublicKey(privKey)
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
         // save result in array

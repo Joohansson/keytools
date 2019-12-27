@@ -1,6 +1,6 @@
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
 import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
-import nacl from 'tweetnacl/nacl';
+import nacl from 'tweetnacl/nacl'
 
 const BATCH_SIZE = 10000
 let running = false

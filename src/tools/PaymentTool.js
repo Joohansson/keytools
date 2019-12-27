@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
@@ -207,7 +207,7 @@ class PaymentTool extends Component {
           <a className="btn btn-primary" id="wallet-btn" href="https://keytools.nanos.cc" role="button">Open in Wallet</a>
           <Button variant="primary" onClick={this.print}>Print QR</Button>
         </div>
-        
+
         <div className={ this.state.qrHidden ? "hidden" : ""}>
           <div className={helpers.qrClassesContainer[this.state.qrState]}>
             <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
 import * as nano_old from 'nanocurrency174'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
@@ -326,20 +326,20 @@ class SeedTool extends Component {
   }
 
   // Generate a new secure seed
-  async generateSeed() {
-    let key = await nano_old.generateSeed()
+  generateSeed() {
+    let key = helpers.genSecureKey()
     this.seedChange(key.toUpperCase())
   }
 
   // Generate a new secure private key
-  async generatePriv() {
-    let key = await nano_old.generateSeed()
+  generatePriv() {
+    let key = helpers.genSecureKey()
     this.privChange(key.toUpperCase())
   }
 
   // Generate a new demo account
-  async generatePub() {
-    let key = await nano_old.generateSeed()
+  generatePub() {
+    let key = helpers.genSecureKey()
     this.pubChange(key.toUpperCase())
   }
 

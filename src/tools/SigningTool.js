@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'

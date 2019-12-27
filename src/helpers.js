@@ -1,11 +1,12 @@
 import MainPage from './mainPage'
 import { css } from 'glamor';
 import $ from 'jquery'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
 import bigInt from 'big-integer'
 import * as convert from './modules/conversion'
 import namedNumber from 'hsimp-named-number'
 import namedNumberDictionary from 'hsimp-named-number/named-number-dictionary.json'
+import nacl from 'tweetnacl/nacl';
 
 namedNumber.setDictionary(namedNumberDictionary)
 
@@ -25,6 +26,12 @@ export function bigSubtract(input,value) {
   let insert = bigInt(input)
   let val = bigInt(value)
   return insert.subtract(val).toString()
+}
+
+// Generate secure random 64 char hex
+export function genSecureKey() {
+  const rand = nacl.randomBytes(32)
+  return rand.reduce((hex, idx) => hex + (`0${idx.toString(16)}`).slice(-2), '')
 }
 
 // Add two big integers

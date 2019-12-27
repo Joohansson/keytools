@@ -3,7 +3,7 @@ import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
 import Calculator from '../modules/calculator/frame.jsx'
 
 class ConvertTool extends Component {

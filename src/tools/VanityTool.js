@@ -76,9 +76,6 @@ class VanityTool extends Component {
       })
       */
       var threads = helpers.getHardwareConcurrency()
-      if (threads > 4) {
-        threads-- //save one thread for handling the site
-      }
 
       for (let i = 0; i < threads; i += 1) {
         let worker = new SeedWorker()

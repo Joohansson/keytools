@@ -1,14 +1,10 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency'
+import * as nano from 'nanocurrency230'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import FindWorker from '../modules/find.worker'
-
-Object.defineProperty(Array.prototype, 'chunk', {value: function(n) {
-  return Array(Math.ceil(this.length/n)).fill().map((_,i) => this.slice(i*n,i*n+n))
-}})
 
 class FindAddressTool extends Component {
   constructor(props) {
@@ -270,7 +266,7 @@ class FindAddressTool extends Component {
         searching: false,
         generateText: 'Stopping...',
         stats: {
-          addressesCount: event.data.payload.index, //report last found
+          addressesCount: (event.data.payload.index - parseInt(this.state.startIndex)), //report last found
           estimatedDuration: 0,
           aps: this.state.stats.aps,
         },
