@@ -4,6 +4,8 @@ import 'react-toastify/dist/ReactToastify.css'
 import { Dropdown, DropdownButton, InputGroup, FormControl} from 'react-bootstrap'
 import { css } from 'glamor';
 import * as helpers from './helpers'
+import $ from 'jquery'
+import donation from './img/donation.png';
 import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
   SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool} from './tools'
 const tools = [ConvertTool, SeedTool, PaperWalletTool, PaymentTool, KeyGeneratorTool, AddressExtractorTool, FindAddressTool,
@@ -18,10 +20,89 @@ class MainPage extends Component {
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,
+      donationPath: donation,
     }
 
     // Bindings
     this.selectTool = this.selectTool.bind(this)
+    this.showDonateModal = this.showDonateModal.bind(this)
+  }
+
+  componentDidMount = () => {
+    // Read URL params
+    var tool = helpers.getUrlParams().tool
+
+    if (typeof tool !== 'undefined') {
+      var toolId = 0
+      switch (tool) {
+        // PaymentTool
+        case 'pay':
+        toolId = 3
+        var address = helpers.getUrlParams().address
+        var amount = helpers.getUrlParams().amount
+        if (typeof address !== 'undefined') {
+          this.setState({
+            address: address
+          })
+        }
+        if (typeof amount !== 'undefined') {
+          this.setState({
+            amount: amount
+          })
+        }
+        break
+
+        default:
+        toolId = 0
+        break
+      }
+      this.setState({
+        activeTool: this.tools[toolId],
+        activeToolId: toolId,
+      })
+    }
+
+    // Define global modal component
+    $.fn.psendmodal = function() {
+      var modal_structure = '<div class="modal_overlay"></div>'+
+                  '<div class="modal_psend">'+
+                    '<div class="modal_title">'+
+                      '<span>&nbsp;</span>'+
+                      '<a href="#" class="modal_close">&times;</a>'+
+                    '</div>'+
+                    '<div class="modal_content"></div>'+
+                  '</div>';
+
+      $('body').append(modal_structure);
+      show_modal();
+
+      function show_modal() {
+        $('.modal_overlay').stop(true, true).fadeIn();
+        $('.modal_psend').stop(true, true).fadeIn();
+      }
+
+      window.remove_modal = function() {
+        $('.modal_overlay').stop(true, true).fadeOut(500, function() { $(this).remove(); });
+        $('.modal_psend').stop(true, true).fadeOut(500, function() { $(this).remove(); });
+        return false;
+      }
+
+      $(".modal_close").click(function(e) {
+        e.preventDefault();
+        window.remove_modal();
+      });
+
+      $(".modal_overlay").click(function(e) {
+        e.preventDefault();
+        window.remove_modal();
+      });
+
+      $(document).keyup(function(e) {
+        if (e.keyCode === 27) { // Esc
+          window.remove_modal();
+        }
+      });
+    };
   }
 
   // Toast functions
@@ -43,6 +124,62 @@ class MainPage extends Component {
       activeTool: this.tools[eventKey],
       activeToolId: eventKey,
     })
+  }
+
+  /* Show donate modal */
+  showDonateModal() {
+    $(document).psendmodal();
+    var account = 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo';
+
+    var content =  '<div class="public_link_modal">'+
+              '<strong>Scan the QR, <a href="nano:nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo">open in wallet</a><br/> or click the donation address to copy</strong><br/>'+
+              '<img class="donation-qr" id="donation" src="#" alt="QR Image"/>'+
+              '<div class="form-group">'+
+                '<textarea id="shareArea" class="input-large public_link_copy form-control" rows="2" readonly>' + account + '</textarea>'+
+              '</div>'+
+              '<div class="copied">Succesfully copied to clipboard</div>'+
+              '<div class="copied_not">Content could not be copied to clipboard</div>'+
+            '</div>';
+    var title 	= 'DONATE DEVELOPER';
+    $('.modal_title span').html(title);
+    $('.modal_content').html(content);
+    document.getElementById("donation").src = this.state.donationPath;
+
+    /* Auto select text */
+    var textBox = document.getElementById("shareArea");
+    textBox.onfocus = function() {
+      textBox.select();
+
+      if (document.execCommand("copy")) {
+        /* Inform user about copy */
+        document.getElementsByClassName("copied")[0].style.display = "block";
+      }
+      else {
+        document.getElementsByClassName("copied_not")[0].style.display = "block";
+      }
+
+      // Work around Chrome's little problem
+      textBox.onmouseup = function() {
+          // Prevent further mouseup intervention
+          textBox.onmouseup = null;
+          return false;
+      };
+    };
+    return false;
+  }
+
+  /* Show donate modal */
+  showOwnerModal() {
+    $(document).psendmodal();
+    var content =  '<div class="public_link_modal">'+
+              '<strong>Who made this service?</strong><br/>'+
+              'A community manager for the Nano Foundation, moderator of <a href="https://www.reddit.com/r/nanocurrency">/r/nanocurrency</a> / <a href="https://chat.nano.org/">nano discord</a> and creator of some other services like <a href="https://nanolinks.info">Nano Links</a> and <a href="https://nanoticker.info">NanoTicker</a>.<br/>'+
+              '<br/>If you find any bugs or have feedback, please don\'t hesitate to contact me at Reddit or Discord! You find me under alias Joohansson or Json or you can join my <a href="https://discord.gg/RVCuFvc">Personal Discord Support Server</a>.';
+    var title 	= 'ABOUT OWNER';
+    $('.modal_title span').html(title);
+    $('.modal_content').html(content);
+
+    return false;
   }
 
   render() {
@@ -153,7 +290,7 @@ class MainPage extends Component {
         <div className="line noprint"></div>
         <div className="content-wrapper">
           <div className="content">
-            <ActiveView/>
+            <ActiveView {...this}/>
           </div>
         </div>
 
@@ -162,7 +299,7 @@ class MainPage extends Component {
           <InputGroup>
             <FormControl as="textarea" rows="3" placeholder="Memo for copy/paste across tools"/>
           </InputGroup>
-          <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/nanocards">Github</a> | <a href="https://nano.org">Nano Home</a> | <a href="https://nanolinks.info">Nano Guide</a> | <span className="link-span" onClick={this.showDonateModal}>Donate me a Cookie</span>
+          <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano Home</a> | <a href="https://nanolinks.info">Nano Guide</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span>
         </footer>
       </div>
     )
