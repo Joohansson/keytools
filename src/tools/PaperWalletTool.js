@@ -84,7 +84,6 @@ class PaperWalletTool extends Component {
 
     node = document.getElementsByClassName('QR-container-paper-inner')[0];
 
-    var width =  document.body.clientWidth;
     domtoimage.toPng(node, {
       width: imageWidth,
       height: imageHeight,

@@ -3,12 +3,14 @@ import * as nano from 'nanocurrency230'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
-import MainPage from '../mainPage'
 import $ from 'jquery'
+import {toast } from 'react-toastify'
 
 class PaymentTool extends Component {
   constructor(props) {
     super(props)
+
+    this.toolParam = 'pay'
 
     this.state = {
       address: '',
@@ -20,12 +22,29 @@ class PaymentTool extends Component {
       qrState: 0,  //qr size
     }
 
+    this.componentDidMount = this.componentDidMount.bind(this)
     this.handleAddressChange = this.handleAddressChange.bind(this)
     this.handleAmountChange = this.handleAmountChange.bind(this)
     this.clearText = this.clearText.bind(this)
     this.sample = this.sample.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.double = this.double.bind(this)
+    this.setParams = this.setParams.bind(this)
+  }
+
+  componentDidMount = () => {
+    // Read URL params from parent and construct new quick path
+    var address = this.props.state.address
+    var amount = this.props.state.amount
+
+    if (address) {
+      this.addressChange(address)
+    }
+    if (amount) {
+      this.amountChange(amount)
+    }
+
+    this.setParams()
   }
 
   //Clear text from input field
@@ -38,6 +57,7 @@ class PaymentTool extends Component {
         },
         function() {
           this.updateQR()
+          this.setParams()
         })
         break
       case 'amount':
@@ -47,6 +67,7 @@ class PaymentTool extends Component {
         },
         function() {
           this.updateQR()
+          this.setParams()
         })
         break
       default:
@@ -54,7 +75,12 @@ class PaymentTool extends Component {
     }
   }
 
-  // loop qr state 1x, 2x, 4x
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+this.toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount)
+  }
+
+  // Loop qr state 1x, 2x, 4x
   double() {
     var state = this.state.qrState
     state = state + 1
@@ -73,7 +99,7 @@ class PaymentTool extends Component {
   addressChange(address) {
     if (!nano.checkAddress(address)) {
       if (address !== '') {
-        new MainPage().notifyInvalidFormat()
+        toast("Invalid Nano address", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       this.setState({
         address: address,
@@ -87,6 +113,7 @@ class PaymentTool extends Component {
     },
     function() {
       this.updateQR()
+      this.setParams()
     })
   }
 
@@ -98,7 +125,7 @@ class PaymentTool extends Component {
     let raw = helpers.MnanoToRaw(amount)
     // allow no amount
     if (!nano.checkAmount(raw) && amount !== '') {
-      new MainPage().notifyInvalidFormat()
+      toast("Invalid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
       this.setState({
         amount: amount,
         validAmount: false
@@ -110,7 +137,10 @@ class PaymentTool extends Component {
       validAmount: true,
     },
     function() {
-      this.updateQR()
+      if (this.state.validAddress) {
+        this.updateQR()
+      }
+      this.setParams()
     })
   }
 
@@ -157,6 +187,7 @@ class PaymentTool extends Component {
     },
     function() {
       this.updateQR()
+      this.setParams()
     })
   }
 
@@ -168,11 +199,11 @@ class PaymentTool extends Component {
     return (
       <div>
         <div className="noprint">
-          <p>Generate payment card or Pay Now with an ADDRESS and optional NANO amount</p>
+          <p>Generate and Share a Payment Card or Pay it now</p>
           <ul>
             <li>Scan QR with a wallet. The amount is included</li>
             <li>Open in Wallet may work depending on wallet installed</li>
-            <li>The link in the URL bar can be shared with anyone</li>
+            <li>The URL path above can be shared with anyone</li>
             <li>Right click and save QR image to embed on any site or print it</li>
           </ul>
         </div>
