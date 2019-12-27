@@ -1,4 +1,6 @@
-# KeyTools - A Nano web toolbox
+# KeyTools - High performance Nano web tools written with reactJS
+* Can be run from local file system offline by downloading [this package]()
+* Hosted by github pages at https://tools.nanos.cc
 
 ## Developer instructions
 
@@ -36,13 +38,17 @@ Your app is ready to be deployed!
 8. Change mainPage.js: Add a tool dropdown title to <this.tools = ['1: Unit Converter',...>
 9. The new tool should now be available from the main dropdown selector. Happy coding!
 
-## Notable Sources
+## Used Libraries
+* [Nano library - Nano-currency-js](https://github.com/marvinroger/nanocurrency-js)
+* [Nano library - Nano-currency-web-js](https://github.com/numsu/nanocurrency-web-js)
+* [PoW Generation - Nano webGL](https://github.com/numtel/nano-webgl-pow)
+* [Fancy QR generation - jsQR](https://github.com/cozmo/jsQR)
+* [Auditable high-security cryptographic library - Tweetnacl](https://tweetnacl.js.org/)
+* [Messaging over sound - Chirp](https://developers.chirp.io/)
 
-Nano-currency-js: https://github.com/marvinroger/nanocurrency-js
-Nano-currency-web-js: https://github.com/numsu/nanocurrency-web-js
-Nano webGL: https://github.com/numtel/nano-webgl-pow
-jsQR: https://github.com/cozmo/jsQR
-Nanoo.tools (Inspiration, zero code copy): https://nanoo.tools/
+## Inspiration
+* Nanoo tools: https://nanoo.tools/
+* Nanoaddr: https://nanoaddr.io
 
 ## Contribution
 
