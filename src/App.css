@@ -336,6 +336,7 @@ a:hover, a:focus {
 
 .footer .form-control {
   border-radius: 0;
+  font-size: calc(10px + 0.3vmin);
 }
 
 .footer .input-group {
