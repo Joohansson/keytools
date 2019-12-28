@@ -34,11 +34,14 @@ Your app is ready to be deployed!
 4. Change tools/index.js: Add <import MyTool from './MyTool.js'>
 5. Change tools/index.js: Add the new class to <export {ConvertTool,...>
 6. Change mainPage.js: Add the new class to <import { ConvertTool,...>
-7. Change mainPage.js: Add the new class to <const tools = [ConvertTool,...>
+7. Change mainPage.js: Add the new entry to <const tools = ['CONVERT'...>
 8. Change mainPage.js: Add a tool dropdown title to <this.tools = ['1: Unit Converter',...>
-9. The new tool should now be available from the main dropdown selector. Happy coding!
+9. Change mainPage.js: Add tool at <{(active === 'CONVERT') && <ConvertTool {...this} /> }...>
+10. Change mainPage.js: Add a section to control URL params at <switch (tool) {...>
+11. The new tool should now be available from the main dropdown selector. Happy coding!
 
 ## Used Libraries
+
 * [Nano library - Nano-currency-js](https://github.com/marvinroger/nanocurrency-js)
 * [Nano library - Nano-currency-web-js](https://github.com/numsu/nanocurrency-web-js)
 * [PoW Generation - Nano webGL](https://github.com/numtel/nano-webgl-pow)
@@ -47,6 +50,7 @@ Your app is ready to be deployed!
 * [Messaging over sound - Chirp](https://developers.chirp.io/)
 
 ## Inspiration
+
 * Nanoo tools: https://nanoo.tools/
 * Nanoaddr: https://nanoaddr.io
 
