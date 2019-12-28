@@ -5,6 +5,7 @@ import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import QrImageStyle from '../modules/qrImageStyle'
 import {toast } from 'react-toastify'
+const toolParam = 'pow'
 
 class WorkGeneratorTool extends Component {
   constructor(props) {
@@ -24,7 +25,7 @@ class WorkGeneratorTool extends Component {
       validWork: false,
       generating: false,
       output: '',
-      savedOutput: '',
+      savedOutput: [],
       selectedOption: '3',
     }
 
@@ -42,6 +43,20 @@ class WorkGeneratorTool extends Component {
   componentDidMount() {
     window.NanoWebglPow.width = this.webGLPower[3]
     window.NanoWebglPow.height = 256
+
+    // Read URL params from parent and construct new quick path
+    var hash = this.props.state.hash
+    if (hash) {
+      this.workHashChange(hash)
+    }
+    else {
+      this.setParams()
+    }
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam + '&hash='+this.state.workHash)
   }
 
   //Clear text from input field
@@ -54,6 +69,7 @@ class WorkGeneratorTool extends Component {
         },
         function() {
           this.updateQR()
+          this.setParams()
         })
         break
 
@@ -64,6 +80,7 @@ class WorkGeneratorTool extends Component {
           },
           function() {
             this.updateQR()
+            this.setParams()
           })
           break
       default:
@@ -73,7 +90,8 @@ class WorkGeneratorTool extends Component {
 
   clearOutput() {
     this.setState({
-      output: ''
+      output: '',
+      savedOutput: []
     })
   }
 
@@ -148,6 +166,7 @@ class WorkGeneratorTool extends Component {
     },
     function() {
       this.updateQR()
+      this.setParams()
     })
   }
 
@@ -175,6 +194,7 @@ class WorkGeneratorTool extends Component {
     },
     function() {
       this.updateQR()
+      this.setParams()
     })
   }
 
@@ -191,7 +211,7 @@ class WorkGeneratorTool extends Component {
           (work, n) => {
               const hashes = window.NanoWebglPow.width * window.NanoWebglPow.height * n
               const calcTime = (Date.now() - start) / 1000
-              toast("Successfully generated PoW at " + Math.round(hashes / calcTime / 1000) +" khash/s", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+              toast("Successfully generated PoW at " + helpers.addCommas(String(Math.round(hashes / calcTime / 1000))) +" khash/s", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
               this.setState({
                 generating: false
               })
@@ -245,10 +265,12 @@ class WorkGeneratorTool extends Component {
 
   // add a new line to output text field
   appendOutput() {
-    let output = this.state.savedOutput + this.state.workHash + ',' + this.state.work + '\r'
+    let output = {hash: this.state.workHash, work: this.state.work}
+    var saved = this.state.savedOutput
+    saved.push(output)
     this.setState({
-      output: output,
-      savedOutput: output
+      output: JSON.stringify(saved, null, 2),
+      savedOutput: saved
     })
   }
 
@@ -257,7 +279,6 @@ class WorkGeneratorTool extends Component {
       <div>
         <p>Generate Proof of Work (PoW) from Input Hash</p>
         <ul>
-          <li>Output format is INPUT HASH, WORK</li>
           <li>The generator is using the GPU via webGL which is not supported in all browsers</li>
           <li>Higher GPU Load is not always faster</li>
         </ul>

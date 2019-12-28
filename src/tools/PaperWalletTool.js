@@ -9,6 +9,7 @@ import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import { saveAs } from 'file-saver'
 import domtoimage from 'dom-to-image'
+const toolParam = 'paper'
 
 class PaperWalletTool extends Component {
   constructor(props) {
@@ -31,6 +32,14 @@ class PaperWalletTool extends Component {
   async componentDidMount() {
     await nano_old.init()
     this.generate()
+
+    // Read URL params from parent and construct new quick path
+    this.setParams()
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam)
   }
 
   //Clear text from input field

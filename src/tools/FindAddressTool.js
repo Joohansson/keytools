@@ -5,6 +5,7 @@ import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import FindWorker from '../modules/find.worker'
+const toolParam = 'findaddr'
 
 class FindAddressTool extends Component {
   constructor(props) {
@@ -74,7 +75,16 @@ class FindAddressTool extends Component {
       toast("Web workers not supported", helpers.getToast(helpers.toastType.ERROR))
       return
     }
+
+    // Read URL params from parent and construct new quick path
+    this.setParams()
   }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam)
+  }
+  
   //Clear text from input field
   clearText(event) {
     switch(event.target.value) {

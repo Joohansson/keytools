@@ -4,6 +4,7 @@ import * as nano_old from 'nanocurrency174' //must be used for high performance 
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
+const toolParam = 'keygen'
 
 class KeyGeneratorTool extends Component {
   constructor(props) {
@@ -27,6 +28,40 @@ class KeyGeneratorTool extends Component {
     this.generate = this.generate.bind(this)
   }
 
+  componentDidMount() {
+    // Read URL params from parent and construct new quick path
+    var count = this.props.state.count
+    var priv = this.props.state.priv
+    var pub = this.props.state.pub
+    var addr = this.props.state.addr
+    if (count) {
+      this.countChange(count)
+    }
+    if (typeof priv !== 'undefined') {
+      this.setState({
+        privKeyChecked: (priv === 'true')
+      })
+    }
+    if (typeof pub !== 'undefined') {
+      this.setState({
+        pubKeyChecked: (pub === 'true')
+      })
+    }
+    if (typeof addr !== 'undefined') {
+      this.setState({
+        addressChecked: (addr === 'true')
+      })
+    }
+    if(!count && !priv && !pub && !addr) {
+      this.setParams()
+    }
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam + '&count='+this.state.count + '&priv='+this.state.privKeyChecked + '&pub='+this.state.pubKeyChecked + '&addr='+this.state.addressChecked)
+  }
+
   setMax() {
     this.setState({
       count: helpers.constants.KEYS_MAX
@@ -34,7 +69,10 @@ class KeyGeneratorTool extends Component {
   }
 
   handleCountChange(event) {
-    let count = event.target.value
+    this.countChange(event.target.value)
+  }
+
+  countChange(count) {
     this.setState({
       count: count
     },
@@ -48,6 +86,7 @@ class KeyGeneratorTool extends Component {
         }
       }
       else {
+        this.setParams()
         this.setState({
           validCount: true
         })
@@ -58,18 +97,27 @@ class KeyGeneratorTool extends Component {
   handlePrivKeyCheck(event) {
     this.setState({
       privKeyChecked: event.target.checked
+    },
+    function() {
+      this.setParams()
     })
   }
 
   handlePubKeyCheck(event) {
     this.setState({
       pubKeyChecked: event.target.checked
+    },
+    function() {
+      this.setParams()
     })
   }
 
   handleAddressCheck(event) {
     this.setState({
       addressChecked: event.target.checked
+    },
+    function() {
+      this.setParams()
     })
   }
 

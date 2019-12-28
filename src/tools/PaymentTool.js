@@ -5,12 +5,11 @@ import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import $ from 'jquery'
 import {toast } from 'react-toastify'
+const toolParam = 'pay'
 
 class PaymentTool extends Component {
   constructor(props) {
     super(props)
-
-    this.toolParam = 'pay'
 
     this.state = {
       address: '',
@@ -22,7 +21,6 @@ class PaymentTool extends Component {
       qrState: 0,  //qr size
     }
 
-    this.componentDidMount = this.componentDidMount.bind(this)
     this.handleAddressChange = this.handleAddressChange.bind(this)
     this.handleAmountChange = this.handleAmountChange.bind(this)
     this.clearText = this.clearText.bind(this)
@@ -44,9 +42,16 @@ class PaymentTool extends Component {
       this.amountChange(amount)
     }
 
-    this.setParams()
+    if (!address && !amount) {
+      this.setParams()
+    }
   }
 
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount)
+  }
+  
   //Clear text from input field
   clearText(event) {
     switch(event.target.value) {
@@ -73,11 +78,6 @@ class PaymentTool extends Component {
       default:
         break
     }
-  }
-
-  // Defines the url params
-  setParams() {
-    helpers.setURLParams('?tool='+this.toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount)
   }
 
   // Loop qr state 1x, 2x, 4x

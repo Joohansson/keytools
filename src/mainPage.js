@@ -8,8 +8,7 @@ import $ from 'jquery'
 import donation from './img/donation.png';
 import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
   SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool} from './tools'
-const tools = [ConvertTool, SeedTool, PaperWalletTool, PaymentTool, KeyGeneratorTool, AddressExtractorTool, FindAddressTool,
-  SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool]
+const tools = ['CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'QR', "MSG"]
 
 class MainPage extends Component {
   constructor(props) {
@@ -31,15 +30,48 @@ class MainPage extends Component {
   componentDidMount = () => {
     // Read URL params
     var tool = helpers.getUrlParams().tool
+    var toolId = 0
 
     if (typeof tool !== 'undefined') {
-      var toolId = 0
       switch (tool) {
+        // ConvertTool
+        case 'convert':
+        toolId = 0
+        let raw = helpers.getUrlParams().raw
+        let nano = helpers.getUrlParams().nano
+        let mnano = helpers.getUrlParams().mnano
+        if (typeof raw !== 'undefined') {
+          this.setState({
+            raw: raw
+          })
+        }
+        if (typeof nano !== 'undefined') {
+          this.setState({
+            nano: nano
+          })
+        }
+        if (typeof mnano !== 'undefined') {
+          this.setState({
+            mnano: mnano
+          })
+        }
+        break
+
+        // SeedTool
+        case 'seed':
+        toolId = 1
+        break
+
+        // PaperWalletTool
+        case 'paper':
+        toolId = 2
+        break
+
         // PaymentTool
         case 'pay':
         toolId = 3
-        var address = helpers.getUrlParams().address
-        var amount = helpers.getUrlParams().amount
+        let address = helpers.getUrlParams().address
+        let amount = helpers.getUrlParams().amount
         if (typeof address !== 'undefined') {
           this.setState({
             address: address
@@ -52,15 +84,139 @@ class MainPage extends Component {
         }
         break
 
+        // KeyGeneratorTool
+        case 'keygen':
+        toolId = 4
+        let count = helpers.getUrlParams().count
+        let priv = helpers.getUrlParams().priv
+        let pub = helpers.getUrlParams().pub
+        let addr = helpers.getUrlParams().addr
+        if (typeof count !== 'undefined') {
+          this.setState({
+            count: count
+          })
+        }
+        if (typeof priv !== 'undefined') {
+          this.setState({
+            priv: priv
+          })
+        }
+        if (typeof pub !== 'undefined') {
+          this.setState({
+            pub: pub
+          })
+        }
+        if (typeof addr !== 'undefined') {
+          this.setState({
+            addr: addr
+          })
+        }
+        break
+
+        // AddressExtractorTool
+        case 'extract':
+        toolId = 5
+        break
+
+        // FindAddressTool
+        case 'findaddr':
+        toolId = 6
+        break
+
+        // SigningTool
+        case 'sign':
+        toolId = 7
+        let s_type = helpers.getUrlParams().type
+        let s_address = helpers.getUrlParams().address
+        let s_link = helpers.getUrlParams().link
+        let s_previous = helpers.getUrlParams().previous
+        let s_rep = helpers.getUrlParams().rep
+        let s_balance = helpers.getUrlParams().balance
+        let s_amount = helpers.getUrlParams().amount
+        let s_hash = helpers.getUrlParams().hash
+
+        if (typeof s_type !== 'undefined') {
+          this.setState({
+            type: s_type
+          })
+        }
+        if (typeof s_address !== 'undefined') {
+          this.setState({
+            address: s_address
+          })
+        }
+        if (typeof s_link !== 'undefined') {
+          this.setState({
+            link: s_link
+          })
+        }
+        if (typeof s_previous !== 'undefined') {
+          this.setState({
+            previous: s_previous
+          })
+        }
+        if (typeof s_rep !== 'undefined') {
+          this.setState({
+            rep: s_rep
+          })
+        }
+        if (typeof s_balance !== 'undefined') {
+          this.setState({
+            balance: s_balance
+          })
+        }
+        if (typeof s_amount !== 'undefined') {
+          this.setState({
+            amount: s_amount
+          })
+        }
+        if (typeof s_hash !== 'undefined') {
+          this.setState({
+            hash: s_hash
+          })
+        }
+        break
+
+        // WorkGeneratorTool
+        case 'pow':
+        toolId = 8
+        let p_hash = helpers.getUrlParams().hash
+        if (typeof p_hash !== 'undefined') {
+          this.setState({
+            hash: p_hash
+          })
+        }
+        break
+
+        // VanityTool
+        case 'vanity':
+        toolId = 9
+        break
+
+        // QRTool
+        case 'qr':
+        toolId = 10
+        break
+
+        // MessengerTool
+        case 'msg':
+        toolId = 11
+        break
+
         default:
         toolId = 0
         break
       }
-      this.setState({
-        activeTool: this.tools[toolId],
-        activeToolId: toolId,
-      })
     }
+    else {
+      toolId = 0
+      console.log(toolId)
+    }
+    this.setState({
+      activeTool: this.tools[toolId],
+      activeToolId: toolId,
+      activeToolName: tools[toolId],
+    })
 
     // Define global modal component
     $.fn.psendmodal = function() {
@@ -123,6 +279,7 @@ class MainPage extends Component {
     this.setState({
       activeTool: this.tools[eventKey],
       activeToolId: eventKey,
+      activeToolName: tools[eventKey],
     })
   }
 
@@ -183,7 +340,8 @@ class MainPage extends Component {
   }
 
   render() {
-    const ActiveView = tools[this.state.activeToolId]
+    //const ActiveView = tools[this.state.activeToolId]
+    var active = this.state.activeToolName
     return (
       <div>
         <header className="header noprint">
@@ -290,14 +448,25 @@ class MainPage extends Component {
         <div className="line noprint"></div>
         <div className="content-wrapper">
           <div className="content">
-            <ActiveView {...this}/>
+            {(active === 'CONVERT') && <ConvertTool {...this} /> }
+            {(active === 'SEED') && <SeedTool {...this} /> }
+            {(active === 'PAPER') && <PaperWalletTool {...this} /> }
+            {(active === 'PAY') && <PaymentTool {...this} /> }
+            {(active === 'KEYGEN') && <KeyGeneratorTool {...this} /> }
+            {(active === 'EXTRACT') && <AddressExtractorTool {...this} /> }
+            {(active === 'FINDADDR') && <FindAddressTool {...this} /> }
+            {(active === 'SIGN') && <SigningTool {...this} /> }
+            {(active === 'POW') && <WorkGeneratorTool {...this} /> }
+            {(active === 'VANITY') && <VanityTool {...this} /> }
+            {(active === 'QR') && <QRTool {...this} /> }
+            {(active === 'MSG') && <MessengerTool {...this} /> }
           </div>
         </div>
 
         <footer className="footer noprint">
           <div className="line"></div>
           <InputGroup>
-            <FormControl as="textarea" rows="3" placeholder="Memo for copy/paste across tools"/>
+            <FormControl as="textarea" rows="4" placeholder="Memo for copy/paste across tools"/>
           </InputGroup>
           <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano Home</a> | <a href="https://nanolinks.info">Nano Guide</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span>
         </footer>

@@ -6,6 +6,7 @@ import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import 'nano-webgl-pow'
+const toolParam = 'sign'
 
 class SigningTool extends Component {
   constructor(props) {
@@ -252,6 +253,57 @@ class SigningTool extends Component {
   componentDidMount() {
     window.NanoWebglPow.width = this.webGLWidth
     window.NanoWebglPow.height = this.webGLHeight
+
+    // Read URL params from parent and construct new quick path
+    var type = this.props.state.type
+    var address = this.props.state.address
+    var link = this.props.state.link
+    var previous = this.props.state.previous
+    var rep = this.props.state.rep
+    var balance = this.props.state.balance
+    var amount = this.props.state.amount
+    var hash = this.props.state.hash
+
+    if (type) {
+      this.optionChange(type,false)
+    }
+    if (address) {
+      this.addressChange(address)
+    }
+    if (link) {
+      this.linkChange(link)
+    }
+    if (previous) {
+      this.previousChange(previous)
+    }
+    if (rep) {
+      this.repChange(rep)
+    }
+    if (balance) {
+      this.balanceChange(balance)
+    }
+    if (amount) {
+      this.amountChange(amount)
+    }
+    if (hash) {
+      this.blockHashChange(hash)
+    }
+
+    if (!type && !address && !link && !previous && !rep && !balance &&!amount && !hash) {
+      this.setParams()
+    }
+  }
+
+  // Defines the url params
+  setParams(includeHash=false) {
+    var params = '?tool='+toolParam + '&type='+this.state.selectedOption + '&address='+this.state.address + '&link='+this.state.link +
+    '&previous='+this.state.previous + '&rep='+this.state.rep + '&balance='+this.state.currBalance + '&amount='+this.state.amount
+
+    // Only include hash in parameters when requested
+    if (includeHash) {
+      params = params + '&hash='+this.state.blockHash
+    }
+    helpers.setURLParams(params)
   }
 
   //Clear text from input field
@@ -387,11 +439,11 @@ class SigningTool extends Component {
       output: '',
       signWorkHash: '',
       validAddress: false,
-      validPrevious: false,
+      validPrevious: this.state.selectedOption === '2' ? true:false, //previous not used for open blocks
       validRep: false,
-      validCurrBalance: false,
-      validAmount: false,
-      validLink: false,
+      validCurrBalance: this.state.selectedOption === '2' ? true:false, //balance not used for open blocks
+      validAmount: this.state.selectedOption === '3' ? true:false, //amount not used for change blocks
+      validLink: this.state.selectedOption === '3' ? true:false, //link not used for change blocks
       validPrivKey: false,
       validBlockHash: false,
       validSignature: false,
@@ -400,6 +452,13 @@ class SigningTool extends Component {
       qrActive: '',
       qrContent: '',
       qrHidden: true,
+    },function() {
+      if (this.state.selectedOption === '4') {
+        this.setParams(true) //include block hash in params
+      }
+      else {
+        this.setParams(false)
+      }
     })
   }
 
@@ -653,6 +712,7 @@ class SigningTool extends Component {
     },
     function() {
       this.signBlock()
+      this.setParams(true)
     })
   }
 
@@ -791,7 +851,9 @@ class SigningTool extends Component {
   }
 
   handleOptionChange = changeEvent => {
-    let val = changeEvent.target.value
+    this.optionChange(changeEvent.target.value)
+  }
+  optionChange(val, clear=true) {
     this.setState({
       selectedOption: val,
       text_address: this.addressText[val],
@@ -806,8 +868,15 @@ class SigningTool extends Component {
       title_amount: this.amountTitle[val],
       title_link: this.linkTitle[val],
       place_link: this.linkPlace[val],
+    },function() {
+      if (clear) {
+        this.clearAll()
+      }
+      //If params needs to be saved, don't clear
+      else {
+        this.setParams()
+      }
     })
-    this.clearAll()
   }
 
   handleQRChange = changeEvent => {
@@ -994,10 +1063,10 @@ class SigningTool extends Component {
     }
   }
 
-  // valid to hash block
+  // valid to hash block. Ignore certain checks for certain block types becasuse they are not needed
   isValidHashInputs() {
-    return (this.state.validAddress && this.state.validLink && this.state.validPrevious &&
-      this.state.validRep && this.state.validCurrBalance && this.state.validAmount)
+    return (this.state.validAddress && (this.state.validLink || this.state.selectedOption === '3') && (this.state.validPrevious || this.state.selectedOption === '2') &&
+      this.state.validRep && (this.state.validCurrBalance || this.state.selectedOption === '2') && (this.state.validAmount || this.state.selectedOption === '3'))
   }
 
   // valid to sign block
@@ -1011,6 +1080,10 @@ class SigningTool extends Component {
     // go directly to sign block if coming from SIGN BLOCK
     if (this.state.selectedOption === '4') {
       this.signBlock()
+      this.setParams(true) //include block hash in params
+    }
+    else {
+      this.setParams(false)
     }
     if (!this.isValidHashInputs()) {
       this.setState({
@@ -1256,7 +1329,7 @@ class SigningTool extends Component {
       previous = null
     }
 
-    // special previous if change block
+    // special link if change block
     var link = this.state.link
     if (link === '') {
       link = null
@@ -1309,11 +1382,10 @@ class SigningTool extends Component {
         <div className="noprint">
           <p>Create and Sign blocks off-chain to be published with an on-chain node</p>
           <ul>
-            <li>Most of the inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a>
-            for example, the raw balance is found under the latest block hash.</li>
-            <li>PoW can be done directly with this tool or done elsewhere and pasted</li>
-            <li>You can publish the final JSON block via <a href="https://nanoo.tools/nano-rpc-playground">RPC Playground</a></li>
-            <li>Hover on text fields to show more details</li>
+            <li>Most of the inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a></li>
+            <li>PoW can be done directly with this tool or done elsewhere</li>
+            <li>For simplicity, the final JSON block can be published directly via <a href="https://nanoo.tools/nano-rpc-playground">RPC Playground</a></li>
+            <li>Hover on text fields to show more details or have a look at this <a href="#">Video Tutorial</a></li>
           </ul>
         </div>
         <InputGroup size="sm" className="mb-3">
@@ -1392,7 +1464,7 @@ class SigningTool extends Component {
               {this.state.text_rep}
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="rep" aria-describedby="rep" value={this.state.rep} title={this.state.title_rep} placeholder={this.state.text_rep === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="64" onChange={this.handleRepChange}/>
+          <FormControl id="rep" aria-describedby="rep" value={this.state.rep} title={this.state.title_rep} placeholder={this.state.text_rep === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="65" onChange={this.handleRepChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='rep' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.rep} onClick={helpers.copyText}></Button>

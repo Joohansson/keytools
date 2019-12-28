@@ -5,6 +5,7 @@ import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
+const toolParam = 'seed'
 
 class SeedTool extends Component {
   constructor(props) {
@@ -39,6 +40,14 @@ class SeedTool extends Component {
 
   async componentDidMount() {
     await nano_old.init()
+
+    // Read URL params from parent and construct new quick path
+    this.setParams()
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam)
   }
 
   //Clear text from input field

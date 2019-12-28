@@ -5,6 +5,7 @@ import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
 import * as nano from 'nanocurrency230'
 import Calculator from '../modules/calculator/frame.jsx'
+const toolParam = 'convert'
 
 class ConvertTool extends Component {
   constructor(props) {
@@ -30,8 +31,51 @@ class ConvertTool extends Component {
     this.updateQR = this.updateQR.bind(this)
     this.clearText = this.clearText.bind(this)
     this.double = this.double.bind(this)
+    this.setParams = this.setParams.bind(this)
   }
 
+  componentDidMount = () => {
+    // Read URL params from parent and construct new quick path
+    var raw = this.props.state.raw
+    var nano = this.props.state.nano
+    var mnano = this.props.state.mnano
+
+    if (raw) {
+      this.rawChange(raw)
+    }
+    else if (nano) {
+
+      this.nanoChange(nano)
+    }
+    else if (mnano) {
+      this.MnanoChange(mnano)
+    }
+    else {
+      this.setParams()
+    }
+  }
+
+  // Defines the url params
+  setParams(type) {
+    switch (type) {
+      case 'raw':
+      helpers.setURLParams('?tool='+toolParam + '&raw=' + this.state.raw)
+      break
+
+      case 'nano':
+      helpers.setURLParams('?tool='+toolParam + '&nano=' + this.state.nano)
+      break
+
+      case 'mnano':
+      helpers.setURLParams('?tool='+toolParam + '&mnano=' + this.state.Mnano)
+      break
+
+      default:
+      helpers.setURLParams('?tool='+toolParam + '&mnano=' + this.state.Mnano)
+      break
+    }
+  }
+  
   //Clear text from input field
   clearText(event) {
     this.setState({
@@ -41,6 +85,7 @@ class ConvertTool extends Component {
     },
     function() {
       this.updateQR()
+      this.setParams()
     })
   }
 
@@ -105,45 +150,91 @@ class ConvertTool extends Component {
   }
 
   handleRawChange(event) {
-    let raw = event.target.value
-    if (raw !== '' && !nano.checkAmount(raw)) {
-      toast("Not a valid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    this.rawChange(event.target.value)
+  }
+  rawChange(val) {
+    if (!nano.checkAmount(val)) {
+      if (val !== '') {
+        toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      else {
+        helpers.setURLParams('?tool='+toolParam + '&mnano=')
+      }
+      this.setState({
+        raw: val,
+        nano: '',
+        Mnano: ''
+      })
+      return
     }
     this.setState({
-      raw: raw,
-      nano: helpers.rawTonano(event.target.value),
-      Mnano: helpers.rawToMnano(event.target.value)
+      raw: val,
+      nano: helpers.rawTonano(val),
+      Mnano: helpers.rawToMnano(val)
     },
     function() {
       this.updateQR()
+      this.setParams('raw')
     })
   }
+
   handlenanoChange(event) {
-    let raw = helpers.nanoToRaw(event.target.value)
-    if (raw !== '' && !nano.checkAmount(raw)) {
-      toast("Not a valid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    this.nanoChange(event.target.value)
+  }
+  nanoChange(val) {
+    let raw = helpers.nanoToRaw(val)
+    if (!nano.checkAmount(raw)) {
+      if (val !== '') {
+        toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      else {
+        helpers.setURLParams('?tool='+toolParam + '&mnano=')
+      }
+      this.setState({
+        raw: '',
+        nano: val,
+        Mnano: ''
+      })
+      return
     }
     this.setState({
       raw: raw,
-      nano: event.target.value,
-      Mnano: helpers.nanoToMnano(event.target.value),
+      nano: val,
+      Mnano: helpers.nanoToMnano(val),
     },
     function() {
       this.updateQR()
+      this.setParams('nano')
     })
   }
+
   handleMnanoChange(event) {
-    let raw = helpers.MnanoToRaw(event.target.value)
-    if (raw !== '' && !nano.checkAmount(raw)) {
-      toast("Not a valid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    this.MnanoChange(event.target.value)
+  }
+  MnanoChange(val) {
+    let raw = helpers.MnanoToRaw(val)
+    if (!nano.checkAmount(raw)) {
+      if (val !== '') {
+        toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      else {
+        helpers.setURLParams('?tool='+toolParam + '&mnano=')
+      }
+      this.setState({
+        raw: '',
+        nano: '',
+        Mnano: val
+      })
+      return
     }
     this.setState({
       raw: raw,
-      nano: helpers.MnanoTonano(event.target.value),
-      Mnano: event.target.value
+      nano: helpers.MnanoTonano(val),
+      Mnano: val
     },
     function() {
       this.updateQR()
+      this.setParams('mnano')
     })
   }
 

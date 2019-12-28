@@ -6,6 +6,7 @@ import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import QrImageStyle from '../modules/qrImageStyle'
 import {toast } from 'react-toastify'
+const toolParam = 'extract'
 
 class AddressExtractorTool extends Component {
   constructor(props) {
@@ -46,6 +47,16 @@ class AddressExtractorTool extends Component {
     this.updateQR = this.updateQR.bind(this)
     this.double = this.double.bind(this)
     this.clearText = this.clearText.bind(this)
+  }
+
+  componentDidMount() {
+    // Read URL params from parent and construct new quick path
+    this.setParams()
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam)
   }
 
   // set min value for start index
