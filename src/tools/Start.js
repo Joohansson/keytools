@@ -15,13 +15,13 @@ class Start extends Component {
   render() {
     return (
       <div>
-        <img src={Logo} width="300"/>
+        <img src={Logo} width="300" alt="logo"/>
         <p>NANO KeyTools is a set of high performance web tools for <a href="https://nano.org">Nano Currency</a></p>
         <br/>
         <h4>SECURE</h4>
         <ul>
           <li>Secret keys comes from <a href="https://tweetnacl.js.org/#/">TweetNaCl</a>, a high-security cryptographic library</li>
-          <li>The site works offline or by <a href="#">downloading</a> and run the index.html from a secure local file system</li>
+          <li>The site works offline or by <a href="https://github.com/Joohansson/keytools/raw/master/keytools.zip">downloading</a> and run the index.html from a secure local file system</li>
           <li>The are zero cookies and trackers and no secret keys are shared via URL</li>
         </ul>
         <h4>QUICKLY ACCESSIBLE</h4>
@@ -33,7 +33,7 @@ class Start extends Component {
         <h4>AUDITABLE</h4>
         <ul>
           <li>Open sourced on <a href="https://github.com/Joohansson/keytools">Github</a></li>
-          <li>This site is directly hosted on <a href="#">Github Pages</a></li>
+          <li>This site is directly hosted on <a href="https://github.com/Joohansson/keytools/tree/gh-pages">Github Pages</a></li>
         </ul>
         <h4>FREE</h4>
         <ul>
