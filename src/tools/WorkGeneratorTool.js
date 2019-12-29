@@ -3,8 +3,8 @@ import * as nano from 'nanocurrency230'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
-import QrImageStyle from '../modules/qrImageStyle'
 import {toast } from 'react-toastify'
+import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'pow'
 
 class WorkGeneratorTool extends Component {

@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency230'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
-import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import 'nano-webgl-pow'
+import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'sign'
 
 class SigningTool extends Component {

@@ -4,7 +4,7 @@ import * as nano_old from 'nanocurrency174' //must be used for high performance 
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
-import QrImageStyle from '../modules/qrImageStyle'
+import QrImageStyle from './components/qrImageStyle'
 import {toast } from 'react-toastify'
 const toolParam = 'extract'
 

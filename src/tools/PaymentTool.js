@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency230'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import $ from 'jquery'
 import {toast } from 'react-toastify'
+import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'pay'
 
 class PaymentTool extends Component {
@@ -51,7 +51,7 @@ class PaymentTool extends Component {
   setParams() {
     helpers.setURLParams('?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount)
   }
-  
+
   //Clear text from input field
   clearText(event) {
     switch(event.target.value) {

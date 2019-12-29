@@ -1,6 +1,6 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import * as helpers from '../../helpers'
+import * as helpers from '../../../helpers'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 
 // Screen row component is written as a functional component

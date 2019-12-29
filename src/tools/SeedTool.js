@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import * as nano from 'nanocurrency230'
 import * as nano_old from 'nanocurrency174'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
+import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'seed'
 
 class SeedTool extends Component {

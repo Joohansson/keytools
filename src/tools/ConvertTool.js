@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
 import * as nano from 'nanocurrency230'
-import Calculator from '../modules/calculator/frame.jsx'
+import Calculator from './components/calculator/frame.jsx'
+import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'convert'
 
 class ConvertTool extends Component {
@@ -75,7 +75,7 @@ class ConvertTool extends Component {
       break
     }
   }
-  
+
   //Clear text from input field
   clearText(event) {
     this.setState({

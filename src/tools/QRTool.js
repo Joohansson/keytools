@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import jsQR from 'jsqr'
 import {toast } from 'react-toastify'
+import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'qr'
 
 class QRTool extends Component {

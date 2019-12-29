@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import * as nano from 'nanocurrency230'
 import * as nano_old from 'nanocurrency174'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
-import QrImageStyle from '../modules/qrImageStyle'
 import { ReactComponent as NanoLogo } from '../img/nano.svg';
 import './PaperWalletTool.css';
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import { saveAs } from 'file-saver'
 import domtoimage from 'dom-to-image'
+import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'paper'
 
 class PaperWalletTool extends Component {
