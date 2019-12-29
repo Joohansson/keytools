@@ -154,7 +154,7 @@ class ConvertTool extends Component {
   }
   rawChange(val) {
     if (!nano.checkAmount(val)) {
-      if (val !== '') {
+      if (val !== '' && val.slice(-1) !== '.') {
         toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       else {
@@ -184,7 +184,7 @@ class ConvertTool extends Component {
   nanoChange(val) {
     let raw = helpers.nanoToRaw(val)
     if (!nano.checkAmount(raw)) {
-      if (val !== '') {
+      if (val !== '' && val.slice(-1) !== '.') {
         toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       else {
@@ -214,7 +214,7 @@ class ConvertTool extends Component {
   MnanoChange(val) {
     let raw = helpers.MnanoToRaw(val)
     if (!nano.checkAmount(raw)) {
-      if (val !== '') {
+      if (val !== '' && val.slice(-1) !== '.') {
         toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       else {
