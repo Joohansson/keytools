@@ -1,4 +1,4 @@
-import * as nano from 'nanocurrency230'
+import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
 import nacl from 'tweetnacl/nacl';
 
@@ -9,7 +9,7 @@ var searchAddress = ''
 var searchSeed = ''
 var indexStart = 0
 var indexEnd = 0
-var batchSize = 10000
+var batchSize = 5000
 
 self.addEventListener("message", getMessage) // eslint-disable-line no-restricted-globals
 

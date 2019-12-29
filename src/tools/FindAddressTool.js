@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency230'
+import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
@@ -84,7 +84,7 @@ class FindAddressTool extends Component {
   setParams() {
     helpers.setURLParams('?tool='+toolParam)
   }
-  
+
   //Clear text from input field
   clearText(event) {
     switch(event.target.value) {

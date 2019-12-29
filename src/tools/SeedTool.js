@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import * as nano from 'nanocurrency230'
+import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'

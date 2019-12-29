@@ -1,7 +1,7 @@
 import MainPage from './mainPage'
 import { css } from 'glamor';
 import $ from 'jquery'
-import * as nano from 'nanocurrency230'
+import * as nano from 'nanocurrency'
 import bigInt from 'big-integer'
 import * as convert from './modules/conversion'
 import namedNumber from 'hsimp-named-number'

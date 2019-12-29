@@ -2,10 +2,6 @@ import React, { Component } from 'react'
 import * as helpers from '../helpers'
 
 class Start extends Component {
-  constructor(props) {
-    super(props)
-  }
-
   componentDidMount = () => {
     this.setParams()
   }

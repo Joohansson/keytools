@@ -356,6 +356,9 @@ class MainPage extends Component {
       case 'ctrl+shift+alt+2':
       this.selectTool(12)
       break
+
+      default:
+      break
     }
   }
 
