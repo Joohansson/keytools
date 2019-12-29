@@ -4,6 +4,7 @@ import * as helpers from '../helpers'
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import SeedWorker from '../modules/seed.worker'
+const toolParam = 'vanity'
 
 class VanityTool extends Component {
   constructor(props) {
@@ -68,13 +69,6 @@ class VanityTool extends Component {
 
   componentDidMount = () => {
     if (window.Worker) {
-      /*
-      this.worker = new SeedWorker()
-
-      this.worker.addEventListener("message", event => {
-        this.workerListener(event)
-      })
-      */
       var threads = helpers.getHardwareConcurrency()
 
       for (let i = 0; i < threads; i += 1) {
@@ -93,6 +87,36 @@ class VanityTool extends Component {
       toast("Web workers not supported", helpers.getToast(helpers.toastType.ERROR))
       return
     }
+
+    // Read URL params from parent and construct new quick path
+    var init = this.props.state.init
+    var prefix = this.props.state.prefix
+    var suffix = this.props.state.suffix
+    var count = this.props.state.count
+    var load = this.props.state.load
+    if (parseInt(init) < this.inits.length) {
+      this.initChange(init)
+    }
+    if (prefix) {
+      this.prefixChange(prefix)
+    }
+    if (suffix) {
+      this.suffixChange(suffix)
+    }
+    if (count) {
+      this.maxWalletsChange(count)
+    }
+    if (parseInt(load) < this.cpuPower.length) {
+      this.loadChange(load)
+    }
+    if (!init && !prefix && !suffix && !count && !load) {
+      this.setParams()
+    }
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam + '&init='+this.state.activeInitId + '&prefix='+this.state.prefix + '&suffix='+this.state.suffix + '&count='+this.state.maxWallets + '&load='+this.state.selectedOption)
   }
 
   //Clear text from input field
@@ -102,12 +126,16 @@ class VanityTool extends Component {
         this.setState({
           prefix: '',
           validPrefix: false
+        },function() {
+          this.setParams()
         })
         break
       case 'suffix':
         this.setState({
           suffix: '',
           validSuffix: false
+        },function() {
+          this.setParams()
         })
         break
       default:
@@ -118,14 +146,21 @@ class VanityTool extends Component {
   setMax() {
     this.setState({
       maxWallets: helpers.constants.KEYS_MAX
+    },function() {
+      this.setParams()
     })
   }
 
   // Select CPU load
   handleOptionChange = changeEvent => {
-    let val = changeEvent.target.value
+    this.loadChange(changeEvent.target.value)
+  }
+
+  loadChange(val) {
     this.setState({
       selectedOption: val
+    },function() {
+      this.setParams()
     })
 
     // recalculate threads
@@ -134,17 +169,15 @@ class VanityTool extends Component {
 
   // Change active address init char
   selectInit(eventKey, event) {
-    this.setState({
-      activeInit: this.inits[eventKey],
-      activeInitId: eventKey,
-    },
-    function() {
-      this.initChange(eventKey)
-    })
+    this.initChange(eventKey)
   }
 
   // The address init character has changed
   initChange(key) {
+    this.setState({
+      activeInit: this.inits[key],
+      activeInitId: key,
+    })
 
     var char = ''
     if (key === '1') {
@@ -157,6 +190,8 @@ class VanityTool extends Component {
       this.setState({
         initChar: '',
         prefixMultiplier: 1,
+      },function() {
+        this.setParams()
       })
       return
     }
@@ -164,6 +199,8 @@ class VanityTool extends Component {
     this.setState({
       initChar: char,
       prefixMultiplier: 2,
+    },function() {
+      this.setParams()
     })
   }
 
@@ -194,6 +231,8 @@ class VanityTool extends Component {
     this.setState({
       prefix: prefix,
       validPrefix: true,
+    },function() {
+      this.setParams()
     })
   }
 
@@ -216,11 +255,16 @@ class VanityTool extends Component {
     this.setState({
       suffix: suffix,
       validSuffix: true,
+    },function() {
+      this.setParams()
     })
   }
 
   handleMaxWalletsChange(event) {
-    let count = event.target.value
+    this.maxWalletsChange(event.target.value)
+  }
+
+  maxWalletsChange(count) {
     this.setState({
       maxWallets: count
     },
@@ -236,6 +280,8 @@ class VanityTool extends Component {
       else {
         this.setState({
           validMaxWallets: true
+        },function() {
+          this.setParams()
         })
       }
     })
@@ -325,7 +371,7 @@ class VanityTool extends Component {
         var output = this.state.outputArray
 
         // save result in array
-        output.push({wallet: this.state.addressesFound, seed: seed, privKey: secretKey, address: address})
+        output.push({wallet: parseInt(this.state.addressesFound) + 1, seed: seed, privKey: secretKey, address: address})
 
         this.setState({
           outputArray: output,
@@ -394,7 +440,7 @@ class VanityTool extends Component {
       return
     }
 
-    if (this.state.validPrefix || this.state.validSuffix) {
+    if (this.state.validMaxWallets && (this.state.validPrefix || this.state.validSuffix)) {
       this.stopped = false
       toast("Search started...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
       this.nextReport = 0

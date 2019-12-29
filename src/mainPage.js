@@ -181,9 +181,15 @@ class MainPage extends Component {
         case 'pow':
         toolId = 8
         let p_hash = helpers.getUrlParams().hash
+        let p_load = helpers.getUrlParams().load
         if (typeof p_hash !== 'undefined') {
           this.setState({
             hash: p_hash
+          })
+        }
+        if (typeof p_load !== 'undefined') {
+          this.setState({
+            load: p_load
           })
         }
         break
@@ -191,11 +197,47 @@ class MainPage extends Component {
         // VanityTool
         case 'vanity':
         toolId = 9
+        let v_init = helpers.getUrlParams().init
+        let v_prefix = helpers.getUrlParams().prefix
+        let v_suffix = helpers.getUrlParams().suffix
+        let v_count = helpers.getUrlParams().count
+        let v_load = helpers.getUrlParams().load
+        if (typeof v_init !== 'undefined') {
+          this.setState({
+            init: v_init
+          })
+        }
+        if (typeof v_prefix !== 'undefined') {
+          this.setState({
+            prefix: v_prefix
+          })
+        }
+        if (typeof v_suffix !== 'undefined') {
+          this.setState({
+            suffix: v_suffix
+          })
+        }
+        if (typeof v_count !== 'undefined') {
+          this.setState({
+            count: v_count
+          })
+        }
+        if (typeof v_load !== 'undefined') {
+          this.setState({
+            load: v_load
+          })
+        }
         break
 
         // QRTool
         case 'qr':
         toolId = 10
+        let q_type = helpers.getUrlParams().type
+        if (typeof q_type !== 'undefined') {
+          this.setState({
+            type: q_type
+          })
+        }
         break
 
         // MessengerTool

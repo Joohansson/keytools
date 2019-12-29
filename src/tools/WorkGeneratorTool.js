@@ -46,17 +46,21 @@ class WorkGeneratorTool extends Component {
 
     // Read URL params from parent and construct new quick path
     var hash = this.props.state.hash
+    var load = this.props.state.load
     if (hash) {
       this.workHashChange(hash)
     }
-    else {
+    if (parseInt(load) < this.webGLPower.length) {
+      this.loadChange(load)
+    }
+    if (!hash && !load) {
       this.setParams()
     }
   }
 
   // Defines the url params
   setParams() {
-    helpers.setURLParams('?tool='+toolParam + '&hash='+this.state.workHash)
+    helpers.setURLParams('?tool='+toolParam + '&hash='+this.state.workHash + '&load='+this.state.selectedOption)
   }
 
   //Clear text from input field
@@ -109,12 +113,18 @@ class WorkGeneratorTool extends Component {
 
   // Select GPU load
   handleOptionChange = changeEvent => {
-    let val = changeEvent.target.value
+    this.loadChange(changeEvent.target.value)
+  }
+
+  loadChange(val) {
     this.setState({
       selectedOption: val
+    },function() {
+      this.setParams()
     })
     window.NanoWebglPow.width = this.webGLPower[parseInt(val)]
     window.NanoWebglPow.height = 256
+
   }
 
   // Any QR button is pressed

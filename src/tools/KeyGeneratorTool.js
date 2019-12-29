@@ -65,6 +65,8 @@ class KeyGeneratorTool extends Component {
   setMax() {
     this.setState({
       count: helpers.constants.KEYS_MAX
+    },function() {
+      this.setParams()
     })
   }
 

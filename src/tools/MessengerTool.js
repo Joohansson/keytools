@@ -4,6 +4,7 @@ import { Chirp } from 'chirpsdk'
 import SimpleCrypto from "simple-crypto-js";
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
+const toolParam = 'msg'
 
 class MessengerTool extends React.Component {
   constructor(props) {
@@ -45,7 +46,6 @@ class MessengerTool extends React.Component {
   }
 
   componentDidMount() {
-
     if (!('WebAssembly' in window)) {
       window.alert('WebAssembly is not supported in this browser')
     }
@@ -56,6 +56,14 @@ class MessengerTool extends React.Component {
         100
       )
     }
+
+    // Read URL params from parent and construct new quick path
+    this.setParams()
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam)
   }
 
   componentWillUnmount() {

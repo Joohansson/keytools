@@ -4,6 +4,7 @@ import QrImageStyle from '../modules/qrImageStyle'
 import * as helpers from '../helpers'
 import jsQR from 'jsqr'
 import {toast } from 'react-toastify'
+const toolParam = 'qr'
 
 class QRTool extends Component {
   constructor(props) {
@@ -34,6 +35,23 @@ class QRTool extends Component {
     this.tick = this.tick.bind(this)
   }
 
+  componentDidMount = () => {
+    // Read URL params from parent and construct new quick path
+    var type = this.props.state.type
+
+    if (typeof type !== 'undefined') {
+      this.optionChange(type)
+    }
+    if(!type) {
+      this.setParams()
+    }
+  }
+
+  // Defines the url params
+  setParams() {
+    helpers.setURLParams('?tool='+toolParam + '&type='+this.state.selectedOption)
+  }
+
   //Clear text from input field
   clearText(event) {
     switch(event.target.value) {
@@ -43,6 +61,7 @@ class QRTool extends Component {
         },
         function() {
           this.updateQR()
+          this.setParams()
         })
         break
       default:
@@ -75,7 +94,10 @@ class QRTool extends Component {
 
   // main checkboxes
   handleOptionChange = changeEvent => {
-    let val = changeEvent.target.value
+    this.optionChange(changeEvent.target.value)
+  }
+
+  optionChange(val) {
     //Init webcam
     if (val === "1") {
       this.startReader()
@@ -83,6 +105,8 @@ class QRTool extends Component {
 
     this.setState({
       selectedOption: val,
+    },function() {
+      this.setParams()
     })
   }
 
