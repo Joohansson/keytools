@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import * as helpers from '../helpers'
+import Logo from '../img/logo.png'
 
 class Start extends Component {
   componentDidMount = () => {
@@ -14,8 +15,8 @@ class Start extends Component {
   render() {
     return (
       <div>
-        <h1>NANO KEYTOOLS</h1>
-        <p>A set of high performance web tools for <a href="https://nano.org">Nano Currency</a></p>
+        <img src={Logo} width="300"/>
+        <p>NANO KeyTools is a set of high performance web tools for <a href="https://nano.org">Nano Currency</a></p>
         <br/>
         <h4>SECURE</h4>
         <ul>
@@ -25,9 +26,9 @@ class Start extends Component {
         </ul>
         <h4>QUICKLY ACCESSIBLE</h4>
         <ul>
-          <li>Each tool support URL params which can be bookmarked, shared or implemented in other tools<br/>
-          <strong>NOTE:</strong> The URL won't be updated if running from a file system, though the parameters will still work. To generate URL params locally you can use <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb">this chrome extension webserver</a> and launch from <a href="http://localhost:8887/">localhost</a>.</li>
-          <li>Access tools by hotkeys SHIFT+ALT+0-9 and CTRL+SHIFT+ALT+0-9</li>
+          <li>Each tool support URL params which can be bookmarked, shared or implemented in other tools.<br/>
+          <strong>NOTE:</strong> The URL won't be updated if running from a file system, though the parameters will still work. A valid workaround is to use this <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb">chrome webserver extension</a> and launch from <a href="http://localhost:8887/">localhost</a>.</li>
+          <li>Access tools with hotkeys SHIFT+ALT+0-9 and CTRL+SHIFT+ALT+0-9</li>
         </ul>
         <h4>AUDITABLE</h4>
         <ul>
