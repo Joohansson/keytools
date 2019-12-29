@@ -29,9 +29,10 @@
     "build-old": "react-scripts build",
     "test-old": "react-scripts test",
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "react-app-rewired build && gulp zip",
     "test": "react-app-rewired test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -86,6 +87,7 @@
     "typescript": "^3.7.4"
   },
   "devDependencies": {
+    "gh-pages": "^2.1.1",
     "react-app-rewired": "^2.1.5",
     "worker-loader": "^2.0.0"
   }
