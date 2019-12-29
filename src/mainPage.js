@@ -6,6 +6,7 @@ import { css } from 'glamor';
 import * as helpers from './helpers'
 import $ from 'jquery'
 import donation from './img/donation.png';
+import Hotkeys from 'react-hot-keys'
 import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
   SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool} from './tools'
 const tools = ['CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'QR', "MSG"]
@@ -303,6 +304,58 @@ class MainPage extends Component {
     };
   }
 
+  onKeyDown(keyName, e, handle) {
+    switch (keyName) {
+      case 'shift+alt+1':
+      this.selectTool(0)
+      break
+
+      case 'shift+alt+2':
+      this.selectTool(1)
+      break
+
+      case 'shift+alt+3':
+      this.selectTool(2)
+      break
+
+      case 'shift+alt+4':
+      this.selectTool(3)
+      break
+
+      case 'shift+alt+5':
+      this.selectTool(4)
+      break
+
+      case 'shift+alt+6':
+      this.selectTool(5)
+      break
+
+      case 'shift+alt+7':
+      this.selectTool(6)
+      break
+
+      case 'shift+alt+8':
+      this.selectTool(7)
+      break
+
+      case 'shift+alt+9':
+      this.selectTool(8)
+      break
+
+      case 'ctrl+shift+alt+0':
+      this.selectTool(9)
+      break
+
+      case 'ctrl+shift+alt+1':
+      this.selectTool(10)
+      break
+
+      case 'ctrl+shift+alt+2':
+      this.selectTool(11)
+      break
+    }
+  }
+
   // Toast functions
   notifyCopy() {
     toast("Value Copied", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
@@ -317,7 +370,7 @@ class MainPage extends Component {
   }
 
   // Change tool to view on main page
-  selectTool(eventKey, event) {
+  selectTool(eventKey) {
     this.setState({
       activeTool: this.tools[eventKey],
       activeToolId: eventKey,
@@ -386,6 +439,11 @@ class MainPage extends Component {
     var active = this.state.activeToolName
     return (
       <div>
+        <Hotkeys
+          keyName="shift+alt+1,shift+alt+2,shift+alt+3,shift+alt+4,shift+alt+5,shift+alt+6,shift+alt+7,shift+alt+8,shift+alt+9,ctrl+shift+alt+0,ctrl+shift+alt+1,ctrl+shift+alt+2"
+          onKeyDown={this.onKeyDown.bind(this)}
+        />
+
         <header className="header noprint">
           <ToastContainer
             enableMultiContainer
