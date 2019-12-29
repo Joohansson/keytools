@@ -1,3 +1,4 @@
+import Start from './Start.js'
 import ConvertTool from './ConvertTool.js'
 import SeedTool from './SeedTool.js'
 import FindAddressTool from './FindAddressTool.js'
@@ -11,5 +12,5 @@ import QRTool from './QRTool.js'
 import MessengerTool from './MessengerTool.js'
 import VanityTool from './VanityTool.js'
 
-export {ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
+export {Start, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
 SigningTool, WorkGeneratorTool, QRTool, MessengerTool, VanityTool}

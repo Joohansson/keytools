@@ -321,5 +321,12 @@ export function getUrlParams(url) {
 }
 
 export function setURLParams(params) {
-  window.history.replaceState("", "", "/"+params)
+  if (window.history.pushState) {
+    try {
+      window.history.replaceState(null, null, "/"+params)
+    }
+    catch(error) {
+      //console.log(error)
+    }
+  }
 }

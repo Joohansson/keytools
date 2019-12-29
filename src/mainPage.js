@@ -7,14 +7,14 @@ import * as helpers from './helpers'
 import $ from 'jquery'
 import donation from './img/donation.png';
 import Hotkeys from 'react-hot-keys'
-import { ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
+import { Start, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
   SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool} from './tools'
-const tools = ['CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'QR', "MSG"]
+const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'QR', "MSG"]
 
 class MainPage extends Component {
   constructor(props) {
     super(props)
-    this.tools = ['1: Unit Converter', '2: Key Converter', '3: Paper Wallet Generator ', '4: Payment Card', '5: Mass Wallet Generator',
+    this.tools = ['0: HOME', '1: Unit Converter', '2: Key Converter', '3: Paper Wallet Generator ', '4: Payment Card', '5: Mass Wallet Generator',
     '6: Mass Keypair Extractor', '7: Find Address in Seed', '8: Off-chain Signing', '9: PoW Generator',
     '10: Vanity Address Generator', '11: QR Generator / Reader', '12: Offline Audio Messenger']
     this.state = {
@@ -37,7 +37,7 @@ class MainPage extends Component {
       switch (tool) {
         // ConvertTool
         case 'convert':
-        toolId = 0
+        toolId = 1
         let raw = helpers.getUrlParams().raw
         let nano = helpers.getUrlParams().nano
         let mnano = helpers.getUrlParams().mnano
@@ -60,17 +60,17 @@ class MainPage extends Component {
 
         // SeedTool
         case 'seed':
-        toolId = 1
+        toolId = 2
         break
 
         // PaperWalletTool
         case 'paper':
-        toolId = 2
+        toolId = 3
         break
 
         // PaymentTool
         case 'pay':
-        toolId = 3
+        toolId = 4
         let address = helpers.getUrlParams().address
         let amount = helpers.getUrlParams().amount
         if (typeof address !== 'undefined') {
@@ -87,7 +87,7 @@ class MainPage extends Component {
 
         // KeyGeneratorTool
         case 'keygen':
-        toolId = 4
+        toolId = 5
         let count = helpers.getUrlParams().count
         let priv = helpers.getUrlParams().priv
         let pub = helpers.getUrlParams().pub
@@ -116,17 +116,17 @@ class MainPage extends Component {
 
         // AddressExtractorTool
         case 'extract':
-        toolId = 5
+        toolId = 6
         break
 
         // FindAddressTool
         case 'findaddr':
-        toolId = 6
+        toolId = 7
         break
 
         // SigningTool
         case 'sign':
-        toolId = 7
+        toolId = 8
         let s_type = helpers.getUrlParams().type
         let s_address = helpers.getUrlParams().address
         let s_link = helpers.getUrlParams().link
@@ -180,7 +180,7 @@ class MainPage extends Component {
 
         // WorkGeneratorTool
         case 'pow':
-        toolId = 8
+        toolId = 9
         let p_hash = helpers.getUrlParams().hash
         let p_load = helpers.getUrlParams().load
         if (typeof p_hash !== 'undefined') {
@@ -197,7 +197,7 @@ class MainPage extends Component {
 
         // VanityTool
         case 'vanity':
-        toolId = 9
+        toolId = 10
         let v_init = helpers.getUrlParams().init
         let v_prefix = helpers.getUrlParams().prefix
         let v_suffix = helpers.getUrlParams().suffix
@@ -232,7 +232,7 @@ class MainPage extends Component {
 
         // QRTool
         case 'qr':
-        toolId = 10
+        toolId = 11
         let q_type = helpers.getUrlParams().type
         if (typeof q_type !== 'undefined') {
           this.setState({
@@ -243,7 +243,7 @@ class MainPage extends Component {
 
         // MessengerTool
         case 'msg':
-        toolId = 11
+        toolId = 12
         break
 
         default:
@@ -253,7 +253,6 @@ class MainPage extends Component {
     }
     else {
       toolId = 0
-      console.log(toolId)
     }
     this.setState({
       activeTool: this.tools[toolId],
@@ -306,52 +305,56 @@ class MainPage extends Component {
 
   onKeyDown(keyName, e, handle) {
     switch (keyName) {
-      case 'shift+alt+1':
+      case 'shift+alt+0':
       this.selectTool(0)
       break
 
-      case 'shift+alt+2':
+      case 'shift+alt+1':
       this.selectTool(1)
       break
 
-      case 'shift+alt+3':
+      case 'shift+alt+2':
       this.selectTool(2)
       break
 
-      case 'shift+alt+4':
+      case 'shift+alt+3':
       this.selectTool(3)
       break
 
-      case 'shift+alt+5':
+      case 'shift+alt+4':
       this.selectTool(4)
       break
 
-      case 'shift+alt+6':
+      case 'shift+alt+5':
       this.selectTool(5)
       break
 
-      case 'shift+alt+7':
+      case 'shift+alt+6':
       this.selectTool(6)
       break
 
-      case 'shift+alt+8':
+      case 'shift+alt+7':
       this.selectTool(7)
       break
 
-      case 'shift+alt+9':
+      case 'shift+alt+8':
       this.selectTool(8)
       break
 
-      case 'ctrl+shift+alt+0':
+      case 'shift+alt+9':
       this.selectTool(9)
       break
 
-      case 'ctrl+shift+alt+1':
+      case 'ctrl+shift+alt+0':
       this.selectTool(10)
       break
 
-      case 'ctrl+shift+alt+2':
+      case 'ctrl+shift+alt+1':
       this.selectTool(11)
+      break
+
+      case 'ctrl+shift+alt+2':
+      this.selectTool(12)
       break
     }
   }
@@ -440,7 +443,7 @@ class MainPage extends Component {
     return (
       <div>
         <Hotkeys
-          keyName="shift+alt+1,shift+alt+2,shift+alt+3,shift+alt+4,shift+alt+5,shift+alt+6,shift+alt+7,shift+alt+8,shift+alt+9,ctrl+shift+alt+0,ctrl+shift+alt+1,ctrl+shift+alt+2"
+          keyName="shift+alt+0,shift+alt+1,shift+alt+2,shift+alt+3,shift+alt+4,shift+alt+5,shift+alt+6,shift+alt+7,shift+alt+8,shift+alt+9,ctrl+shift+alt+0,ctrl+shift+alt+1,ctrl+shift+alt+2"
           onKeyDown={this.onKeyDown.bind(this)}
         />
 
@@ -548,6 +551,7 @@ class MainPage extends Component {
         <div className="line noprint"></div>
         <div className="content-wrapper">
           <div className="content">
+            {(active === 'HOME') && <Start /> }
             {(active === 'CONVERT') && <ConvertTool {...this} /> }
             {(active === 'SEED') && <SeedTool {...this} /> }
             {(active === 'PAPER') && <PaperWalletTool {...this} /> }

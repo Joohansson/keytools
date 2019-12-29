@@ -17,7 +17,7 @@ html, body {
 .App {
   /*text-align: center;*/
   color: #EEE;
-  font-size: calc(10px + 0.6vmin);
+  font-size: calc(10px + 0.5vmin);
   line-height: calc(10px + 1.2vmin);
   font-family: 'NotoSans Regular', Fallback, sans-serif;
   height: 100%;
