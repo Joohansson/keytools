@@ -79,8 +79,8 @@ export function MnanoTonano(input) {
 // Check if numeric string
 export function isNumeric(val) {
   //numerics and last character is not a dot and number of dots is 0 or 1
-  let isnum = /(?<=^| )\d+(\.\d+)?(?=$| )/.test(val)
-  if (isnum) {
+  let isnum = /^-?\d*\.?\d*$/.test(val)
+  if (isnum && val.slice(-1) !== '.') {
     return true
   }
   else {
