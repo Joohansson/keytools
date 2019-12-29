@@ -237,6 +237,9 @@ class QRTool extends Component {
         </div>
 
         <div className={this.state.selectedOption==='0' ? 'hidden':'qr-reader-wrapper'}>
+          <ul>
+            <li>If the webcam is not visible or QR data not fetched, try use another browser</li>
+          </ul>
           <canvas id="qr-canvas" hidden></canvas>
           <InputGroup size="sm" className="mb-3">
             <InputGroup.Prepend className="narrow-prepend">
