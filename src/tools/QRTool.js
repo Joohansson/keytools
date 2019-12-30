@@ -98,15 +98,14 @@ class QRTool extends Component {
   }
 
   optionChange(val) {
-    //Init webcam
-    if (val === "1") {
-      this.startReader()
-    }
-
     this.setState({
       selectedOption: val,
     },function() {
       this.setParams()
+      //Init webcam
+      if (val === "1") {
+        this.startReader()
+      }
     })
   }
 
@@ -182,15 +181,25 @@ class QRTool extends Component {
     this.canvas = this.canvasElement.getContext("2d")
 
     // Use facingMode: environment to attemt to get the front camera on phones
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", audio: false, video: true } }).then(function(stream) {
-      this.video.srcObject = stream
-      this.video.setAttribute("playsinline", true) // required to tell iOS safari we don't want fullscreen
-      this.video.play()
-      requestAnimationFrame(this.tick)
-    }.bind(this)).catch(function(err) {
-      console.log(err)
-      toast("Failed to load video device. Make sure it's connected.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
-    })
+    try {
+      let device = navigator.mediaDevices
+      if (device) {
+        device.getUserMedia({ video: { facingMode: "environment", audio: false, video: true } }).then(async function(stream) {
+          this.video.srcObject = stream
+          this.video.setAttribute("playsinline", true) // required to tell iOS safari we don't want fullscreen
+          this.video.setAttribute('autoplay', '');
+          this.video.setAttribute('muted', '');
+          await this.video.play()
+          requestAnimationFrame(this.tick)
+        }.bind(this)).catch(function(err) {
+          console.log(err)
+          toast("Failed to load video device. Make sure it's connected.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        })
+      }
+    }
+    catch(error) {
+      console.log(error)
+    }
   }
 
   render() {
@@ -238,7 +247,7 @@ class QRTool extends Component {
 
         <div className={this.state.selectedOption==='0' ? 'hidden':'qr-reader-wrapper'}>
           <ul>
-            <li>If the webcam is not visible or QR data not fetched, try use another browser</li>
+            <li>If the cam stream is not visible or QR data not fetched, try use another device/browser</li>
           </ul>
           <canvas id="qr-canvas" hidden></canvas>
           <InputGroup size="sm" className="mb-3">
