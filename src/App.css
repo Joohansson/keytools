@@ -278,8 +278,8 @@ a:hover, a:focus {
   margin-top: 4px;
 }
 
-/* PoW GENERATOR TOOL */
-.gpu-load-title {
+/* RADIO BUTTONS */
+.gpu-load-title, .derivation-title {
   margin-right: 30px;
 }
 
