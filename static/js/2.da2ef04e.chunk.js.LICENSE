@@ -29,18 +29,18 @@
    * Date: 2019-04-08
    */
 
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
-
 /*!
  * The buffer module from node.js, for the browser.
  *
  * @author   Feross Aboukhadijeh <http://feross.org>
  * @license  MIT
  */
+
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
 
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
