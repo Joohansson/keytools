@@ -457,6 +457,7 @@ class FindAddressTool extends Component {
         <p>Find out if an address belongs to a seed</p>
         <ul>
           <li>Could be useful if a wallet does not import an address at correct index</li>
+          <li>It uses the Nano Default derivation method and can't be used with a Ledger seed</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">

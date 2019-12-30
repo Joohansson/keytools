@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174'
+import { wallet } from 'nanocurrency-web'
+import * as bip39 from 'bip39'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
-import MainPage from '../mainPage'
 import QrImageStyle from './components/qrImageStyle'
+import {toast } from 'react-toastify'
 const toolParam = 'seed'
 
 class SeedTool extends Component {
@@ -13,6 +15,8 @@ class SeedTool extends Component {
 
     this.state = {
       seed: '',
+      mnemonic: '',
+      selectedDerivationMethod: '0',
       index: '0',
       privKey: '',
       pubKey: '',
@@ -25,6 +29,7 @@ class SeedTool extends Component {
     }
 
     this.handleSeedChange = this.handleSeedChange.bind(this)
+    this.handleMnemonicChange = this.handleMnemonicChange.bind(this)
     this.handleIndexChange = this.handleIndexChange.bind(this)
     this.handlePrivChange = this.handlePrivChange.bind(this)
     this.handlePubChange = this.handlePubChange.bind(this)
@@ -36,6 +41,7 @@ class SeedTool extends Component {
     this.setMax = this.setMax.bind(this)
     this.clearText = this.clearText.bind(this)
     this.double = this.double.bind(this)
+    this.handleOptionChange = this.handleOptionChange.bind(this)
   }
 
   async componentDidMount() {
@@ -56,6 +62,14 @@ class SeedTool extends Component {
       case 'seed':
         this.setState({
           seed: ''
+        },
+        function() {
+          this.updateQR()
+        })
+        break
+      case 'mnemonic':
+        this.setState({
+          mnemonic: ''
         },
         function() {
           this.updateQR()
@@ -88,6 +102,20 @@ class SeedTool extends Component {
       default:
         break
     }
+  }
+
+  // Select CPU load
+  handleOptionChange = changeEvent => {
+    this.derivationChange(changeEvent.target.value)
+  }
+
+  derivationChange(val) {
+    this.setState({
+      selectedDerivationMethod: val
+    },function() {
+      this.indexChange(this.state.index) //use the same method as when changing the index
+      this.setParams()
+    })
   }
 
   // loop qr state 1x, 2x, 4x
@@ -141,6 +169,11 @@ class SeedTool extends Component {
           qrContent: this.state.seed,
         })
         break
+      case 'mnemonic':
+        this.setState({
+          qrContent: this.state.mnemonic,
+        })
+        break
       case 'privKey':
         this.setState({
           qrContent: this.state.privKey,
@@ -190,18 +223,86 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (seed !== '' && this.state.index !== '') {
-        new MainPage().notifyInvalidFormat()
+        toast("Invalid seed or index.", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       return
     }
 
-    let privKey = nano_old.deriveSecretKey(seed, parseInt(this.state.index))
+    let nanowallet = wallet.generate(seed)
+    let mnemonic = nanowallet.mnemonic
+    var privKey
+    if (this.state.selectedDerivationMethod === '0') {
+      privKey = nano_old.deriveSecretKey(seed, index)
+    }
+    else {
+      let accounts = wallet.accounts(nanowallet.seed, index, index)
+      privKey = accounts[0].privateKey
+    }
     let pubKey = nano_old.derivePublicKey(privKey)
+    let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
+
     this.setState({
       seed: seed,
+      mnemonic: mnemonic,
       privKey: privKey,
       pubKey: pubKey,
-      address: nano.deriveAddress(pubKey, {useNanoPrefix: true}),
+      address: address,
+    },
+    function() {
+      this.updateQR()
+    })
+  }
+
+  handleMnemonicChange(event) {
+    this.mnemonicChange(event.target.value)
+  }
+
+  mnemonicChange(mnemonic) {
+    var index = this.state.index
+    var invalid = false
+    if (helpers.isNumeric(index)) {
+      index = parseInt(index)
+      if (!nano.checkIndex(index) || !bip39.validateMnemonic(mnemonic)) {
+        invalid = true
+      }
+    }
+    else {
+      invalid = true
+    }
+
+    if (invalid) {
+      this.setState({
+        mnemonic: mnemonic
+      },
+      function() {
+        this.updateQR()
+      })
+      if (mnemonic !== '' && this.state.index !== '') {
+        toast("Invalid 24-word phrase or index.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      return
+    }
+
+    let seed = bip39.mnemonicToEntropy(mnemonic).toUpperCase()
+    let nanowallet = wallet.generate(seed)
+    var privKey
+    if (this.state.selectedDerivationMethod === '0') {
+      privKey = nano_old.deriveSecretKey(seed, index)
+    }
+    else {
+      let accounts = wallet.accounts(nanowallet.seed, index, index)
+      privKey = accounts[0].privateKey
+    }
+    let pubKey = nano_old.derivePublicKey(privKey)
+    let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
+
+
+    this.setState({
+      seed: seed,
+      mnemonic: mnemonic,
+      privKey: privKey,
+      pubKey: pubKey,
+      address: address,
     },
     function() {
       this.updateQR()
@@ -209,7 +310,10 @@ class SeedTool extends Component {
   }
 
   handleIndexChange(event) {
-    var index = event.target.value
+    this.indexChange(event.target.value)
+  }
+
+  indexChange(index) {
     var invalid = false
     if (helpers.isNumeric(index)) {
       index = parseInt(index)
@@ -228,18 +332,28 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (this.state.seed !== '' && index !== '') {
-        new MainPage().notifyInvalidFormat()
+        toast("Invalid index or seed.", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       return
     }
 
-    let privKey = nano_old.deriveSecretKey(this.state.seed, index)
+    let nanowallet = wallet.generate(this.state.seed)
+    var privKey
+    if (this.state.selectedDerivationMethod === '0') {
+      privKey = nano_old.deriveSecretKey(this.state.seed, index)
+    }
+    else {
+      let accounts = wallet.accounts(nanowallet.seed, index, index)
+      privKey = accounts[0].privateKey
+    }
     let pubKey = nano_old.derivePublicKey(privKey)
+    let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
+
     this.setState({
       index: index,
       privKey: privKey,
       pubKey: pubKey,
-      address: nano.deriveAddress(pubKey, {useNanoPrefix: true}),
+      address: address,
     },
     function() {
       this.updateQR()
@@ -259,7 +373,7 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (priv !== '') {
-        new MainPage().notifyInvalidFormat()
+        toast("Invalid private key.", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       return
     }
@@ -267,6 +381,7 @@ class SeedTool extends Component {
     let pubKey = nano_old.derivePublicKey(priv)
     this.setState({
       seed: '',
+      mnemonic: '',
       privKey: priv,
       pubKey: pubKey,
       address: nano.deriveAddress(pubKey, {useNanoPrefix: true}),
@@ -289,13 +404,14 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (pub !== '') {
-        new MainPage().notifyInvalidFormat()
+        toast("Invalid public key.", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       return
     }
 
     this.setState({
       seed: '',
+      mnemonic: '',
       privKey: '',
       pubKey: pub,
       address: nano.deriveAddress(pub, {useNanoPrefix: true}),
@@ -318,13 +434,14 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (address !== '') {
-        new MainPage().notifyInvalidFormat()
+        toast("Invalid Nano address.", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
       return
     }
 
     this.setState({
       seed: '',
+      mnemonic: '',
       privKey: '',
       pubKey: nano.derivePublicKey(address),
       address: address,
@@ -355,10 +472,12 @@ class SeedTool extends Component {
   render() {
     return (
       <div>
-        <p>Convert or Verify a Seed, Private/Public Key, or Address</p>
+        <p>Convert or Verify a Seed, Mnemonic, Private/Public Key, or Address</p>
         <ul>
-          <li><strong>Seed + Index &gt;</strong> Priv Key, Pub Key & Address </li>
-          <li><strong>Priv Key  &gt;</strong> Pub Key & Address </li>
+          <li>The seed from a Ledger device will only be useful for wallets supporting the alternative derivation method below. However, the private keys are good and can be used with the Signing Tool or wallets supporting it.</li>
+          <li><strong>Seed &gt;</strong> Mnemonic, Priv Key, Pub Key & Address </li>
+          <li><strong>Mnemonic &gt;</strong> Seed, Priv Key, Pub Key & Address </li>
+          <li><strong>Priv Key &gt;</strong> Pub Key & Address </li>
           <li><strong>Pub Key &gt;</strong> Address </li>
           <li><strong>Address &gt;</strong> Pub Key </li>
         </ul>
@@ -375,6 +494,32 @@ class SeedTool extends Component {
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'seed' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='seed' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
+        </InputGroup>
+
+        <InputGroup size="sm" className="mb-3 has-clear">
+          <InputGroup.Prepend>
+            <InputGroup.Text id="mnemonic">
+              Mnemonic
+            </InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl id="mnemonic" aria-describedby="mnemonic" value={this.state.mnemonic} title="The 24-word passphrase is interchangeable with the seed" placeholder="24 words pass phrase" onChange={this.handleMnemonicChange}/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='mnemonic' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.mnemonic} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'mnemonic' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='mnemonic' onClick={this.handleQRChange}></Button>
+          </InputGroup.Append>
+        </InputGroup>
+
+        <InputGroup size="sm" className="mb-3">
+          <div className="derivation-title">Derivation Method:</div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="send-check" value="0" checked={this.state.selectedDerivationMethod === "0"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="send-check">Nano Default</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="receive-check" value="1" checked={this.state.selectedDerivationMethod === "1"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="receive-check">Ledger/Magnum</label>
+          </div>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3 index-input">
