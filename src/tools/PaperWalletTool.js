@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174'
+import { wallet } from 'nanocurrency-web'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import { ReactComponent as NanoLogo } from '../img/nano.svg';
 import './PaperWalletTool.css';
@@ -17,6 +18,7 @@ class PaperWalletTool extends Component {
 
     this.state = {
       seed: '',
+      mnemonic: '',
       qrSeedContent: '',
       qrAddressContent: '',
       qrSize: 720,
@@ -46,6 +48,7 @@ class PaperWalletTool extends Component {
   clearText(event) {
     this.setState({
       seed: '',
+      mnemonic: '',
       qrSeedContent: '',
       qrAddressContent: '',
     })
@@ -66,10 +69,13 @@ class PaperWalletTool extends Component {
       return
     }
 
+    let nanowallet = wallet.generate(seed)
+    let mnemonic = nanowallet.mnemonic
     let privKey = nano_old.deriveSecretKey(seed, 0)
     let pubKey = nano_old.derivePublicKey(privKey)
     this.setState({
       seed: seed,
+      mnemonic: mnemonic,
       qrSeedContent: seed,
       qrAddressContent: nano.deriveAddress(pubKey, {useNanoPrefix: true}),
     })
@@ -88,7 +94,7 @@ class PaperWalletTool extends Component {
   /* Download card */
   download(event) {
     var imageWidth = 600
-    var imageHeight = 256
+    var imageHeight = 310
     var node =  null
 
     node = document.getElementsByClassName('QR-container-paper-inner')[0];
@@ -109,7 +115,7 @@ class PaperWalletTool extends Component {
     return (
       <div>
         <div className="noprint">
-          <p>Generate simple paper wallets with a SEED and ADDRESS</p>
+          <p>Generate simple paper wallets with a SEED, ADDRESS & MNEMONIC</p>
           <ul>
             <li>The address is derived using seed index 0</li>
           </ul>
@@ -154,6 +160,9 @@ class PaperWalletTool extends Component {
             <QrImageStyle className="QR-img-paper QR-img-paper-left" content={this.state.qrSeedContent} size={this.state.qrSize} />
             <NanoLogo className="paper-wallet-logo"/>
             <QrImageStyle className="QR-img-paper QR-img-paper-right" content={this.state.qrAddressContent} size={this.state.qrSize} />
+            <div className="mnemonic">
+              {this.state.mnemonic}
+            </div>
           </div>
         </div>
       </div>
