@@ -11,6 +11,8 @@ class ConvertTool extends Component {
   constructor(props) {
     super(props)
 
+    this.inputToast = null //disallow duplicates
+
     this.state = {
       raw: '1000000000000000000000000000000',
       nano: '1000000',
@@ -155,7 +157,9 @@ class ConvertTool extends Component {
   rawChange(val) {
     if (!nano.checkAmount(val)) {
       if (val !== '' && val.slice(-1) !== '.') {
-        toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       else {
         helpers.setURLParams('?tool='+toolParam + '&mnano=')
@@ -185,7 +189,9 @@ class ConvertTool extends Component {
     let raw = helpers.nanoToRaw(val)
     if (!nano.checkAmount(raw)) {
       if (val !== '' && val.slice(-1) !== '.') {
-        toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       else {
         helpers.setURLParams('?tool='+toolParam + '&mnano=')
@@ -215,7 +221,9 @@ class ConvertTool extends Component {
     let raw = helpers.MnanoToRaw(val)
     if (!nano.checkAmount(raw)) {
       if (val !== '' && val.slice(-1) !== '.') {
-        toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       else {
         helpers.setURLParams('?tool='+toolParam + '&mnano=')

@@ -6,15 +6,17 @@ import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import { ReactComponent as NanoLogo } from '../img/nano.svg';
 import './PaperWalletTool.css';
 import * as helpers from '../helpers'
-import MainPage from '../mainPage'
 import { saveAs } from 'file-saver'
 import domtoimage from 'dom-to-image'
 import QrImageStyle from './components/qrImageStyle'
+import {toast } from 'react-toastify'
 const toolParam = 'paper'
 
 class PaperWalletTool extends Component {
   constructor(props) {
     super(props)
+
+    this.inputToast = null //disallow duplicates
 
     this.state = {
       seed: '',
@@ -64,7 +66,9 @@ class PaperWalletTool extends Component {
         seed: seed,
       })
       if (seed !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Not a valid seed", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -97,7 +101,7 @@ class PaperWalletTool extends Component {
     var imageHeight = 310
     var node =  null
 
-    node = document.getElementsByClassName('QR-container-paper-inner')[0];
+    node = this.refs.QRContainerPaperInner
 
     domtoimage.toPng(node, {
       width: imageWidth,
@@ -152,7 +156,7 @@ class PaperWalletTool extends Component {
         </div>
 
         <div className="QR-container-paper">
-          <div className="QR-container-paper-inner">
+          <div className="QR-container-paper-inner" ref="QRContainerPaperInner">
             <div className="paper-wallet-text-container">
               <div className="paper-wallet-text">SEED</div>
               <div className="paper-wallet-text">ADDRESS</div>

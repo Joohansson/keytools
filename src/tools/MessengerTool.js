@@ -4,6 +4,7 @@ import { Chirp } from 'chirpsdk'
 import SimpleCrypto from "simple-crypto-js";
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
+import {toast } from 'react-toastify'
 const toolParam = 'msg'
 
 class MessengerTool extends React.Component {
@@ -47,7 +48,7 @@ class MessengerTool extends React.Component {
 
   componentDidMount() {
     if (!('WebAssembly' in window)) {
-      window.alert('WebAssembly is not supported in this browser')
+      toast("WebAssembly is not supported in this browser", helpers.getToast(helpers.toastType.ERROR))
     }
     //Start timer for automatic sending
     else {
@@ -278,7 +279,7 @@ class MessengerTool extends React.Component {
       reader.readAsArrayBuffer(files[0])
     }
     else {
-      window.alert("Max file size allowed: 1 MB")
+      toast("Max file size allowed: 1 MB", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
     }
   }
 
@@ -467,7 +468,8 @@ class MessengerTool extends React.Component {
         this.setState({ started: true })
       }).catch(console.error)
     }).catch(err => console.error(err) && err.message.includes('WebAssembly') ?
-        window.alert(err) : window.alert(this.audioError))
+        toast(err, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG)) : toast(this.audioError, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      )
   }
 
   render() {

@@ -11,6 +11,8 @@ class PaymentTool extends Component {
   constructor(props) {
     super(props)
 
+    this.inputToast = null //disallow duplicates
+
     this.state = {
       address: '',
       amount: '',
@@ -99,7 +101,9 @@ class PaymentTool extends Component {
   addressChange(address) {
     if (!nano.checkAddress(address)) {
       if (address !== '') {
-        toast("Invalid Nano address", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Nano address", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         address: address,
@@ -125,7 +129,9 @@ class PaymentTool extends Component {
     let raw = helpers.MnanoToRaw(amount)
     // allow no amount
     if (!nano.checkAmount(raw) && amount !== '') {
-      toast("Invalid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Invalid Nano amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
       this.setState({
         amount: amount,
         validAmount: false

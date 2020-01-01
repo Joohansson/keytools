@@ -81,7 +81,6 @@ a:hover, a:focus {
 .content-wrapper {
   position: absolute;
   top: 80px;
-  bottom: 130px;
   overflow: auto;
   margin: 10px auto 0 auto;
   width: 100%;
@@ -232,6 +231,10 @@ a:hover, a:focus {
   width: 70px;
 }
 
+.narrow-prepend-2 {
+  width: 100px;
+}
+
 /* Multiple input group on one row */
 .multi-group {
   margin-left: 20px;
@@ -328,7 +331,6 @@ a:hover, a:focus {
 .footer {
   background-color: #000034;
   text-align: center;
-  height: 130px;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -346,6 +348,20 @@ a:hover, a:focus {
 
 .footer .input-group {
   margin-bottom: 5px;
+}
+
+.footer-text {
+  margin-bottom: 5px;
+}
+
+/* Collapsible div */
+.collapse-content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  text-align: left;
+  margin: 10px auto 0 auto !important;
 }
 
 @media screen and (max-width: 992px) {

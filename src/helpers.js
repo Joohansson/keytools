@@ -92,10 +92,10 @@ export function isNumeric(val) {
 export function getHardwareConcurrency() {
   var threads =  window.navigator.hardwareConcurrency || 1;
   if (threads >= 12) {
-    threads-=2 //save one thread for handling the site
+    threads-=2 //save two thread for handling the site
   }
   else if (threads >= 6) {
-    threads-=1 //save two threads for handling the site
+    threads-=1 //save one threads for handling the site
   }
   return threads
 }
