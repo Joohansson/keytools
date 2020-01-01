@@ -21,8 +21,8 @@ class Start extends Component {
         <h4>SECURE</h4>
         <ul>
           <li>Secret keys comes from <a href="https://tweetnacl.js.org/#/">TweetNaCl</a>, a high-security cryptographic library</li>
-          <li>The site works offline or by <a href="https://github.com/Joohansson/keytools/raw/master/keytools.zip">downloading</a> and run the index.html from a secure local file system</li>
-          <li>The are zero cookies and trackers and no secret keys are shared via URL</li>
+          <li>The site works offline or by <a href="https://github.com/Joohansson/keytools/raw/master/keytools.zip">downloading</a> and running the index.html from a secure local file system</li>
+          <li>There are zero cookies and trackers and no secret keys are shared via URL</li>
         </ul>
         <h4>ACCESSIBLE</h4>
         <ul>

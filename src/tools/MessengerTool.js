@@ -587,12 +587,12 @@ class MessengerTool extends React.Component {
           <InputGroup size="sm" className="mb-3">
             <InputGroup.Prepend className="narrow-prepend">
               <InputGroup.Text id="output">
-                QR Data
+                Data
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="output" aria-describedby="output" as="textarea" rows="6" value={this.state.received} placeholder="Listening for message..." readOnly/>
+            <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" value={this.state.received} placeholder="Listening for message..." readOnly/>
             <InputGroup.Append>
-              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.received} onClick={helpers.copyText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
             </InputGroup.Append>
           </InputGroup>
 
