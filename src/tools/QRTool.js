@@ -12,8 +12,8 @@ class QRTool extends Component {
 
     // READER
     this.video = null
-    this.canvasElement = null
-    this.canvas = null
+    this.videoCanvas = null
+    this.videoCtx = null
     this.loadingMessage = null
 
     this.state = {
@@ -23,7 +23,9 @@ class QRTool extends Component {
       qrSize: 1024,
       selectedOption: '0',
       output: "",
-      outputFound: false, //found qr code from webcam,
+      outputFound: false, //found qr code from webcam
+      selectedFile: null,
+      saturation: '0%',
     }
 
     this.handleInputChange = this.handleInputChange.bind(this)
@@ -31,8 +33,9 @@ class QRTool extends Component {
     this.updateQR = this.updateQR.bind(this)
     this.double = this.double.bind(this)
     this.startReader = this.startReader.bind(this)
-    this.drawLine = this.drawLine.bind(this)
+    this.drawRect = this.drawRect.bind(this)
     this.tick = this.tick.bind(this)
+    this.reset = this.reset.bind(this)
   }
 
   componentDidMount = () => {
@@ -92,6 +95,30 @@ class QRTool extends Component {
     window.print()
   }
 
+  reset() {
+    switch (this.state.selectedOption) {
+      case '1':
+      this.startReader()
+      break
+
+      case '2':
+      this.setState({
+        output: '',
+        outputFound: false,
+        selectedFile: null,
+      })
+      const canvas = this.refs.fileCanvas
+      const ctx = canvas.getContext('2d')
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.hidden = true
+      break
+
+      default:
+      break
+    }
+
+  }
+
   // main checkboxes
   handleOptionChange = changeEvent => {
     this.optionChange(changeEvent.target.value)
@@ -123,32 +150,92 @@ class QRTool extends Component {
 
   //READER CODE
   // Draws border around video canvas
-  drawLine(begin, end, color) {
-    this.canvas.beginPath()
-    this.canvas.moveTo(begin.x, begin.y)
-    this.canvas.lineTo(end.x, end.y)
-    this.canvas.lineWidth = 2
-    this.canvas.strokeStyle = color
-    this.canvas.stroke()
+  drawLine(canvas, begin, end, color, width) {
+    canvas.beginPath()
+    canvas.moveTo(begin.x, begin.y)
+    canvas.lineTo(end.x, end.y)
+    canvas.lineWidth = width
+    canvas.strokeStyle = color
+    canvas.stroke()
+  }
+
+  drawRect(canvas, height, code, color) {
+    const lineWidth = Math.ceil(Math.max(height / 100, 3))
+    this.drawLine(canvas, code.location.topLeftCorner, code.location.topRightCorner, color, lineWidth)
+    this.drawLine(canvas, code.location.topRightCorner, code.location.bottomRightCorner, color, lineWidth)
+    this.drawLine(canvas, code.location.bottomRightCorner, code.location.bottomLeftCorner, color, lineWidth)
+    this.drawLine(canvas, code.location.bottomLeftCorner, code.location.topLeftCorner, color, lineWidth)
+  }
+
+  // Upload a file
+  onFileHandler = event => {
+    let reader = new FileReader()
+    let file = event.target.files[0]
+    let fileName = event.target.value
+    var outputFound = false
+
+    reader.onloadend = () => {
+      this.setState({
+        selectedFile: fileName.replace(/.*[\\]/, ''),
+        outputFound: false,
+      },function() {
+        const fileCanvas = this.refs.fileCanvas
+        const fileCtx = fileCanvas.getContext('2d')
+        fileCanvas.hidden = false
+
+        var qrImage = new Image()
+        qrImage.src = reader.result
+        qrImage.onload = function() {
+          fileCanvas.width = qrImage.width
+          fileCanvas.height = qrImage.height
+          fileCtx.filter = "saturate(50%) contrast(130%)" //increase the chances to succeed on poor images
+          fileCtx.drawImage(qrImage,0,0)
+          var imageData = fileCtx.getImageData(0, 0, qrImage.width, qrImage.height)
+          var code = jsQR(imageData.data, imageData.width, imageData.height)
+
+          if (code) {
+            // draw line around the QR
+            this.drawRect(fileCtx, imageData.height, code, "#ff0000")
+
+            if (!this.state.outputFound && !outputFound) {
+              toast("Found QR data", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+              this.setState({
+                output: code.data,
+                outputFound: true,
+              })
+              outputFound = true
+            }
+          }
+          else {
+            toast("Did not find a QR in the uploaded image", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+            this.setState({
+              output: '',
+              outputFound: false,
+            })
+          }
+        }.bind(this)
+      }.bind(this))
+    }
+
+    if (file instanceof Blob) {
+      reader.readAsDataURL(file)
+    }
   }
 
   // Webcam reader and qr detector
   tick() {
     if (this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
-      this.canvasElement.hidden = false
-      this.canvasElement.height = this.video.videoHeight
-      this.canvasElement.width = this.video.videoWidth
-      this.canvas.drawImage(this.video, 0, 0, this.canvasElement.width, this.canvasElement.height)
-      var imageData = this.canvas.getImageData(0, 0, this.canvasElement.width, this.canvasElement.height)
+      this.videoCanvas.hidden = false
+      this.videoCanvas.height = this.video.videoHeight
+      this.videoCanvas.width = this.video.videoWidth
+      this.videoCtx.drawImage(this.video, 0, 0, this.videoCanvas.width, this.videoCanvas.height)
+      var imageData = this.videoCtx.getImageData(0, 0, this.videoCanvas.width, this.videoCanvas.height)
       var code = jsQR(imageData.data, imageData.width, imageData.height, {
         inversionAttempts: "dontInvert",
       })
       if (code) {
         // draw line around the QR
-        this.drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#f9ae42")
-        this.drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#f9ae42")
-        this.drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#f9ae42")
-        this.drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#f9ae42")
+        this.drawRect(this.videoCtx, imageData.height, code, "#ff0000")
 
         if (!this.state.outputFound) {
           toast("Found QR data", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
@@ -177,8 +264,8 @@ class QRTool extends Component {
       outputFound: false,
     })
     this.video = document.createElement("video")
-    this.canvasElement = document.getElementById("qr-canvas")
-    this.canvas = this.canvasElement.getContext("2d")
+    this.videoCanvas = this.refs.videoCanvas
+    this.videoCtx = this.videoCanvas.getContext('2d')
 
     // Use facingMode: environment to attemt to get the front camera on phones
     try {
@@ -213,7 +300,11 @@ class QRTool extends Component {
             </div>
             <div className="form-check form-check-inline index-checkbox header-radio">
               <input className="form-check-input" type="radio" id="reader-check" value="1" checked={this.state.selectedOption === "1"} onChange={this.handleOptionChange}/>
-              <label className="form-check-label" htmlFor="reader-check">QR READER</label>
+              <label className="form-check-label" htmlFor="reader-check">QR VIDEO READER</label>
+            </div>
+            <div className="form-check form-check-inline index-checkbox header-radio">
+              <input className="form-check-input" type="radio" id="file-check" value="2" checked={this.state.selectedOption === "2"} onChange={this.handleOptionChange}/>
+              <label className="form-check-label" htmlFor="file-check">QR FILE READER</label>
             </div>
           </InputGroup>
 
@@ -221,7 +312,7 @@ class QRTool extends Component {
             <li>Click on QR to toggle size, if using large data</li>
           </ul>
 
-          <div className={this.state.selectedOption==='1' ? 'hidden':''}>
+          <div className={this.state.selectedOption!=='0' ? 'hidden':''}>
             <InputGroup size="sm" className="mb-3">
               <InputGroup.Prepend className="narrow-prepend">
                 <InputGroup.Text id="input">
@@ -239,29 +330,69 @@ class QRTool extends Component {
           </div>
         </div>
 
-        <div className={this.state.selectedOption==='1' ? 'hidden':''}>
+        <div className={this.state.selectedOption!=='0' ? 'hidden':''}>
         <div className={helpers.qrClassesContainer[this.state.qrState]}>
           <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
         </div>
         </div>
 
-        <div className={this.state.selectedOption==='0' ? 'hidden':'qr-reader-wrapper'}>
+        <div className={this.state.selectedOption!=='1' ? 'hidden':'qr-reader-wrapper'}>
           <ul>
             <li>If the cam stream is not visible or QR data not fetched, try use another device/browser</li>
           </ul>
-          <canvas id="qr-canvas" hidden></canvas>
+          <canvas ref="videoCanvas" className="qr-canvas" hidden></canvas>
           <InputGroup size="sm" className="mb-3">
             <InputGroup.Prepend className="narrow-prepend">
               <InputGroup.Text id="output">
                 QR Data
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="output" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR data..." readOnly/>
+            <FormControl id="output" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR video data..." readOnly/>
             <InputGroup.Append>
               <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
             </InputGroup.Append>
           </InputGroup>
-          <Button variant="primary" onClick={this.startReader}>Reset</Button>
+          <Button variant="primary" onClick={this.reset}>Reset</Button>
+        </div>
+
+        <div className={this.state.selectedOption!=='2' ? 'hidden':'qr-reader-wrapper'}>
+          <ul>
+            <li>No image data is stored other than in device RAM until page is reloaded or reset</li>
+          </ul>
+          <InputGroup size="sm" className="mb-3">
+            <InputGroup.Prepend className="narrow-prepend">
+              <InputGroup.Text id="output">
+                Upload
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <div className="custom-file">
+              <input
+                type="file"
+                name="file"
+                className="custom-file-input"
+                id="inputGroupFile01"
+                aria-describedby="inputGroupFileAddon01"
+                onChange={this.onFileHandler}
+              />
+              <label className="custom-file-label" htmlFor="inputGroupFile01">
+                {this.state.selectedFile ? this.state.selectedFile: "Choose an image file containing a QR code"}
+              </label>
+            </div>
+          </InputGroup>
+
+          <canvas ref="fileCanvas" className="qr-canvas" hidden></canvas>
+          <InputGroup size="sm" className="mb-3">
+            <InputGroup.Prepend className="narrow-prepend">
+              <InputGroup.Text id="output">
+                QR Data
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl id="output" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR image file..." readOnly/>
+            <InputGroup.Append>
+              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
+            </InputGroup.Append>
+          </InputGroup>
+          <Button variant="primary" onClick={this.reset}>Reset</Button>
         </div>
       </div>
     )

@@ -26,9 +26,9 @@ class Start extends Component {
         </ul>
         <h4>QUICKLY ACCESSIBLE</h4>
         <ul>
+          <li>Access tools with hotkeys SHIFT+ALT+0-9 and CTRL+SHIFT+ALT+0-9</li>
           <li>Each tool support URL params which can be bookmarked, shared or implemented in other tools.<br/>
           <strong>NOTE:</strong> The URL won't be updated if running from a file system, though the parameters will still work. A valid workaround is to use this <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb">chrome webserver extension</a> and launch from <a href="http://localhost:8887/">localhost</a>.</li>
-          <li>Access tools with hotkeys SHIFT+ALT+0-9 and CTRL+SHIFT+ALT+0-9</li>
         </ul>
         <h4>AUDITABLE</h4>
         <ul>

@@ -177,7 +177,7 @@ a:hover, a:focus {
   text-align: left;
 }
 
-#qr-canvas {
+.qr-canvas {
   max-height: 300px;
   max-width: 100%;
   margin-bottom: 20px;
@@ -200,6 +200,11 @@ a:hover, a:focus {
 .btn-outline-secondary:focus {
   box-shadow: none;
 }
+
+.form-control:focus {
+  box-shadow: none;
+}
+
 
 .btn-active {
   background-color: #6C757D;
