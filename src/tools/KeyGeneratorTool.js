@@ -3,12 +3,14 @@ import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
-import MainPage from '../mainPage'
+import {toast } from 'react-toastify'
 const toolParam = 'keygen'
 
 class KeyGeneratorTool extends Component {
   constructor(props) {
     super(props)
+
+    this.inputToast = null //disallow duplicates
 
     this.state = {
       count: '10',
@@ -75,16 +77,21 @@ class KeyGeneratorTool extends Component {
   }
 
   countChange(count) {
+    if (count > helpers.constants.KEYS_MAX) {
+      count = helpers.constants.KEYS_MAX
+    }
     this.setState({
       count: count
     },
     function() {
-      if (!helpers.isNumeric(count) || count > helpers.constants.KEYS_MAX) {
+      if (!helpers.isNumeric(count)) {
         this.setState({
           validCount: false
         })
         if (count !== '') {
-          new MainPage().notifyInvalidFormat()
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("Not a valid count", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
       else {
@@ -161,7 +168,9 @@ class KeyGeneratorTool extends Component {
       })
     }
     else {
-      new MainPage().notifyInvalidFormat()
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Not a valid count", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
 
     this.setState({
@@ -175,7 +184,7 @@ class KeyGeneratorTool extends Component {
         <p>Mass generate wallets using seed index 0</p>
 
         <InputGroup size="sm" className="mb-3 count-input">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className="narrow-prepend-2">
             <InputGroup.Text id="count">
               Pair Count
             </InputGroup.Text>
@@ -206,9 +215,9 @@ class KeyGeneratorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className="narrow-prepend-2">
             <InputGroup.Text id="output">
-              Output
+              JSON
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>

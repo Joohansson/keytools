@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
-import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import SeedWorker from '../modules/seed.worker'
 const toolParam = 'vanity'
@@ -9,6 +8,9 @@ const toolParam = 'vanity'
 class VanityTool extends Component {
   constructor(props) {
     super(props)
+
+    this.inputToast = null //disallow duplicates
+
     this.workers = []
     this.addressesCount = 0
     this.countDiff = 0
@@ -224,7 +226,9 @@ class VanityTool extends Component {
         validPrefix: false
       })
       if (prefix !== '') {
-        toast("Prefix must be a-z and 0-9 but can't contain 0,2,L or V", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Prefix must be a-z and 0-9 but can't contain 0,2,L or V", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -248,7 +252,9 @@ class VanityTool extends Component {
         validSuffix: false
       })
       if (suffix !== '') {
-        toast("Suffix must be a-z and 0-9 but can't contain 0,2,L or V", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Suffix must be a-z and 0-9 but can't contain 0,2,L or V", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -265,16 +271,21 @@ class VanityTool extends Component {
   }
 
   maxWalletsChange(count) {
+    if (count > helpers.constants.KEYS_MAX) {
+      count = helpers.constants.KEYS_MAX
+    }
     this.setState({
       maxWallets: count
     },
     function() {
-      if (!helpers.isNumeric(count) || count > helpers.constants.KEYS_MAX) {
+      if (!helpers.isNumeric(count)) {
         this.setState({
           validMaxWallets: false
         })
         if (count !== '') {
-          new MainPage().notifyInvalidFormat()
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("Invalid Value", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
       else {
@@ -462,7 +473,9 @@ class VanityTool extends Component {
       });
     }
     else {
-      new MainPage().notifyInvalidFormat()
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Invalid Input Values", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
   }
 
@@ -572,7 +585,7 @@ class VanityTool extends Component {
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend className="narrow-prepend">
             <InputGroup.Text id="output">
-              Output
+              JSON
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>

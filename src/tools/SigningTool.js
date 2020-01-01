@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
-import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import 'nano-webgl-pow'
 import QrImageStyle from './components/qrImageStyle'
@@ -11,6 +10,8 @@ const toolParam = 'sign'
 class SigningTool extends Component {
   constructor(props) {
     super(props)
+
+    this.inputToast = null //disallow duplicates
 
     this.addressText = [
       'Sending Address',
@@ -201,6 +202,7 @@ class SigningTool extends Component {
       signature: '',
       work: '',
       output: '',
+      outputRaw: '',
       signWorkHash: '', //special work hash field for sign block option
       validAddress: false,
       validPrevious: false,
@@ -234,6 +236,8 @@ class SigningTool extends Component {
       place_link: this.linkPlace[0],
       activeAmount: this.amounts[0],
       activeAmountId: '0', // NANO=0, raw=1
+      jsonOneLine: false, //if the output is one line or not
+      jsonOneLineText: 'Simple',
     }
 
     this.clearText = this.clearText.bind(this)
@@ -243,6 +247,7 @@ class SigningTool extends Component {
     this.selectAmount = this.selectAmount.bind(this)
     this.generateWork = this.generateWork.bind(this)
     this.double = this.double.bind(this)
+    this.oneLine = this.oneLine.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
@@ -437,6 +442,7 @@ class SigningTool extends Component {
       signature: '',
       work: '',
       output: '',
+      outputRaw: '',
       signWorkHash: '',
       validAddress: false,
       validPrevious: this.state.selectedOption === '2' ? true:false, //previous not used for open blocks
@@ -492,7 +498,9 @@ class SigningTool extends Component {
   addressChange(address) {
     if (!nano.checkAddress(address)) {
       if (address !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Input", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         address: address,
@@ -510,7 +518,9 @@ class SigningTool extends Component {
       let pubKey = nano.derivePublicKey(privKey)
       let derivedAddress = nano.deriveAddress(pubKey, {useNanoPrefix: true})
       if (derivedAddress !== nanoAddress) {
-        toast("The address does not match the private key given", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("The address does not match the private key given", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
     }
 
@@ -521,7 +531,9 @@ class SigningTool extends Component {
       if (this.state.validWork) {
         let pubKey = nano.derivePublicKey(address)
         if (!nano.validateWork({blockHash:pubKey, work:this.state.work})) {
-          toast("The PoW is no longer valid for the given address.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("The PoW is no longer valid for the given address", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
     }
@@ -542,7 +554,9 @@ class SigningTool extends Component {
   linkChange(address) {
     if (!nano.checkAddress(address) && !nano.checkKey(address)) {
       if (address !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Input", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         link: address,
@@ -569,7 +583,9 @@ class SigningTool extends Component {
   previousChange(hash) {
     if (!nano.checkKey(hash)) {
       if (hash !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Input", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         previous: hash,
@@ -586,7 +602,9 @@ class SigningTool extends Component {
     if (sendType === '0' || sendType === '1' || sendType === '3') {
       if (this.state.validWork) {
         if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
-          toast("The PoW is no longer valid for the given previous hash.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("The PoW is no longer valid for the given previous hash", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
     }
@@ -607,7 +625,9 @@ class SigningTool extends Component {
   repChange(address) {
     if (!nano.checkAddress(address)) {
       if (address !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Input", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         rep: address,
@@ -635,7 +655,9 @@ class SigningTool extends Component {
     if (!nano.checkAmount(balance)) {
       // do not warn when start typing dot
       if (balance !== '' && balance[balance.length -1] !== '.') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Nano Amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         currBalance: balance,
@@ -668,7 +690,9 @@ class SigningTool extends Component {
     if (!nano.checkAmount(raw)) {
       // do not warn when start typing dot
       if (amount !== '' && amount[amount.length -1] !== '.') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Nano Amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         amount: amount,
@@ -695,7 +719,9 @@ class SigningTool extends Component {
   blockHashChange(hash) {
     if (!nano.checkHash(hash)) {
       if (hash !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Hash", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         blockHash: hash,
@@ -723,7 +749,9 @@ class SigningTool extends Component {
   privKeyChange(hash) {
     if (!nano.checkKey(hash)) {
       if (hash !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Key", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         privKey: hash,
@@ -740,7 +768,9 @@ class SigningTool extends Component {
       let pubKey = nano.derivePublicKey(hash)
       let derivedAddress = nano.deriveAddress(pubKey, {useNanoPrefix: true})
       if (derivedAddress !== address) {
-        toast("The private key does not match the address given", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("The private key does not match the address given", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
     }
     this.setState({
@@ -759,7 +789,9 @@ class SigningTool extends Component {
   signWorkHashChange(hash) {
     if (!nano.checkHash(hash)) {
       if (hash !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Hash", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         signWorkHash: hash,
@@ -775,7 +807,9 @@ class SigningTool extends Component {
     if (this.state.selectedOption === '4') {
       if (this.state.validWork) {
         if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
-          toast("The PoW is no longer valid for the given input hash.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("The PoW is no longer valid for the given input hash", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
     }
@@ -802,12 +836,16 @@ class SigningTool extends Component {
         if (this.state.validPrevious) {
           if (!nano.validateWork({blockHash:this.state.previous, work:hash})) {
             failed = true
-            toast("The previous hash is no longer valid for the given PoW.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+            if (! toast.isActive(this.inputToast)) {
+              this.inputToast = toast("The previous hash is no longer valid for the given PoW", helpers.getToast(helpers.toastType.ERROR_AUTO))
+            }
           }
         }
         else {
           failed = true
-          toast("Need a valid previous hash to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("Need a valid previous hash to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
       // use public key for open block
@@ -816,19 +854,25 @@ class SigningTool extends Component {
           let pubKey = nano.derivePublicKey(this.state.address)
           if (!nano.validateWork({blockHash:pubKey, work:hash})) {
             failed = true
-            toast("The address is no longer valid for the given PoW.", helpers.getToast(helpers.toastType.ERROR))
+            if (! toast.isActive(this.inputToast)) {
+              this.inputToast = toast("The address is no longer valid for the given PoW", helpers.getToast(helpers.toastType.ERROR_AUTO))
+            }
           }
         }
         else {
           failed = true
-          toast("Need a valid address to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("Need a valid address to create the JSON block", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
     }
     else {
       failed = true
       if (hash !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Work Value", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
     }
 
@@ -1024,7 +1068,9 @@ class SigningTool extends Component {
         hash = this.state.signWorkHash
       }
       if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
-        toast("The work value does not match", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("The work value does not match", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
 
       this.hashBlock()
@@ -1114,7 +1160,9 @@ class SigningTool extends Component {
 
       // check that the new balance is not negative
       if (helpers.bigIsNegative(newBalance)) {
-        toast("The amount is larger than available balance!", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("The amount is larger than available balance!", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         return
       }
       break
@@ -1125,7 +1173,9 @@ class SigningTool extends Component {
 
       // check that the new balance is valid
       if (!nano.checkAmount(newBalance)) {
-        toast("The new amount is invalid", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("The new amount is invalid", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         return
       }
       break
@@ -1179,7 +1229,9 @@ class SigningTool extends Component {
         adjustedBalance: null,
         validBlockHash: false,
       })
-      toast("Failed to create block hash. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Failed to create block hash. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
   }
 
@@ -1215,7 +1267,9 @@ class SigningTool extends Component {
       function() {
         this.createBlock()
       })
-      toast("Failed to create signature. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Failed to create signature. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
   }
 
@@ -1269,13 +1323,19 @@ class SigningTool extends Component {
       }
     }
     else if (this.state.selectedOption !== '2' && this.state.selectedOption !== '4'){
-      toast("Need a valid previous block hash to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Need a valid previous block hash to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
     else if (this.state.selectedOption === '2'){
-      toast("Need a valid opening address to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Need a valid opening address to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
     else if (this.state.selectedOption === '4'){
-      toast("Need a valid input hash to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Need a valid input hash to generate work.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
   }
 
@@ -1315,7 +1375,8 @@ class SigningTool extends Component {
     // All input parameters must be valid
     if (!this.state.validWork || !this.isValidHashInputs() || !this.isValidSignInputs()) {
       this.setState({
-        output: 'Invalid input parameters...'
+        output: 'Invalid input parameters...',
+        outputRaw: '',
       })
       return
     }
@@ -1366,12 +1427,31 @@ class SigningTool extends Component {
       }
 
       this.setState({
+        outputRaw: processJson,
         output: JSON.stringify(processJson, null, 2)
       })
     }
     else {
       this.setState({
         output: 'Bad JSON block generated, please contact the developer'
+      })
+    }
+  }
+
+  // Make output JSON one compact line
+  oneLine() {
+    if (!this.state.jsonOneLine) {
+      this.setState({
+        output: JSON.stringify(this.state.outputRaw),
+        jsonOneLine: true,
+        jsonOneLineText: 'Pretty'
+      })
+    }
+    else {
+      this.setState({
+        output: JSON.stringify(this.state.outputRaw, null, 2),
+        jsonOneLine: false,
+        jsonOneLineText: 'Simple'
       })
     }
   }
@@ -1588,6 +1668,7 @@ class SigningTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
           <InputGroup.Append>
+            <Button variant="outline-secondary" onClick={this.oneLine}>{this.state.jsonOneLineText}</Button>
             <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'output' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='output' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>

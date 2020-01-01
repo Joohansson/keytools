@@ -21,14 +21,20 @@ class MainPage extends Component {
       activeTool: this.tools[0],
       activeToolId: 0,
       donationPath: donation,
+      collapseText: 'Show Memo',
     }
 
     // Bindings
     this.selectTool = this.selectTool.bind(this)
     this.showDonateModal = this.showDonateModal.bind(this)
+    this.collapse = this.collapse.bind(this)
   }
 
   componentDidMount = () => {
+    // Set footer height
+    var contentWrapper = this.refs.contentWrapper
+    contentWrapper.style.bottom = "40px"
+
     // Read URL params
     var tool = helpers.getUrlParams().tool
     var toolId = 0
@@ -440,6 +446,27 @@ class MainPage extends Component {
     return false;
   }
 
+  /* Show/hide memo section at the footer */
+  collapse() {
+    var content = this.refs.collapse
+    var contentWrapper = this.refs.contentWrapper
+
+    if (content.style.maxHeight) {
+      content.style.maxHeight = null
+      contentWrapper.style.bottom = "2rem"
+      this.setState({
+        collapseText: 'Show Memo'
+      })
+    }
+    else {
+      content.style.maxHeight = "5rem"
+      contentWrapper.style.bottom = "7.8rem"
+      this.setState({
+        collapseText: 'Hide Memo'
+      })
+    }
+  }
+
   render() {
     //const ActiveView = tools[this.state.activeToolId]
     var active = this.state.activeToolName
@@ -552,7 +579,7 @@ class MainPage extends Component {
           </div>
         </header>
         <div className="line noprint"></div>
-        <div className="content-wrapper">
+        <div className="content-wrapper" ref="contentWrapper">
           <div className="content">
             {(active === 'HOME') && <Start /> }
             {(active === 'CONVERT') && <ConvertTool {...this} /> }
@@ -572,10 +599,12 @@ class MainPage extends Component {
 
         <footer className="footer noprint">
           <div className="line"></div>
-          <InputGroup>
-            <FormControl as="textarea" rows="4" placeholder="Memo for copy/paste across tools"/>
+          <InputGroup ref="collapse" className="collapse-content">
+            <FormControl as="textarea" rows="4" placeholder="Memo for copy data between tools"/>
           </InputGroup>
-          <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano Home</a> | <a href="https://nanolinks.info">Nano Guide</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span>
+          <div className="footer-text">
+            <span className="link-span" onClick={this.collapse}>{this.state.collapseText}</span> | <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span>
+          </div>
         </footer>
       </div>
     )

@@ -294,7 +294,7 @@ class WorkGeneratorTool extends Component {
         </ul>
 
         <InputGroup size="sm" className='mb-3'>
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className='narrow-prepend-2'>
             <InputGroup.Text id="workHash">
               Input Hash
             </InputGroup.Text>
@@ -307,7 +307,7 @@ class WorkGeneratorTool extends Component {
           </InputGroup.Append>
         </InputGroup>
         <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className='narrow-prepend-2'>
             <InputGroup.Text id="work">
               PoW
             </InputGroup.Text>
@@ -359,9 +359,9 @@ class WorkGeneratorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className='mb-3'>
-          <InputGroup.Prepend className='narrow-prepend'>
+          <InputGroup.Prepend className='narrow-prepend-2'>
             <InputGroup.Text id="output">
-              Output
+              JSON
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>

@@ -13,6 +13,8 @@ class SeedTool extends Component {
   constructor(props) {
     super(props)
 
+    this.inputToast = null //disallow duplicates
+
     this.state = {
       seed: '',
       mnemonic: '',
@@ -223,7 +225,9 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (seed !== '' && this.state.index !== '') {
-        toast("Invalid seed or index.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid seed or index", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -278,7 +282,9 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (mnemonic !== '' && this.state.index !== '') {
-        toast("Invalid 24-word phrase or index.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid 24-word phrase or index", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -332,7 +338,9 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (this.state.seed !== '' && index !== '') {
-        toast("Invalid index or seed.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid index or seed", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -373,7 +381,9 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (priv !== '') {
-        toast("Invalid private key.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid private key", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -404,7 +414,9 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (pub !== '') {
-        toast("Invalid public key.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid public key", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -434,7 +446,9 @@ class SeedTool extends Component {
         this.updateQR()
       })
       if (address !== '') {
-        toast("Invalid Nano address.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Nano address", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }

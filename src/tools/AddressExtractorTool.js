@@ -12,6 +12,8 @@ class AddressExtractorTool extends Component {
   constructor(props) {
     super(props)
 
+    this.inputToast = null
+
     this.state = {
       seed: '',
       startIndex: '0',
@@ -183,6 +185,9 @@ class AddressExtractorTool extends Component {
 
   handleStartIndexChange(event) {
     var index = event.target.value
+    if (index > helpers.constants.INDEX_MAX) {
+      index = helpers.constants.INDEX_MAX
+    }
     this.setState({
       startIndex: index
     })
@@ -213,6 +218,9 @@ class AddressExtractorTool extends Component {
 
   handleEndIndexChange(event) {
     var index = event.target.value
+    if (index > helpers.constants.INDEX_MAX) {
+      index = helpers.constants.INDEX_MAX
+    }
     this.setState({
       endIndex: index
     })
@@ -269,11 +277,15 @@ class AddressExtractorTool extends Component {
   async generate() {
     // check that max number is not exceeded
     if (parseInt(this.state.endIndex) - parseInt(this.state.startIndex) > helpers.constants.KEYS_MAX) {
-      toast("The total range can't exceed " + helpers.addCommas(String(helpers.constants.KEYS_MAX)), helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast =  toast("The total range can't exceed " + helpers.addCommas(String(helpers.constants.KEYS_MAX)), helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
       return
     }
     if (parseInt(this.state.endIndex) < parseInt(this.state.startIndex)) {
-      toast("End index can't be smaller than start index", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast =  toast("End index can't be smaller than start index", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
       return
     }
 
@@ -330,7 +342,7 @@ class AddressExtractorTool extends Component {
         </ul>
 
         <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className="narrow-prepend-2">
             <InputGroup.Text id="seed">
               Seed
             </InputGroup.Text>
@@ -344,7 +356,7 @@ class AddressExtractorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3 index-input">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className="narrow-prepend-2">
             <InputGroup.Text id="startIndex">
               Start Index
             </InputGroup.Text>
@@ -356,7 +368,7 @@ class AddressExtractorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3 index-input">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className="narrow-prepend-2">
             <InputGroup.Text id="endIndex">
               End Index
             </InputGroup.Text>
@@ -392,9 +404,9 @@ class AddressExtractorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
+          <InputGroup.Prepend className="narrow-prepend-2">
             <InputGroup.Text id="output">
-              Output
+              JSON
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
