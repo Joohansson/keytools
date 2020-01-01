@@ -338,7 +338,7 @@ a:hover, a:focus {
 }
 
 .footer .line {
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .footer .form-control {
@@ -356,12 +356,11 @@ a:hover, a:focus {
 
 /* Collapsible div */
 .collapse-content {
-  padding: 0 18px;
+  padding: 0 0;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
-  text-align: left;
-  margin: 10px auto 0 auto !important;
+  margin: 0 0 5px 0;
 }
 
 @media screen and (max-width: 992px) {
