@@ -459,7 +459,7 @@ class MainPage extends Component {
       })
     }
     else {
-      content.style.maxHeight = "5rem"
+      content.style.maxHeight = "5.6rem"
       contentWrapper.style.bottom = "7.8rem"
       this.setState({
         collapseText: 'Hide Memo'
