@@ -1429,6 +1429,8 @@ class SigningTool extends Component {
       this.setState({
         outputRaw: processJson,
         output: JSON.stringify(processJson, null, 2)
+      },function() {
+        this.updateQR()
       })
     }
     else {

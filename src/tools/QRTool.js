@@ -406,9 +406,9 @@ class QRTool extends Component {
                 QR Data
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="output" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR image file..." readOnly/>
+            <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR image file..." readOnly/>
             <InputGroup.Append>
-              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
             </InputGroup.Append>
           </InputGroup>
           <Button variant="primary" onClick={this.reset}>Reset</Button>

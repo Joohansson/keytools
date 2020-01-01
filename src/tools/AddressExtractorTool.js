@@ -411,7 +411,7 @@ class AddressExtractorTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
           </InputGroup.Append>
         </InputGroup>
 

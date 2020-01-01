@@ -16,6 +16,7 @@ class KeyGeneratorTool extends Component {
       count: '10',
       generating: false,
       validCount: true,
+      walletNoChecked: true,
       privKeyChecked: true,
       addressChecked: true,
       pubKeyChecked: true,
@@ -24,6 +25,7 @@ class KeyGeneratorTool extends Component {
 
     this.setMax = this.setMax.bind(this)
     this.handleCountChange = this.handleCountChange.bind(this)
+    this.handleWalletNoCheck = this.handleWalletNoCheck.bind(this)
     this.handlePrivKeyCheck = this.handlePrivKeyCheck.bind(this)
     this.handlePubKeyCheck = this.handlePubKeyCheck.bind(this)
     this.handleAddressCheck = this.handleAddressCheck.bind(this)
@@ -103,6 +105,15 @@ class KeyGeneratorTool extends Component {
     })
   }
 
+  handleWalletNoCheck(event) {
+    this.setState({
+      walletNoChecked: event.target.checked
+    },
+    function() {
+      this.setParams()
+    })
+  }
+
   handlePrivKeyCheck(event) {
     this.setState({
       privKeyChecked: event.target.checked
@@ -148,8 +159,12 @@ class KeyGeneratorTool extends Component {
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
         // save result in array
-        var obj = {seed: seed}
+        var obj = {}
 
+        if (this.state.walletNoChecked) {
+          obj.wallet = i+1
+        }
+        obj.seed = seed
         if (this.state.privKeyChecked) {
           obj.privKey = privKey
         }
@@ -197,6 +212,10 @@ class KeyGeneratorTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="walletNo-check" value="walletNo" checked={this.state.walletNoChecked} onChange={this.handleWalletNoCheck}/>
+            <label className="form-check-label" htmlFor="walletNo-check">Wallet No.</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="checkbox" id="privKey-check" value="privKey" checked={this.state.privKeyChecked} onChange={this.handlePrivKeyCheck}/>
             <label className="form-check-label" htmlFor="privKey-check">Private Key</label>
           </div>
@@ -222,7 +241,7 @@ class KeyGeneratorTool extends Component {
           </InputGroup.Prepend>
           <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
           <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
           </InputGroup.Append>
         </InputGroup>
       </div>

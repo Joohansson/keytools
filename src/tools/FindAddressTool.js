@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
-import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 import FindWorker from '../modules/find.worker'
 const toolParam = 'findaddr'
@@ -10,6 +9,8 @@ const toolParam = 'findaddr'
 class FindAddressTool extends Component {
   constructor(props) {
     super(props)
+
+    this.inputToast = null //disallow duplicates
 
     this.workers = []
     this.addressesCount = 0
@@ -159,7 +160,9 @@ class FindAddressTool extends Component {
         validSeed: false
       })
       if (seed !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Seed", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       return
     }
@@ -179,7 +182,9 @@ class FindAddressTool extends Component {
 
     if (!nano.checkAddress(address)) {
       if (address !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Address", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         validAddress: false
@@ -193,6 +198,9 @@ class FindAddressTool extends Component {
 
   handleStartIndexChange(event) {
     var index = event.target.value
+    if (index > helpers.constants.INDEX_MAX) {
+      index = helpers.constants.INDEX_MAX
+    }
     this.setState({
       startIndex: index
     })
@@ -209,7 +217,9 @@ class FindAddressTool extends Component {
     }
     if (invalid) {
       if (index !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Index", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         validStartIndex: false
@@ -223,6 +233,9 @@ class FindAddressTool extends Component {
 
   handleEndIndexChange(event) {
     var index = event.target.value
+    if (index > helpers.constants.INDEX_MAX) {
+      index = helpers.constants.INDEX_MAX
+    }
     this.setState({
       endIndex: index
     })
@@ -239,7 +252,9 @@ class FindAddressTool extends Component {
     }
     if (invalid) {
       if (index !== '') {
-        new MainPage().notifyInvalidFormat()
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Invalid Index", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
       }
       this.setState({
         validEndIndex: false
@@ -447,7 +462,9 @@ class FindAddressTool extends Component {
       });
     }
     else {
-      new MainPage().notifyInvalidFormat()
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Invalid Input Values", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
   }
 
