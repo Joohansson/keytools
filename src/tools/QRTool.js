@@ -4,6 +4,7 @@ import * as helpers from '../helpers'
 import jsQR from 'jsqr'
 import {toast } from 'react-toastify'
 import QrImageStyle from './components/qrImageStyle'
+import ImageFilters from 'canvas-filters'
 const toolParam = 'qr'
 
 class QRTool extends Component {
@@ -193,15 +194,14 @@ class QRTool extends Component {
         var qrImage = new Image()
         qrImage.src = reader.result
         qrImage.onload = function() {
-          //fileCtx.filter = "saturate(50%) contrast(130%)" //increase the chances to succeed on poor images
           var newWidth = qrImage.width
           var newHeight = qrImage.height
           // Scale down if image too large
           fileCanvas.width = newWidth
           fileCanvas.height = newHeight
-          if (newWidth > 1000 && qrImage.height > 0) {
+          if (newWidth > 1500 && qrImage.height > 0) {
             let ratio = qrImage.height / qrImage.width
-            newWidth = 1000
+            newWidth = 1500
             newHeight = Math.ceil(newWidth * ratio)
           }
           fileCanvas.width = newWidth
@@ -210,6 +210,12 @@ class QRTool extends Component {
           console.log(newHeight)
           fileCtx.drawImage(qrImage,0,0, newWidth, newHeight)
           var imageData = fileCtx.getImageData(0, 0, newWidth, newHeight)
+
+          // increase the chances to succeed on poor images
+          var filtered = ImageFilters.GrayScale(imageData)
+          filtered = ImageFilters.BrightnessContrastPhotoshop(filtered, 0, 40)
+          fileCtx.putImageData(filtered, 0, 0) // put back the filtered image
+
           var code = jsQR(imageData.data, newWidth, newHeight)
 
           if (code) {

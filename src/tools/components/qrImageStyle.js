@@ -16,7 +16,7 @@ export default class QrImageStyle extends React.Component {
       QrCode.render({
         text: props.content,
         radius: 0.5, // 0.0 to 0.5
-        ecLevel: 'M', // L, M, Q, H
+        ecLevel: 'Q', // L, M, Q, H
         fill: {
           type: 'radial-gradient', // or 'linear-gradient'
           position: [ 0.5,0.5,0, 0.5,0.5,0.75 ], //xPos,yPos,radius of inner and outer circle where position is 0-1 of full dimension
