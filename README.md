@@ -1,5 +1,5 @@
 # KeyTools - High performance Nano web tools written with reactJS
-* Can be run from local file system offline by downloading [this package]()
+* Can be run from local file system offline by downloading [this zip package](https://github.com/Joohansson/keytools/raw/master/keytools.zip)
 * Hosted by github pages at https://tools.nanos.cc
 
 ## Developer instructions
@@ -40,11 +40,13 @@ Your app is ready to be deployed!
 10. Change mainPage.js: Add a section to control URL params at <switch (tool) {...>
 11. The new tool should now be available from the main dropdown selector. Happy coding!
 
-## Used Libraries
+## Used Nice Libraries
 
 * [Nano library - Nano-currency-js](https://github.com/marvinroger/nanocurrency-js)
 * [Nano library - Nano-currency-web-js](https://github.com/numsu/nanocurrency-web-js)
 * [PoW Generation - Nano webGL](https://github.com/numtel/nano-webgl-pow)
+* [BIP39 Mnemonics](https://www.npmjs.com/package/bip39)
+* [Notifications](https://github.com/fkhadra/react-toastify)
 * [Fancy QR generation - jsQR](https://github.com/cozmo/jsQR)
 * [Auditable high-security cryptographic library - Tweetnacl](https://tweetnacl.js.org/)
 * [Messaging over sound - Chirp](https://developers.chirp.io/)
