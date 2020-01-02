@@ -773,7 +773,12 @@ class SigningTool extends Component {
         validPrivKey: false
       },
       function() {
-        this.createBlock()
+        if (this.state.selectedOption === '4') {
+          this.signBlock()
+        }
+        else {
+          this.createBlock()
+        }
       })
       return
     }
@@ -792,7 +797,12 @@ class SigningTool extends Component {
       privKey: hash,
       validPrivKey: true
     },function() {
-      this.createBlock()
+      if (this.state.selectedOption === '4') {
+        this.signBlock()
+      }
+      else {
+        this.createBlock()
+      }
     })
   }
 
