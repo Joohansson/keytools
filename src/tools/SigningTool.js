@@ -285,6 +285,7 @@ class SigningTool extends Component {
     var balance = this.props.state.balance
     var amount = this.props.state.amount
     var hash = this.props.state.hash
+    var workHash = this.props.state.workHash
 
     if (type) {
       this.optionChange(type,false)
@@ -310,20 +311,26 @@ class SigningTool extends Component {
     if (hash) {
       this.blockHashChange(hash)
     }
+    if (workHash) {
+      this.signWorkHashChange(workHash)
+    }
 
-    if (!type && !address && !link && !previous && !rep && !balance &&!amount && !hash) {
+    if (!type && !address && !link && !previous && !rep && !balance &&!amount && !hash && !workHash) {
       this.setParams()
     }
   }
 
   // Defines the url params
   setParams(includeHash=false) {
-    var params = '?tool='+toolParam + '&type='+this.state.selectedOption + '&address='+this.state.address + '&link='+this.state.link +
-    '&previous='+this.state.previous + '&rep='+this.state.rep + '&balance='+this.state.currBalance + '&amount='+this.state.amount
+    var params = '?tool='+toolParam + '&type='+this.state.selectedOption
 
     // Only include hash in parameters when requested
     if (includeHash) {
-      params = params + '&hash='+this.state.blockHash
+      params = params + '&hash='+this.state.blockHash + '&workhash='+this.state.signWorkHash
+    }
+    else {
+      params = params + '&address='+this.state.address + '&link='+this.state.link +
+      '&previous='+this.state.previous + '&rep='+this.state.rep + '&balance='+this.state.currBalance + '&amount='+this.state.amount
     }
     helpers.setURLParams(params)
   }
@@ -821,14 +828,10 @@ class SigningTool extends Component {
       this.setState({
         signWorkHash: hash,
         validSignWorkHash: false
-      },
-      function() {
-        this.hashBlock()
       })
       return
     }
     // invalidate work if changing previous hash if the work was valid before
-    // only for send, receive and change because work for open block is based on public key
     if (this.state.selectedOption === '4') {
       if (this.state.validWork) {
         if (!nano.validateWork({blockHash:hash, work:this.state.work})) {
@@ -842,9 +845,6 @@ class SigningTool extends Component {
     this.setState({
       signWorkHash: hash,
       validSignWorkHash: true
-    },
-    function() {
-      this.hashBlock()
     })
   }
 
@@ -1510,11 +1510,11 @@ class SigningTool extends Component {
 
         <InputGroup size="sm" className={this.state.text_address === 'N/A' ? 'hidden':'mb-3'}>
           <InputGroup.Prepend>
-            <InputGroup.Text id="address">
+            <InputGroup.Text id="account">
               {this.state.text_address}
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="address" aria-describedby="address" value={this.state.address} title={this.state.title_address} placeholder={this.state.text_address === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="65" onChange={this.handleAddressChange}/>
+          <FormControl id="account" aria-describedby="account" value={this.state.address} title={this.state.title_address} placeholder={this.state.text_address === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="65" onChange={this.handleAddressChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText}></Button>
@@ -1528,7 +1528,7 @@ class SigningTool extends Component {
               {this.state.text_link}
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="link" aria-describedby="link" value={this.state.link} title={this.state.title_link} placeholder={this.state.place_link} maxLength="65" onChange={this.handleLinkChange}/>
+          <FormControl id="link" aria-describedby="link" value={this.state.link} title={this.state.title_link} placeholder={this.state.place_link} maxLength="65" onChange={this.handleLinkChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='link' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.link} onClick={helpers.copyText}></Button>
@@ -1542,7 +1542,7 @@ class SigningTool extends Component {
               {this.state.text_previous}
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="previous" aria-describedby="previous" value={this.state.previous} title={this.state.title_previous} placeholder={this.state.text_previous === 'N/A' ? 'Not needed':'ABC123... or abc123...'} maxLength="64" onChange={this.handlePreviousChange}/>
+          <FormControl id="previous" aria-describedby="previous" value={this.state.previous} title={this.state.title_previous} placeholder={this.state.text_previous === 'N/A' ? 'Not needed':'ABC123... or abc123...'} maxLength="64" onChange={this.handlePreviousChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='previous' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.previous} onClick={helpers.copyText}></Button>
@@ -1556,7 +1556,7 @@ class SigningTool extends Component {
               {this.state.text_rep}
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="rep" aria-describedby="rep" value={this.state.rep} title={this.state.title_rep} placeholder={this.state.text_rep === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="65" onChange={this.handleRepChange}/>
+          <FormControl id="rep" aria-describedby="rep" value={this.state.rep} title={this.state.title_rep} placeholder={this.state.text_rep === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="65" onChange={this.handleRepChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='rep' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.rep} onClick={helpers.copyText}></Button>
@@ -1570,7 +1570,7 @@ class SigningTool extends Component {
               {this.state.text_currBalance}
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="currBalance" aria-describedby="currBalance" value={this.state.currBalance} title={this.state.title_currBalance} placeholder={this.state.text_currBalance === 'N/A' ? 'Not needed':'Current balance in raw'} maxLength="48" onChange={this.handleCurrBalanceChange}/>
+          <FormControl id="currBalance" aria-describedby="currBalance" value={this.state.currBalance} title={this.state.title_currBalance} placeholder={this.state.text_currBalance === 'N/A' ? 'Not needed':'Current balance in raw'} maxLength="48" onChange={this.handleCurrBalanceChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='currBalance' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.currBalance} onClick={helpers.copyText}></Button>
@@ -1591,7 +1591,7 @@ class SigningTool extends Component {
               }.bind(this))}
             </DropdownButton>
           </InputGroup.Prepend>
-          <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title={this.state.title_amount} placeholder={this.state.place_amount} maxLength="48" onChange={this.handleAmountChange}/>
+          <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title={this.state.title_amount} placeholder={this.state.place_amount} maxLength="48" onChange={this.handleAmountChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
@@ -1606,7 +1606,7 @@ class SigningTool extends Component {
               Block Hash
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="blockHash" aria-describedby="blockHash" value={this.state.blockHash} disabled={this.state.selectedOption !== "4"} title="Block hash used together with the private key to create the signature." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleBlockHashChange}/>
+          <FormControl id="blockHash" aria-describedby="blockHash" value={this.state.blockHash} disabled={this.state.selectedOption !== "4"} title="Block hash used together with the private key to create the signature." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleBlockHashChange} autocomplete="off"/>
           <InputGroup.Append>
           <Button variant="outline-secondary" className="fas fa-times-circle" value='blockHash' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.blockHash} onClick={helpers.copyText}></Button>
@@ -1621,7 +1621,7 @@ class SigningTool extends Component {
               Private Key
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="Account's private key for signing the block hash" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePrivKeyChange}/>
+          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="Account's private key for signing the block hash" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePrivKeyChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText}></Button>
@@ -1650,7 +1650,7 @@ class SigningTool extends Component {
               Work Hash
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="signWorkHash" aria-describedby="signWorkHash" value={this.state.signWorkHash} title="64 char hex hash for generating work." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSignWorkHashChange}/>
+          <FormControl id="signWorkHash" aria-describedby="signWorkHash" value={this.state.signWorkHash} title="64 char hex hash for generating work." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSignWorkHashChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='signWorkHash' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.signWorkHash} onClick={helpers.copyText}></Button>
@@ -1659,12 +1659,12 @@ class SigningTool extends Component {
         </InputGroup>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
-            <InputGroup.Text id="work">
+            <InputGroup.Text id="pow">
               PoW
             </InputGroup.Text>
             <Button variant="outline-secondary" className="fas fa-hammer" value='work' title="Use webGL and the GPU to calculate work now. It may take a few seconds." onClick={this.generateWork}></Button>
           </InputGroup.Prepend>
-          <FormControl id="work" aria-describedby="work" value={this.state.work} disabled={this.state.selectedOption === '4'} title={this.state.title_pow} placeholder="ABC123... or abc123..." maxLength="16" onChange={this.handleWorkChange}/>
+          <FormControl id="pow" aria-describedby="pow" value={this.state.work} disabled={this.state.selectedOption === '4'} title={this.state.title_pow} placeholder="ABC123... or abc123..." maxLength="16" onChange={this.handleWorkChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='work' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText}></Button>

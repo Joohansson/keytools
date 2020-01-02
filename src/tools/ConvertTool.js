@@ -261,7 +261,7 @@ class ConvertTool extends Component {
               raw
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="raw" aria-describedby="raw" value={this.state.raw} title="Smallest possible unit" maxLength="39" onChange={this.handleRawChange}/>
+          <FormControl id="raw" aria-describedby="raw" value={this.state.raw} title="Smallest possible unit" maxLength="39" onChange={this.handleRawChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='raw' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.raw} onClick={helpers.copyText}></Button>
@@ -275,7 +275,7 @@ class ConvertTool extends Component {
               nano
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="nano" aria-describedby="nano" value={this.state.nano} title="Original main unit" maxLength="26" onChange={this.handlenanoChange}/>
+          <FormControl id="nano" aria-describedby="nano" value={this.state.nano} title="Original main unit" maxLength="26" onChange={this.handlenanoChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='nano' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.nano} onClick={helpers.copyText}></Button>
@@ -289,7 +289,7 @@ class ConvertTool extends Component {
               NANO
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.Mnano} title="Unit for wallets/exchanges" maxLength="32"  onChange={this.handleMnanoChange}/>
+          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.Mnano} title="Unit for wallets/exchanges" maxLength="32"  onChange={this.handleMnanoChange} autocomplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='Mnano' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.Mnano} onClick={helpers.copyText}></Button>
