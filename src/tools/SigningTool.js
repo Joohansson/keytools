@@ -107,6 +107,14 @@ class SigningTool extends Component {
       'N/A',
     ]
 
+    this.powTitle = [
+      'Generated proof of work based on the Previous Hash.',
+      'Generated proof of work based on the Previous Hash.',
+      'Generated proof of work based on the Opening Address Public Key.',
+      'Generated proof of work based on the Previous Hash.',
+      'Generated proof of work based on the Input Hash.',
+    ]
+
     // PLACEHOLDERS
     this.linkPlace = [
       'nano_xxx... or xrb_xxx...',
@@ -116,19 +124,18 @@ class SigningTool extends Component {
       'N/A',
     ]
 
+    this.amountPlace = [
+      'Amount to be sent',
+      'Amount to be received',
+      'Amount to be received upon opening',
+      'N/A',
+      'N/A',
+    ]
+
     // Amount dropdown titles
     this.amounts = [
       'Amount NANO',
       'Amount raw',
-    ]
-
-    // Title of the PoW field
-    this.powTitle = [
-      'Generated proof of work based on the Previous Hash.',
-      'Generated proof of work based on the Previous Hash.',
-      'Generated proof of work based on the Opening Address Public Key.',
-      'Generated proof of work based on the Previous Hash.',
-      'Generated proof of work based on the Input Hash.',
     ]
 
     this.sampleText = [
@@ -242,6 +249,7 @@ class SigningTool extends Component {
       title_amount: this.amountTitle[0],
       title_link: this.linkTitle[0],
       place_link: this.linkPlace[0],
+      place_amount: this.amountPlace[0],
       activeAmount: this.amounts[0],
       title_pow: this.powTitle[0],
       activeAmountId: '0', // NANO=0, raw=1
@@ -919,6 +927,7 @@ class SigningTool extends Component {
       title_amount: this.amountTitle[val],
       title_link: this.linkTitle[val],
       place_link: this.linkPlace[val],
+      place_amount: this.amountPlace[val],
       title_pow: this.powTitle[val],
     },function() {
       if (clear) {
@@ -1547,7 +1556,7 @@ class SigningTool extends Component {
               }.bind(this))}
             </DropdownButton>
           </InputGroup.Prepend>
-          <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title={this.state.title_amount} placeholder={this.state.title_amount === 'N/A' ? 'Not needed':'Amount to be sent'} maxLength="48" onChange={this.handleAmountChange}/>
+          <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title={this.state.title_amount} placeholder={this.state.place_amount} maxLength="48" onChange={this.handleAmountChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
