@@ -483,7 +483,7 @@ class FindAddressTool extends Component {
               Seed
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange} autocomplete="off"/>
+          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing a maximum of 4,294,967,295 addresses" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
           </InputGroup.Append>
@@ -495,7 +495,7 @@ class FindAddressTool extends Component {
               Address
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="account" aria-describedby="account" value={this.state.address} title="Address to find in the seed. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." maxLength="65" onChange={this.handleAddressChange} autocomplete="off"/>
+          <FormControl id="account" aria-describedby="account" value={this.state.address} title="Address to find in the seed. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." maxLength="65" onChange={this.handleAddressChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
           </InputGroup.Append>
@@ -507,7 +507,7 @@ class FindAddressTool extends Component {
               Start Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" maxLength="10" onChange={this.handleStartIndexChange} autocomplete="off"/>
+          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" maxLength="10" onChange={this.handleStartIndexChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMin}>Min</Button>
           </InputGroup.Append>
@@ -519,7 +519,7 @@ class FindAddressTool extends Component {
               End Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" maxLength="10" onChange={this.handleEndIndexChange} autocomplete="off"/>
+          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" maxLength="10" onChange={this.handleEndIndexChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>

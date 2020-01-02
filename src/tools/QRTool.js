@@ -348,7 +348,7 @@ class QRTool extends Component {
                   QR Text
                 </InputGroup.Text>
               </InputGroup.Prepend>
-              <FormControl id="input" aria-describedby="input" as="textarea" rows="6" value={this.state.input} placeholder="" maxLength="2500" onChange={this.handleInputChange} autocomplete="off"/>
+              <FormControl id="input" aria-describedby="input" as="textarea" rows="6" value={this.state.input} placeholder="" maxLength="2500" onChange={this.handleInputChange} autoComplete="off"/>
               <InputGroup.Append>
                 <Button variant="outline-secondary" className="fas fa-times-circle" value='input' onClick={this.clearText}></Button>
                 <Button variant="outline-secondary" className="fas fa-copy" value={this.state.input} onClick={helpers.copyText}></Button>

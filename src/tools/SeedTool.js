@@ -502,7 +502,7 @@ class SeedTool extends Component {
               Seed
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing private keys" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange} autocomplete="off"/>
+          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing private keys" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText}></Button>
@@ -516,7 +516,7 @@ class SeedTool extends Component {
               Mnemonic
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="mnemonic" aria-describedby="mnemonic" value={this.state.mnemonic} title="The 24-word passphrase is interchangeable with the seed" placeholder="24 words pass phrase" onChange={this.handleMnemonicChange} autocomplete="off"/>
+          <FormControl id="mnemonic" aria-describedby="mnemonic" value={this.state.mnemonic} title="The 24-word passphrase is interchangeable with the seed" placeholder="24 words pass phrase" onChange={this.handleMnemonicChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='mnemonic' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.mnemonic} onClick={helpers.copyText}></Button>
@@ -542,7 +542,7 @@ class SeedTool extends Component {
               Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="index" aria-describedby="index" value={this.state.index} title="Index integer for the derived private key. Max: 4,294,967,295" maxLength="10" onChange={this.handleIndexChange} autocomplete="off"/>
+          <FormControl id="index" aria-describedby="index" value={this.state.index} title="Index integer for the derived private key. Max: 4,294,967,295" maxLength="10" onChange={this.handleIndexChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
@@ -554,7 +554,7 @@ class SeedTool extends Component {
               Private Key
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="64 hex Private key to derive Public key" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePrivChange} autocomplete="off"/>
+          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="64 hex Private key to derive Public key" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePrivChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText}></Button>
@@ -568,7 +568,7 @@ class SeedTool extends Component {
               Public Key
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="pubKey" aria-describedby="pubKey" value={this.state.pubKey} title="64 hex Public key to derive address" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePubChange} autocomplete="off"/>
+          <FormControl id="pubKey" aria-describedby="pubKey" value={this.state.pubKey} title="64 hex Public key to derive address" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePubChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='pubKey' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.pubKey} onClick={helpers.copyText}></Button>
@@ -582,7 +582,7 @@ class SeedTool extends Component {
               Address
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="account" aria-describedby="account" value={this.state.address} title="Nano address used in wallets. Also derives Public key." maxLength="65" placeholder="nano_xxx... or xrb_xxx..." onChange={this.handleAddressChange} autocomplete="off"/>
+          <FormControl id="account" aria-describedby="account" value={this.state.address} title="Nano address used in wallets. Also derives Public key." maxLength="65" placeholder="nano_xxx... or xrb_xxx..." onChange={this.handleAddressChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText}></Button>

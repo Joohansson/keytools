@@ -220,7 +220,7 @@ class PaymentTool extends Component {
                 Address
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="account" aria-describedby="account" value={this.state.address} title="Payment address. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." maxLength="65" onChange={this.handleAddressChange} autocomplete="off"/>
+            <FormControl id="account" aria-describedby="account" value={this.state.address} title="Payment address. xrb_ or nano_ prefix." placeholder="nano_xxx... or xrb_xxx..." maxLength="65" onChange={this.handleAddressChange} autoComplete="off"/>
             <InputGroup.Append>
               <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
               <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText}></Button>
@@ -233,7 +233,7 @@ class PaymentTool extends Component {
                 NANO
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title="Payment amount in NANO" maxLength="32" onChange={this.handleAmountChange} autocomplete="off"/>
+            <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title="Payment amount in NANO" maxLength="32" onChange={this.handleAmountChange} autoComplete="off"/>
             <InputGroup.Append>
               <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
               <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
