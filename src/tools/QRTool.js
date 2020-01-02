@@ -255,6 +255,12 @@ class QRTool extends Component {
       this.videoCanvas.width = this.video.videoWidth
       this.videoCtx.drawImage(this.video, 0, 0, this.videoCanvas.width, this.videoCanvas.height)
       var imageData = this.videoCtx.getImageData(0, 0, this.videoCanvas.width, this.videoCanvas.height)
+
+      // increase the chances to succeed on poor images
+      var filtered = ImageFilters.GrayScale(imageData)
+      filtered = ImageFilters.BrightnessContrastPhotoshop(filtered, 0, 40)
+      this.videoCtx.putImageData(filtered, 0, 0) // put back the filtered image
+
       var code = jsQR(imageData.data, imageData.width, imageData.height, {
         inversionAttempts: "dontInvert",
       })
