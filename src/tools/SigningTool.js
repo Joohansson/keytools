@@ -743,7 +743,7 @@ class SigningTool extends Component {
         validBlockHash: false
       },
       function() {
-        this.createBlock()
+        this.signBlock()
       })
       return
     }
@@ -752,7 +752,7 @@ class SigningTool extends Component {
       validBlockHash: true
     },
     function() {
-      this.createBlock()
+      this.signBlock()
       this.setParams(true)
     })
   }
@@ -1140,9 +1140,9 @@ class SigningTool extends Component {
   // Hash a block with block parameters to get a block hash
   hashBlock() {
     this.updateQR()
-    // go directly to create block if coming from SIGN BLOCK
+    // go directly to sign block if coming from SIGN BLOCK
     if (this.state.selectedOption === '4') {
-      this.createBlock()
+      this.signBlock()
       this.setParams(true) //include block hash in params
     }
     else {
@@ -1408,7 +1408,6 @@ class SigningTool extends Component {
       this.setState({
         outputRaw: processJson,
         output: JSON.stringify(processJson, null, 2),
-        signature: block.block.signature,
       },function() {
         this.updateQR()
       })
@@ -1435,6 +1434,32 @@ class SigningTool extends Component {
         jsonOneLine: false,
         jsonOneLineText: 'Simple'
       })
+    }
+  }
+
+  // Standalone block signing from block hash
+  signBlock() {
+    this.updateQR()
+    if (!this.isValidSignInputs()) {
+      this.setState({
+        signature: 'Invalid block hash or private key',
+      })
+      return
+    }
+
+    let signature = nano.signBlock({hash:this.state.blockHash, secretKey:this.state.privKey})
+    if (nano.checkSignature(signature)) {
+      this.setState({
+        signature: signature,
+      })
+    }
+    else {
+      this.setState({
+        signature: 'Invalid signature',
+      })
+      if (! toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Failed to create signature. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
   }
 
@@ -1579,7 +1604,7 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={this.state.selectedOption === "4" ? 'hidden':''}>SIGN BLOCK HASH</div>
+        <div className={this.state.selectedOption === "4" ? 'hidden':''}>SIGN THE BLOCK AND PROVIDE PROOF OF WORK</div>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="privKey">
@@ -1594,7 +1619,7 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <InputGroup size="sm" className="mb-3">
+        <InputGroup size="sm" className={this.state.selectedOption !== "4" ? 'hidden':'mb-3'}>
           <InputGroup.Prepend>
             <InputGroup.Text id="signature">
               Signature
@@ -1608,11 +1633,11 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        GENERATED WORK
+        <div className={this.state.selectedOption !== "4" ? 'hidden':''}>OPTIONALLY PROVIDE PROOF OF WORK</div>
         <InputGroup size="sm" className={this.state.selectedOption === '4' ? 'mb-3':'hidden'}>
           <InputGroup.Prepend>
             <InputGroup.Text id="signWorkHash">
-              Input Hash
+              Work Hash
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="signWorkHash" aria-describedby="signWorkHash" value={this.state.signWorkHash} title="64 char hex hash for generating work." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSignWorkHashChange}/>
