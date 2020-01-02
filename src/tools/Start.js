@@ -20,21 +20,21 @@ class Start extends Component {
         <br/>
         <h4>SECURE</h4>
         <ul>
-          <li>Secret keys comes from <a href="https://tweetnacl.js.org/#/">TweetNaCl</a>, a high-security cryptographic library</li>
+          <li>Secret keys are made from <a href="https://tweetnacl.js.org/#/">TweetNaCl</a>, a high-security cryptographic library</li>
           <li>The site works offline or by <a href="https://github.com/Joohansson/keytools/raw/master/keytools.zip">downloading</a> and running the index.html from a secure local file system</li>
-          <li>There are zero cookies and trackers and no secret keys are shared via URL</li>
+          <li>There are zero cookies/trackers, no keys are shared via URL and no data is stored other than on device RAM</li>
         </ul>
         <h4>ACCESSIBLE</h4>
         <ul>
-          <li>Quick access to tools with hotkeys SHIFT+ALT+0-9 and CTRL+SHIFT+ALT+0-9</li>
+          <li>Quick access to tools with hotkeys SHIFT+ALT+0-9 (CTRL+SHIFT+ALT+0-9 for 10-20)</li>
           <li>Memo field at the bottom for copying data between tools</li>
-          <li>Each tool support URL params which can be bookmarked, shared or implemented in other tools.<br/>
-          <strong>NOTE:</strong> The URL won't be updated if running from a file system, though the parameters will still work. A valid workaround is to use this <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb">chrome webserver extension</a> and launch from <a href="http://localhost:8887/">localhost</a>.</li>
+          <li>Each tool support URL params which can be bookmarked, shared or linked from other tools<br/>
+          <strong>NOTE:</strong> The address bar won't be updated if running from a file system. However, URL parameters will still work. A valid workaround is to use this <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb">chrome webserver extension</a> and launch from <a href="http://localhost:8887/">localhost:8887</a></li>
         </ul>
         <h4>AUDITABLE</h4>
         <ul>
           <li>Open sourced on <a href="https://github.com/Joohansson/keytools">Github</a></li>
-          <li>This site is directly hosted on <a href="https://github.com/Joohansson/keytools/tree/gh-pages">Github Pages</a></li>
+          <li>This site is directly hosted on <a href="https://github.com/Joohansson/keytools/tree/gh-pages">Github Pages</a> via Cloudflare</li>
         </ul>
         <h4>FREE</h4>
         <ul>
