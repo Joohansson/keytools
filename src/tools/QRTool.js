@@ -206,8 +206,6 @@ class QRTool extends Component {
           }
           fileCanvas.width = newWidth
           fileCanvas.height = newHeight
-          console.log(newWidth)
-          console.log(newHeight)
           fileCtx.drawImage(qrImage,0,0, newWidth, newHeight)
           var imageData = fileCtx.getImageData(0, 0, newWidth, newHeight)
 
