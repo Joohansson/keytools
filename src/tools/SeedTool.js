@@ -248,8 +248,8 @@ class SeedTool extends Component {
     this.setState({
       seed: seed,
       mnemonic: mnemonic,
-      privKey: privKey,
-      pubKey: pubKey,
+      privKey: privKey.toUpperCase(),
+      pubKey: pubKey.toUpperCase(),
       address: address,
     },
     function() {
@@ -306,8 +306,8 @@ class SeedTool extends Component {
     this.setState({
       seed: seed,
       mnemonic: mnemonic,
-      privKey: privKey,
-      pubKey: pubKey,
+      privKey: privKey.toUpperCase(),
+      pubKey: pubKey.toUpperCase(),
       address: address,
     },
     function() {
@@ -359,8 +359,8 @@ class SeedTool extends Component {
 
     this.setState({
       index: index,
-      privKey: privKey,
-      pubKey: pubKey,
+      privKey: privKey.toUpperCase(),
+      pubKey: pubKey.toUpperCase(),
       address: address,
     },
     function() {
@@ -392,8 +392,8 @@ class SeedTool extends Component {
     this.setState({
       seed: '',
       mnemonic: '',
-      privKey: priv,
-      pubKey: pubKey,
+      privKey: priv.toUpperCase(),
+      pubKey: pubKey.toUpperCase(),
       address: nano.deriveAddress(pubKey, {useNanoPrefix: true}),
     },
     function() {
