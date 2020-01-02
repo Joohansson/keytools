@@ -221,7 +221,6 @@ class SigningTool extends Component {
       validLink: false,
       validPrivKey: false,
       validBlockHash: false,
-      validSignature: false,
       validWork: false,
       validSignWorkHash: false,
       selectedOption: '0',
@@ -407,7 +406,6 @@ class SigningTool extends Component {
       case 'signature':
       this.setState({
         signature: '',
-        validSignature: false
       },
       function() {
         this.hashBlock()
@@ -462,7 +460,6 @@ class SigningTool extends Component {
       validLink: this.state.selectedOption === '3' ? true:false, //link not used for change blocks
       validPrivKey: false,
       validBlockHash: false,
-      validSignature: false,
       validWork: false,
       validSignWorkHash: false,
       qrActive: '',
@@ -738,7 +735,7 @@ class SigningTool extends Component {
         validBlockHash: false
       },
       function() {
-        this.signBlock()
+        this.createBlock()
       })
       return
     }
@@ -747,7 +744,7 @@ class SigningTool extends Component {
       validBlockHash: true
     },
     function() {
-      this.signBlock()
+      this.createBlock()
       this.setParams(true)
     })
   }
@@ -768,7 +765,7 @@ class SigningTool extends Component {
         validPrivKey: false
       },
       function() {
-        this.signBlock()
+        this.createBlock()
       })
       return
     }
@@ -787,7 +784,7 @@ class SigningTool extends Component {
       privKey: hash,
       validPrivKey: true
     },function() {
-      this.signBlock()
+      this.createBlock()
     })
   }
 
@@ -1134,9 +1131,9 @@ class SigningTool extends Component {
   // Hash a block with block parameters to get a block hash
   hashBlock() {
     this.updateQR()
-    // go directly to sign block if coming from SIGN BLOCK
+    // go directly to create block if coming from SIGN BLOCK
     if (this.state.selectedOption === '4') {
-      this.signBlock()
+      this.createBlock()
       this.setParams(true) //include block hash in params
     }
     else {
@@ -1148,7 +1145,7 @@ class SigningTool extends Component {
         validBlockHash: false
       },
       function() {
-        this.signBlock()
+        this.createBlock()
       })
       return
     }
@@ -1231,7 +1228,7 @@ class SigningTool extends Component {
         validBlockHash: true,
       },
       function() {
-        this.signBlock()
+        this.createBlock()
       })
     }
     else {
@@ -1242,44 +1239,6 @@ class SigningTool extends Component {
       })
       if (! toast.isActive(this.inputToast)) {
         this.inputToast = toast("Failed to create block hash. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR_AUTO))
-      }
-    }
-  }
-
-  // Sign a block hash with private key to get a signature
-  signBlock() {
-    this.updateQR()
-    if (!this.isValidSignInputs()) {
-      this.setState({
-        signature: 'Invalid inputs',
-        validSignature: false
-      },
-      function() {
-        this.createBlock()
-      })
-      return
-    }
-
-    let signature = nano.signBlock({hash:this.state.blockHash, secretKey:this.state.privKey})
-    if (nano.checkSignature(signature)) {
-      this.setState({
-        signature: signature,
-        validSignature: true,
-      },
-      function() {
-        this.createBlock()
-      })
-    }
-    else {
-      this.setState({
-        signature: 'Failed to create signature',
-        validSignature: false,
-      },
-      function() {
-        this.createBlock()
-      })
-      if (! toast.isActive(this.inputToast)) {
-        this.inputToast = toast("Failed to create signature. Please contact the developer.", helpers.getToast(helpers.toastType.ERROR_AUTO))
       }
     }
   }
@@ -1439,7 +1398,8 @@ class SigningTool extends Component {
 
       this.setState({
         outputRaw: processJson,
-        output: JSON.stringify(processJson, null, 2)
+        output: JSON.stringify(processJson, null, 2),
+        signature: block.block.signature,
       },function() {
         this.updateQR()
       })
