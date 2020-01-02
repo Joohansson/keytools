@@ -28,8 +28,9 @@ class Start extends Component {
         <ul>
           <li>Quick access to tools with hotkeys SHIFT+ALT+0-9 (CTRL+SHIFT+ALT+0-9 for 10-20)</li>
           <li>Memo field at the bottom for copying data between tools</li>
-          <li>Each tool support URL params which can be bookmarked, shared or linked from other tools<br/>
-          <strong>NOTE:</strong> The address bar won't be updated if running from a file system. However, URL parameters will still work. A valid workaround is to use this <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb">chrome webserver extension</a> and launch from <a href="http://localhost:8887/">localhost:8887</a></li>
+          <li>Each tool support URL params which can be bookmarked, shared or linked from other tools</li>
+          <li><strong>NOTE:</strong> The address bar won't be updated if running from a file system. However, URL parameters will still work. A valid workaround is to use this <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb">chrome webserver extension</a> and launch from <a href="http://localhost:8887/">localhost:8887</a>.<br/>
+          The same is needed for the Audio Messenger to work when running from the file system.</li>
         </ul>
         <h4>AUDITABLE</h4>
         <ul>
