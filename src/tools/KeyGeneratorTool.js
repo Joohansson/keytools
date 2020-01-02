@@ -204,7 +204,7 @@ class KeyGeneratorTool extends Component {
               Pair Count
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="count" aria-describedby="count" value={this.state.count} title="Number of keypairs to generate." maxLength="5" onChange={this.handleCountChange} autocomplete="off"/>
+          <FormControl id="count" aria-describedby="count" value={this.state.count} title="Number of keypairs to generate." maxLength="5" onChange={this.handleCountChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>

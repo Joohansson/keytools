@@ -500,7 +500,7 @@ class VanityTool extends Component {
               }.bind(this))}
             </DropdownButton>
           </InputGroup.Prepend>
-          <FormControl id="prefix" aria-describedby="prefix" value={this.state.prefix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address start" maxLength="30" onChange={this.handlePrefixChange} autocomplete="off"/>
+          <FormControl id="prefix" aria-describedby="prefix" value={this.state.prefix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address start" maxLength="30" onChange={this.handlePrefixChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='prefix' onClick={this.clearText}></Button>
           </InputGroup.Append>
@@ -510,7 +510,7 @@ class VanityTool extends Component {
               Suffix
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="sufffix" aria-describedby="sufffix" value={this.state.suffix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address end" maxLength="30" onChange={this.handleSuffixChange} autocomplete="off"/>
+          <FormControl id="sufffix" aria-describedby="sufffix" value={this.state.suffix} title="Any chars a-z and 0-9 except 0(zero), 2, L or V. Leave empty to ignore." placeholder="Match address end" maxLength="30" onChange={this.handleSuffixChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='suffix' onClick={this.clearText}></Button>
           </InputGroup.Append>
@@ -530,7 +530,7 @@ class VanityTool extends Component {
               Wallets
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="maxwallets" aria-describedby="maxwallets" value={this.state.maxWallets} title="Number of keypairs to generate." maxLength="5" onChange={this.handleMaxWalletsChange} autocomplete="off"/>
+          <FormControl id="maxwallets" aria-describedby="maxwallets" value={this.state.maxWallets} title="Number of keypairs to generate." maxLength="5" onChange={this.handleMaxWalletsChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>

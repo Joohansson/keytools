@@ -299,7 +299,7 @@ class WorkGeneratorTool extends Component {
               Work Hash
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="workHash" aria-describedby="workHash" value={this.state.workHash} disabled={this.state.generating} title="64 char hex hash for generating work." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleWorkHashChange} autocomplete="off"/>
+          <FormControl id="workHash" aria-describedby="workHash" value={this.state.workHash} disabled={this.state.generating} title="64 char hex hash for generating work." placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleWorkHashChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='workHash' disabled={this.state.generating} onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.workHash} onClick={helpers.copyText}></Button>
@@ -312,7 +312,7 @@ class WorkGeneratorTool extends Component {
               PoW
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="pow" aria-describedby="pow" value={this.state.work} disabled title="The generated proof of work for given input." placeholder="ABC123... or abc123..." maxLength="16" autocomplete="off"/>
+          <FormControl id="pow" aria-describedby="pow" value={this.state.work} disabled title="The generated proof of work for given input." placeholder="ABC123... or abc123..." maxLength="16" autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='work' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText}></Button>
