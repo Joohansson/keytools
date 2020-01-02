@@ -122,6 +122,15 @@ class SigningTool extends Component {
       'Amount raw',
     ]
 
+    // Title of the PoW field
+    this.powTitle = [
+      'Generated proof of work based on the Previous Hash.',
+      'Generated proof of work based on the Previous Hash.',
+      'Generated proof of work based on the Opening Address Public Key.',
+      'Generated proof of work based on the Previous Hash.',
+      'Generated proof of work based on the Input Hash.',
+    ]
+
     this.sampleText = [
       {
         // SEND
@@ -235,6 +244,7 @@ class SigningTool extends Component {
       title_link: this.linkTitle[0],
       place_link: this.linkPlace[0],
       activeAmount: this.amounts[0],
+      title_pow: this.powTitle[0],
       activeAmountId: '0', // NANO=0, raw=1
       jsonOneLine: false, //if the output is one line or not
       jsonOneLineText: 'Simple',
@@ -912,6 +922,7 @@ class SigningTool extends Component {
       title_amount: this.amountTitle[val],
       title_link: this.linkTitle[val],
       place_link: this.linkPlace[val],
+      title_pow: this.powTitle[val],
     },function() {
       if (clear) {
         this.clearAll()
@@ -1493,11 +1504,6 @@ class SigningTool extends Component {
           </div>
         </InputGroup>
 
-        <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.sample}>Sample</Button>
-          <Button variant="primary" onClick={this.clearAll}>Clear All</Button>
-        </InputGroup>
-
         <InputGroup size="sm" className={this.state.text_address === 'N/A' ? 'hidden':'mb-3'}>
           <InputGroup.Prepend>
             <InputGroup.Text id="address">
@@ -1654,7 +1660,7 @@ class SigningTool extends Component {
             </InputGroup.Text>
             <Button variant="outline-secondary" className="fas fa-hammer" value='work' title="Use webGL and the GPU to calculate work now. It may take a few seconds." onClick={this.generateWork}></Button>
           </InputGroup.Prepend>
-          <FormControl id="work" aria-describedby="work" value={this.state.work} disabled={this.state.selectedOption === '4'} title="The generated proof of work for given input." placeholder="ABC123... or abc123..." maxLength="16" onChange={this.handleWorkChange}/>
+          <FormControl id="work" aria-describedby="work" value={this.state.work} disabled={this.state.selectedOption === '4'} title={this.state.title_pow} placeholder="ABC123... or abc123..." maxLength="16" onChange={this.handleWorkChange}/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='work' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.work} onClick={helpers.copyText}></Button>
@@ -1674,6 +1680,11 @@ class SigningTool extends Component {
             <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'output' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='output' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
+        </InputGroup>
+
+        <InputGroup size="sm" className="mb-3">
+          <Button variant="primary" onClick={this.sample}>Sample</Button>
+          <Button variant="primary" onClick={this.clearAll}>Clear All</Button>
         </InputGroup>
 
         <div className={ this.state.qrHidden ? "hidden" : ""}>

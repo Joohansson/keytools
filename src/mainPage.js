@@ -600,7 +600,7 @@ class MainPage extends Component {
         <footer className="footer noprint">
           <div className="line"></div>
           <InputGroup ref="collapse" className="collapse-content">
-            <FormControl as="textarea" rows="4" placeholder="Memo for copy data between tools"/>
+            <FormControl as="textarea" rows="4" placeholder="Memo for copying data between tools"/>
           </InputGroup>
           <div className="footer-text">
             <span className="link-span" onClick={this.collapse}>{this.state.collapseText}</span> | <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span>
