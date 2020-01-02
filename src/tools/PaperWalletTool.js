@@ -130,7 +130,7 @@ class PaperWalletTool extends Component {
                 Seed
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing the address" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange}/>
+            <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing the address" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange} autocomplete="off"/>
             <InputGroup.Append>
               <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
               <Button variant="outline-secondary" className="fas fa-copy" value={this.state.qrSeedContent} onClick={helpers.copyText}></Button>

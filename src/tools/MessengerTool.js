@@ -504,7 +504,7 @@ class MessengerTool extends React.Component {
                 Message
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="messageInput" aria-describedby="messageInput" value={this.state.message} title="Message to be sent over audio channel." placeholder=""
+            <FormControl id="messageInput" aria-describedby="messageInput" value={this.state.message} title="Message to be sent over audio channel." placeholder="" autocomplete="off"
               onChange={(event) => {
                 if (event.target.value.length === 0) {
                   //Reset file payload before calculating the rest
@@ -539,7 +539,7 @@ class MessengerTool extends React.Component {
                 Encryption Key
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="pswInput" aria-describedby="encryption" value={this.state.password} title="Encrypt message to avoid audio interception." placeholder="Optional"
+            <FormControl id="pswInput" aria-describedby="encryption" value={this.state.password} title="Encrypt message to avoid audio interception." placeholder="Optional" autocomplete="off"
               onChange={(event) => {
                 this.handleMessageChange(this.state.message, event.target.value)
               }}/>
