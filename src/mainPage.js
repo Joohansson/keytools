@@ -61,7 +61,6 @@ class MainPage extends Component {
         init: null,
         prefix: null,
         suffix: null,
-        hash: null,
       })
     }
 
