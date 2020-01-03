@@ -960,7 +960,12 @@ class SigningTool extends Component {
       work: hash,
       validWork: true
     },function() {
-      this.createBlock()
+      if (this.state.privKey.length <= 64 || this.state.selectedOption === '4') {
+        this.createBlock()
+      }
+      else {
+        this.createBlock(true) //using signature instead of private key
+      }
     })
   }
 
