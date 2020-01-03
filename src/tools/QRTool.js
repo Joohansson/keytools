@@ -16,6 +16,7 @@ class QRTool extends Component {
     this.videoCanvas = null
     this.videoCtx = null
     this.loadingMessage = null
+    this.outputFound = false
 
     this.state = {
       input: '😉whatever😉',
@@ -24,7 +25,6 @@ class QRTool extends Component {
       qrSize: 1024,
       selectedOption: '0',
       output: "",
-      outputFound: false, //found qr code from webcam
       selectedFile: null,
       saturation: '0%',
     }
@@ -105,9 +105,9 @@ class QRTool extends Component {
       case '2':
       this.setState({
         output: '',
-        outputFound: false,
         selectedFile: null,
       })
+      this.outputFound = false
       const canvas = this.refs.fileCanvas
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -137,9 +137,9 @@ class QRTool extends Component {
       if (val === "2") {
         this.setState({
           output: '',
-          outputFound: false,
           selectedFile: null,
         })
+        this.outputFound = false
       }
     })
   }
@@ -180,12 +180,11 @@ class QRTool extends Component {
     let reader = new FileReader()
     let file = event.target.files[0]
     let fileName = event.target.value
-    var outputFound = false
 
     reader.onloadend = () => {
+      this.outputFound = false
       this.setState({
         selectedFile: fileName.replace(/.*[\\]/, ''),
-        outputFound: false,
       },function() {
         const fileCanvas = this.refs.fileCanvas
         const fileCtx = fileCanvas.getContext('2d')
@@ -220,21 +219,21 @@ class QRTool extends Component {
             // draw line around the QR
             this.drawRect(fileCtx, imageData.height, code, "#ff0000")
 
-            if (!this.state.outputFound && !outputFound) {
+            if (!this.outputFound) {
+              this.outputFound = true
               toast("Found QR data", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
               this.setState({
                 output: code.data,
-                outputFound: true,
               })
-              outputFound = true
+              this.outputFound = true
             }
           }
           else {
             toast("Did not find a QR in the uploaded image", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
             this.setState({
               output: '',
-              outputFound: false,
             })
+            this.outputFound = false
           }
         }.bind(this)
       }.bind(this))
@@ -266,18 +265,18 @@ class QRTool extends Component {
         // draw line around the QR
         this.drawRect(this.videoCtx, imageData.height, code, "#ff0000")
 
-        if (!this.state.outputFound) {
+        if (!this.outputFound) {
+          this.outputFound = true
           toast("Found QR data", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
           this.setState({
             output: code.data,
-            outputFound: true,
           })
         }
       }
     }
 
     // only run video stream as long as reader is active
-    if (this.state.selectedOption === "1" && !this.state.outputFound) {
+    if (this.state.selectedOption === "1" && !this.outputFound) {
       requestAnimationFrame(this.tick)
     }
     else {
@@ -290,8 +289,8 @@ class QRTool extends Component {
   startReader() {
     this.setState({
       output: '',
-      outputFound: false,
     })
+    this.outputFound = false
     this.video = document.createElement("video")
     this.videoCanvas = this.refs.videoCanvas
     this.videoCtx = this.videoCanvas.getContext('2d')
@@ -376,9 +375,9 @@ class QRTool extends Component {
                 QR Data
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="output" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR video data..." readOnly/>
+            <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR video data..." readOnly/>
             <InputGroup.Append>
-              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.output} onClick={helpers.copyText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
             </InputGroup.Append>
           </InputGroup>
           <Button variant="primary" onClick={this.reset}>Reset</Button>
