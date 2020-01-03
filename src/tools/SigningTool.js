@@ -3,6 +3,7 @@ import * as nano from 'nanocurrency'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
+import $ from 'jquery'
 import 'nano-webgl-pow'
 import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'sign'
@@ -206,6 +207,8 @@ class SigningTool extends Component {
       },
     ]
 
+    this.rpc = 'http://152.89.106.98:7076'
+
     this.state = {
       address: '',
       previous: '',
@@ -230,6 +233,7 @@ class SigningTool extends Component {
       validBlockHash: false,
       validWork: false,
       validSignWorkHash: false,
+      validOutput: false,
       selectedOption: '0',
       qrActive: '',
       qrContent: '',
@@ -265,6 +269,7 @@ class SigningTool extends Component {
     this.generateWork = this.generateWork.bind(this)
     this.double = this.double.bind(this)
     this.oneLine = this.oneLine.bind(this)
+    this.publishBlock = this.publishBlock.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
@@ -477,6 +482,7 @@ class SigningTool extends Component {
       validBlockHash: false,
       validWork: false,
       validSignWorkHash: false,
+      validOutput: false,
       qrActive: '',
       qrContent: '',
       qrHidden: true,
@@ -769,17 +775,43 @@ class SigningTool extends Component {
   }
 
   privKeyChange(hash) {
-    if (!nano.checkKey(hash)) {
-      if (hash !== '') {
-        if (! toast.isActive(this.inputToast)) {
-          this.inputToast = toast("Invalid Key", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    //IS PRIVATE KEY
+    if (hash.length <= 64 || this.state.selectedOption === '4') {
+      if (!nano.checkKey(hash)) {
+        if (hash !== '') {
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("Invalid Key", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
+        }
+        this.setState({
+          privKey: hash,
+          validPrivKey: false
+        },
+        function() {
+          if (this.state.selectedOption === '4') {
+            this.signBlock()
+          }
+          else {
+            this.createBlock()
+          }
+        })
+        return
+      }
+      // check that the private key actually correspond to the address provided. Do not do for SIGN BLOCK
+      if (this.state.validAddress && this.state.selectedOption !== '4') {
+        let address = this.state.address.replace('xrb', 'nano')
+        let pubKey = nano.derivePublicKey(hash)
+        let derivedAddress = nano.deriveAddress(pubKey, {useNanoPrefix: true})
+        if (derivedAddress !== address) {
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("The private key does not match the address given", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
       }
       this.setState({
         privKey: hash,
-        validPrivKey: false
-      },
-      function() {
+        validPrivKey: true
+      },function() {
         if (this.state.selectedOption === '4') {
           this.signBlock()
         }
@@ -787,31 +819,33 @@ class SigningTool extends Component {
           this.createBlock()
         }
       })
-      return
     }
-    // check that the private key actually correspond to the address provided. Do not do for SIGN BLOCK
-    if (this.state.validAddress && this.state.selectedOption !== '4') {
-      let address = this.state.address.replace('xrb', 'nano')
-      let pubKey = nano.derivePublicKey(hash)
-      let derivedAddress = nano.deriveAddress(pubKey, {useNanoPrefix: true})
-      if (derivedAddress !== address) {
-        if (! toast.isActive(this.inputToast)) {
-          this.inputToast = toast("The private key does not match the address given", helpers.getToast(helpers.toastType.ERROR_AUTO))
+    // IS SIGNATURE
+    else {
+      if (!nano.checkSignature(hash)) {
+        if (hash !== '') {
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("Invalid Input", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
         }
+        this.setState({
+          privKey: hash,
+          validPrivKey: false
+        },
+        function() {
+          this.createBlock()
+        })
+        return
       }
+      this.setState({
+        privKey: hash,
+        validPrivKey: true
+      },function() {
+          this.createBlock(true) //indicate the we have a signature and not a priv key
+      })
     }
-    this.setState({
-      privKey: hash,
-      validPrivKey: true
-    },function() {
-      if (this.state.selectedOption === '4') {
-        this.signBlock()
-      }
-      else {
-        this.createBlock()
-      }
-    })
   }
+
 
   // only used for SIGN BLOCK
   handleSignWorkHashChange = changeEvent => {
@@ -1154,6 +1188,7 @@ class SigningTool extends Component {
     if (this.state.selectedOption === '4') {
       this.signBlock()
       this.setParams(true) //include block hash in params
+      return
     }
     else {
       this.setParams(false)
@@ -1329,7 +1364,7 @@ class SigningTool extends Component {
   }
 
   // Create the final JSON block representation
-  createBlock() {
+  createBlock(hasSignature=false) {
     this.updateQR()
     var subType = ''
     switch (this.state.selectedOption) {
@@ -1366,6 +1401,7 @@ class SigningTool extends Component {
       this.setState({
         output: 'Invalid input parameters...',
         outputRaw: '',
+        validOutput: false,
       })
       return
     }
@@ -1386,9 +1422,34 @@ class SigningTool extends Component {
     }
 
     try {
-      // create the block
-      block = nano.createBlock(this.state.privKey,{balance:this.state.adjustedBalance, representative:this.state.rep,
-      work:this.state.work, link:link, previous:previous})
+      // create the block using private key
+      if (!hasSignature) {
+        block = nano.createBlock(this.state.privKey,{balance:this.state.adjustedBalance, representative:this.state.rep,
+        work:this.state.work, link:link, previous:previous})
+      }
+      // create the block using signature
+      else {
+        if (!previous) {
+          previous = '0000000000000000000000000000000000000000000000000000000000000000'
+        }
+        if (!link) {
+          link = '0000000000000000000000000000000000000000000000000000000000000000'
+        }
+
+        //Check if link is address or hash
+        var linkAddress
+        if (nano.checkAddress(link)) {
+          linkAddress = link
+          link = nano.derivePublicKey(link)
+        }
+        else if (nano.checkHash(link)) {
+          linkAddress = nano.deriveAddress(link, {useNanoPrefix: true})
+        }
+        block = {hash: this.state.blockHash, block:
+          {type:'state', account:this.state.address, previous:previous, representative:this.state.rep, balance:this.state.adjustedBalance,
+          link:link, link_as_account:linkAddress, work:this.state.work, signature:this.state.privKey}}
+      }
+
 
       // check that the new block is valid
       let pubKey = nano.derivePublicKey(block.block.account)
@@ -1418,13 +1479,15 @@ class SigningTool extends Component {
       this.setState({
         outputRaw: processJson,
         output: JSON.stringify(processJson, null, 2),
+        validOutput: true,
       },function() {
         this.updateQR()
       })
     }
     else {
       this.setState({
-        output: 'Bad JSON block generated, please contact the developer'
+        output: 'Bad JSON block generated, please contact the developer',
+        validOutput: false,
       })
     }
   }
@@ -1473,6 +1536,55 @@ class SigningTool extends Component {
     }
   }
 
+  async postData(url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *client
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+    return await response.json(); // parses JSON response into native JavaScript objects
+  }
+
+  // Publish the json block
+  publishBlock() {
+    if (this.state.validOutput) {
+      this.postData(this.rpc, this.state.outputRaw)
+      .then((data) => {
+        if (data.hash) {
+          console.log("Processed block hash: "+data.hash)
+          if (data.hash === this.state.blockHash) {
+            this.inputToast = toast("Successfully processed with given block hash!", helpers.getToast(helpers.toastType.SUCCESS))
+          }
+          else {
+            this.inputToast = toast("Block processed but the hash does not match. Contact dev.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
+        }
+        else {
+          this.inputToast = toast("Failed processing block, see console for info (CTRL+F12).", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          console.log("Failed processing block: "+data.error)
+          this.setState({
+            validOutput: false,
+          })
+        }
+      });
+    }
+    else {
+      this.inputToast = toast("There is no valid block to process.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      this.setState({
+        validOutput: false,
+      })
+    }
+  }
+
   render() {
     return (
       <div>
@@ -1480,8 +1592,8 @@ class SigningTool extends Component {
           <p>Create and Sign blocks off-chain to be published with an on-chain node</p>
           <ul>
             <li>Most of the inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a></li>
-            <li>PoW can be done directly with this tool or done elsewhere</li>
-            <li>For simplicity, the final JSON block can be published directly via <a href="https://nanoo.tools/nano-rpc-playground">RPC Playground</a></li>
+            <li>PoW can be done directly with this tool or elsewhere</li>
+            <li>The final JSON can be published directly to the network with Publish Block</li>
             <li>Hover on text fields to show more details or have a look at this <a href="#">Video Tutorial</a></li>
           </ul>
         </div>
@@ -1614,14 +1726,14 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={this.state.selectedOption === "4" ? 'hidden':''}>SIGN THE BLOCK AND PROVIDE PROOF OF WORK</div>
+        <div className={this.state.selectedOption === "4" ? 'hidden':''}>SIGN WITH PRIVATE KEY OR SIGNATURE AND PROVIDE PROOF OF WORK</div>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="privKey">
-              Private Key
+              Key/Signature
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="Account's private key for signing the block hash" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handlePrivKeyChange} autoComplete="off"/>
+          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="Account's 64 length private key for signing the block hash or 128 length block signature" placeholder="ABC123... or abc123..." maxLength="128" onChange={this.handlePrivKeyChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText}></Button>
@@ -1688,6 +1800,7 @@ class SigningTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <Button variant="primary" onClick={this.sample}>Sample</Button>
+          <Button variant="primary" disabled={!this.state.validOutput} onClick={this.publishBlock}>Publish Block</Button>
           <Button variant="primary" onClick={this.clearAll}>Clear All</Button>
         </InputGroup>
 
