@@ -3,7 +3,6 @@ import * as nano from 'nanocurrency'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
-import $ from 'jquery'
 import 'nano-webgl-pow'
 import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'sign'
@@ -1872,10 +1871,10 @@ class SigningTool extends Component {
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="privKey">
-              Key/Signature
+              {this.state.selectedOption === "4" ? "Private Key": "Key/Signature"}
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title="Account's 64 length private key for signing the block hash or 128 length block signature" placeholder="ABC123... or abc123..." maxLength="128" onChange={this.handlePrivKeyChange} autoComplete="off"/>
+          <FormControl id="privKey" aria-describedby="privKey" value={this.state.privKey} title={this.state.selectedOption === "4" ? "Account's 64 length private key for signing the block hash": "Account's 64 length private key for signing the block hash or 128 length block signature"} placeholder="ABC123... or abc123..." maxLength="128" onChange={this.handlePrivKeyChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='privKey' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.privKey} onClick={helpers.copyText}></Button>

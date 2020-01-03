@@ -19,8 +19,8 @@ class QRTool extends Component {
     this.outputFound = false
 
     this.state = {
-      input: '😉whatever😉',
-      qrContent: '😉whatever😉',
+      input: '',
+      qrContent: '',
       qrState: 0, //qr size
       qrSize: 1024,
       selectedOption: '0',
