@@ -207,7 +207,7 @@ class SigningTool extends Component {
       },
     ]
 
-    this.rpc = 'http://152.89.106.98:7076'
+    this.rpc = 'http://152.89.106.98:9950/api/node-api'
 
     this.state = {
       address: '',
@@ -270,6 +270,7 @@ class SigningTool extends Component {
     this.double = this.double.bind(this)
     this.oneLine = this.oneLine.bind(this)
     this.publishBlock = this.publishBlock.bind(this)
+    this.getRPC = this.getRPC.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
@@ -709,12 +710,22 @@ class SigningTool extends Component {
     this.amountChange(changeEvent.target.value)
   }
 
-  amountChange(amount) {
-    //convert to raw if needed
+  amountChange(amount, isRaw = false) {
     var raw = amount
-    if (this.state.activeAmountId === '0') {
-      raw = helpers.MnanoToRaw(amount)
+    // force raw
+    if (isRaw) {
+      this.setState({
+        activeAmount: this.amounts[1],
+        activeAmountId: '1',
+      })
     }
+    else {
+      // convert to raw if needed
+      if (this.state.activeAmountId === '0') {
+        raw = helpers.MnanoToRaw(amount)
+      }
+    }
+
     if (!nano.checkAmount(raw)) {
       // do not warn when start typing dot
       if (amount !== '' && amount[amount.length -1] !== '.') {
@@ -1575,12 +1586,133 @@ class SigningTool extends Component {
             validOutput: false,
           })
         }
-      });
+      })
     }
     else {
       this.inputToast = toast("There is no valid block to process.", helpers.getToast(helpers.toastType.ERROR_AUTO))
       this.setState({
         validOutput: false,
+      })
+    }
+  }
+
+  // Make RPC call
+  getRPC(event) {
+    var command = {}
+    var value = event.target.value
+    switch (value) {
+      case 'previous':
+      if (this.state.validAddress) {
+        command.action = 'account_info'
+        command.account = this.state.address
+      }
+      else {
+        this.inputToast = toast("Need a valid address to get frontier hash.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      break
+
+      case 'rep':
+      if (this.state.validAddress) {
+        command.action = 'account_representative'
+        command.account = this.state.address
+      }
+      else {
+        this.inputToast = toast("Need a valid address to get rep.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      break
+
+      case 'currBalance':
+      if (this.state.validAddress) {
+        command.action = 'account_info'
+        command.account = this.state.address
+      }
+      else {
+        this.inputToast = toast("Need a valid address to get current balance.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      break
+
+      case 'pending':
+      if (this.state.validAddress) {
+        command.action = 'pending'
+        command.account = this.state.address
+      }
+      else {
+        this.inputToast = toast("Need a valid address to get pending transactions.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      break
+
+      case 'amount':
+      if (this.state.validLink) {
+        command.action = 'block_info'
+        command.hash = this.state.link
+      }
+      else {
+        this.inputToast = toast("Need a valid Pending to get the amount.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+      break
+
+      default:
+      break
+    }
+
+    if (Object.keys(command).length > 0) {
+      this.postData(this.rpc, command)
+      .then((data) => {
+        var fail = false
+        switch (value) {
+          case 'previous':
+          if (data.frontier) {
+            this.previousChange(data.frontier)
+          }
+          else {
+            fail = true
+          }
+          break
+
+          case 'rep':
+          if (data.representative) {
+            this.repChange(data.representative)
+          }
+          else {
+            fail = true
+          }
+          break
+
+          case 'currBalance':
+          if (data.balance) {
+            this.balanceChange(data.balance)
+          }
+          else {
+            fail = true
+          }
+          break
+
+          case 'pending':
+          if (data.blocks) {
+            this.linkChange(data.blocks[0])
+          }
+          else {
+            fail = true
+          }
+          break
+
+          case 'amount':
+          if (data.amount) {
+            this.amountChange(data.amount,true)
+          }
+          else {
+            fail = true
+          }
+          break
+
+          default:
+          break
+        }
+
+        if (fail) {
+          this.inputToast = toast("Bad RPC response. See console (CTRL+F12)", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          console.log("Bad RPC: "+data.error)
+        }
       })
     }
   }
@@ -1591,8 +1723,8 @@ class SigningTool extends Component {
         <div className="noprint">
           <p>Create and Sign blocks off-chain to be published with an on-chain node</p>
           <ul>
-            <li>Most of the inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a></li>
-            <li>PoW can be done directly with this tool or elsewhere</li>
+            <li>Inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a></li>
+            <li>Live data comes from the <a href="https://node.nanoticker.info/nano.html">NanoTicker node</a>. You should double check with an explorer.</li>
             <li>The final JSON can be published directly to the network with Publish Block</li>
             <li>Hover on text fields to show more details or have a look at this <a href="#">Video Tutorial</a></li>
           </ul>
@@ -1643,6 +1775,7 @@ class SigningTool extends Component {
           <FormControl id="link" aria-describedby="link" value={this.state.link} title={this.state.title_link} placeholder={this.state.place_link} maxLength="65" onChange={this.handleLinkChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='link' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className={this.state.selectedOption === "1" || this.state.selectedOption === "2" ? 'fas fa-cloud-download-alt':'hidden'} title="Live network request: The next pending hash" value='pending' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.link} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'link' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='link' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1657,6 +1790,7 @@ class SigningTool extends Component {
           <FormControl id="previous" aria-describedby="previous" value={this.state.previous} title={this.state.title_previous} placeholder={this.state.text_previous === 'N/A' ? 'Not needed':'ABC123... or abc123...'} maxLength="64" onChange={this.handlePreviousChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='previous' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-cloud-download-alt" title="Live network request: Frontier hash of the address" value='previous' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.previous} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'previous' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='previous' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1671,6 +1805,7 @@ class SigningTool extends Component {
           <FormControl id="rep" aria-describedby="rep" value={this.state.rep} title={this.state.title_rep} placeholder={this.state.text_rep === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="65" onChange={this.handleRepChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='rep' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className={this.state.selectedOption === "2" ? 'hidden':'fas fa-cloud-download-alt'} title="Live network request: The address representative" value='rep' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.rep} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'rep' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='rep' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1685,6 +1820,7 @@ class SigningTool extends Component {
           <FormControl id="currBalance" aria-describedby="currBalance" value={this.state.currBalance} title={this.state.title_currBalance} placeholder={this.state.text_currBalance === 'N/A' ? 'Not needed':'Current balance in raw'} maxLength="48" onChange={this.handleCurrBalanceChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='currBalance' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-cloud-download-alt" title="Live network request: Current balance of the address" value='currBalance' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.currBalance} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'currBalance' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='currBalance' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1706,6 +1842,7 @@ class SigningTool extends Component {
           <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title={this.state.title_amount} placeholder={this.state.place_amount} maxLength="48" onChange={this.handleAmountChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className={this.state.selectedOption === "1" || this.state.selectedOption === "2" ? 'fas fa-cloud-download-alt':'hidden'} title="Live network request: The pending amount" value='amount' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'amount' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='amount' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
