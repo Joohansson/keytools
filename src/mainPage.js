@@ -165,6 +165,7 @@ class MainPage extends Component {
         let s_rep = helpers.getUrlParams().rep
         let s_balance = helpers.getUrlParams().balance
         let s_amount = helpers.getUrlParams().amount
+        let s_amountType = helpers.getUrlParams().amounttype
         let s_hash = helpers.getUrlParams().hash
         let s_workhash = helpers.getUrlParams().workhash
 
@@ -201,6 +202,11 @@ class MainPage extends Component {
         if (typeof s_amount !== 'undefined') {
           this.setState({
             amount: s_amount
+          })
+        }
+        if (typeof s_amountType !== 'undefined') {
+          this.setState({
+            amountType: s_amountType
           })
         }
         if (typeof s_hash !== 'undefined') {

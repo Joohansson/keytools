@@ -270,6 +270,7 @@ class SigningTool extends Component {
     this.oneLine = this.oneLine.bind(this)
     this.publishBlock = this.publishBlock.bind(this)
     this.getRPC = this.getRPC.bind(this)
+    this.changeAmountType = this.changeAmountType.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
@@ -289,6 +290,7 @@ class SigningTool extends Component {
     var rep = this.props.state.rep
     var balance = this.props.state.balance
     var amount = this.props.state.amount
+    var amountType = this.props.state.amountType
     var hash = this.props.state.hash
     var workHash = this.props.state.workHash
 
@@ -313,6 +315,9 @@ class SigningTool extends Component {
     if (amount) {
       this.amountChange(amount)
     }
+    if (amountType) {
+      this.changeAmountType(amountType)
+    }
     if (hash) {
       this.blockHashChange(hash)
     }
@@ -320,7 +325,7 @@ class SigningTool extends Component {
       this.signWorkHashChange(workHash)
     }
 
-    if (!type && !address && !link && !previous && !rep && !balance &&!amount && !hash && !workHash) {
+    if (!type && !address && !link && !previous && !rep && !balance &&!amount &&!amountType && !hash && !workHash) {
       this.setParams()
     }
   }
@@ -335,7 +340,7 @@ class SigningTool extends Component {
     }
     else {
       params = params + '&address='+this.state.address + '&link='+this.state.link +
-      '&previous='+this.state.previous + '&rep='+this.state.rep + '&balance='+this.state.currBalance + '&amount='+this.state.amount
+      '&previous='+this.state.previous + '&rep='+this.state.rep + '&balance='+this.state.currBalance + '&amount='+this.state.amount + '&amounttype='+this.state.activeAmountId
     }
     helpers.setURLParams(params)
   }
@@ -510,9 +515,13 @@ class SigningTool extends Component {
 
   // Change active amount unit on dropdown select
   selectAmount(eventKey, event) {
+    this.changeAmountType(eventKey)
+  }
+
+  changeAmountType(key) {
     this.setState({
-      activeAmount: this.amounts[eventKey],
-      activeAmountId: eventKey,
+      activeAmount: this.amounts[key],
+      activeAmountId: key,
     },
     function() {
       this.amountChange(this.state.amount)
@@ -1551,28 +1560,10 @@ class SigningTool extends Component {
     }
   }
 
-  async postData(url = '', data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *client
-      body: JSON.stringify(data) // body data type must match "Content-Type" header
-    });
-    return await response.json(); // parses JSON response into native JavaScript objects
-  }
-
   // Publish the json block
   publishBlock() {
     if (this.state.validOutput) {
-      this.postData(this.rpc, this.state.outputRaw)
+      helpers.postData(this.rpc, this.state.outputRaw)
       .then((data) => {
         if (data.hash) {
           console.log("Processed block hash: "+data.hash)
@@ -1660,7 +1651,7 @@ class SigningTool extends Component {
     }
 
     if (Object.keys(command).length > 0) {
-      this.postData(this.rpc, command)
+      helpers.postData(this.rpc, command)
       .then((data) => {
         var fail = false
         switch (value) {
