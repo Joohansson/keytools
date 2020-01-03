@@ -206,8 +206,6 @@ class SigningTool extends Component {
       },
     ]
 
-    this.rpc = 'http://152.89.106.98:9950/api/node-api'
-
     this.state = {
       address: '',
       previous: '',
@@ -1563,7 +1561,7 @@ class SigningTool extends Component {
   // Publish the json block
   publishBlock() {
     if (this.state.validOutput) {
-      helpers.postData(this.rpc, this.state.outputRaw)
+      helpers.postData(this.state.outputRaw)
       .then((data) => {
         if (data.hash) {
           console.log("Processed block hash: "+data.hash)
@@ -1651,7 +1649,7 @@ class SigningTool extends Component {
     }
 
     if (Object.keys(command).length > 0) {
-      helpers.postData(this.rpc, command)
+      helpers.postData(command)
       .then((data) => {
         var fail = false
         switch (value) {
@@ -1708,6 +1706,9 @@ class SigningTool extends Component {
           this.inputToast = toast("Bad RPC response. See console (CTRL+F12)", helpers.getToast(helpers.toastType.ERROR_AUTO))
           console.log("Bad RPC: "+data.error)
         }
+      })
+      .catch(function(error) {
+          console.log(error)
       })
     }
   }
