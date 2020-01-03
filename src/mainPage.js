@@ -39,6 +39,32 @@ class MainPage extends Component {
     var tool = helpers.getUrlParams().tool
     var toolId = 0
 
+    if (typeof raw !== 'undefined') {
+      this.setState({
+        raw: null,
+        nano: null,
+        mnano: null,
+        address: null,
+        count: null,
+        priv: null,
+        pub: null,
+        addr: null,
+        type: null,
+        link: null,
+        previous: null,
+        rep: null,
+        balance: null,
+        amount: null,
+        hash: null,
+        workHash: null,
+        load: null,
+        init: null,
+        prefix: null,
+        suffix: null,
+        hash: null,
+      })
+    }
+
     if (typeof tool !== 'undefined') {
       switch (tool) {
         // ConvertTool
