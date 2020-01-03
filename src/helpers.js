@@ -15,6 +15,7 @@ export const constants = {
   INDEX_MAX: 4294967295, //seed index
   KEYS_MAX: 10000, //max keys to export
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
+  RPC_SERVER: 'https://rpc.nanoticker.info:9951/api/node-api'
 }
 
 // QR css
@@ -333,9 +334,9 @@ export function setURLParams(params) {
 }
 
 // Post data to remote interface
-export async function postData(url = '', data = {}) {
+export async function postData(data = {}) {
   // Default options are marked with *
-  const response = await fetch(url, {
+  const response = await fetch(constants.RPC_SERVER, {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
     mode: 'cors', // no-cors, *cors, same-origin
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -347,6 +348,6 @@ export async function postData(url = '', data = {}) {
     redirect: 'follow', // manual, *follow, error
     referrerPolicy: 'no-referrer', // no-referrer, *client
     body: JSON.stringify(data) // body data type must match "Content-Type" header
-  });
+  })
   return await response.json(); // parses JSON response into native JavaScript objects
 }
