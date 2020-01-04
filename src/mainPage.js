@@ -39,31 +39,6 @@ class MainPage extends Component {
     var tool = helpers.getUrlParams().tool
     var toolId = 0
 
-    if (typeof raw !== 'undefined') {
-      this.setState({
-        raw: null,
-        nano: null,
-        mnano: null,
-        address: null,
-        count: null,
-        priv: null,
-        pub: null,
-        addr: null,
-        type: null,
-        link: null,
-        previous: null,
-        rep: null,
-        balance: null,
-        amount: null,
-        hash: null,
-        workHash: null,
-        load: null,
-        init: null,
-        prefix: null,
-        suffix: null,
-      })
-    }
-
     if (typeof tool !== 'undefined') {
       switch (tool) {
         // ConvertTool
@@ -421,6 +396,26 @@ class MainPage extends Component {
   // Change tool to view on main page
   selectTool(eventKey) {
     this.setState({
+      raw: undefined,
+      nano: undefined,
+      mnano: undefined,
+      address: undefined,
+      count: undefined,
+      priv: undefined,
+      pub: undefined,
+      addr: undefined,
+      type: undefined,
+      link: undefined,
+      previous: undefined,
+      rep: undefined,
+      balance: undefined,
+      amount: undefined,
+      hash: undefined,
+      workHash: undefined,
+      load: undefined,
+      init: undefined,
+      prefix: undefined,
+      suffix: undefined,
       activeTool: this.tools[eventKey],
       activeToolId: eventKey,
       activeToolName: tools[eventKey],
