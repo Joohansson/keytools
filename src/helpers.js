@@ -15,7 +15,7 @@ export const constants = {
   INDEX_MAX: 4294967295, //seed index
   KEYS_MAX: 10000, //max keys to export
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
-  RPC_SERVER: 'https://rpc.nanoticker.info:9951/api/node-api'
+  RPC_SERVER: 'https://rpc.nanoticker.info/api/node-api'
 }
 
 // QR css
