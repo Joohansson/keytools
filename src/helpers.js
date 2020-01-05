@@ -10,13 +10,31 @@ import nacl from 'tweetnacl/nacl';
 
 namedNumber.setDictionary(namedNumberDictionary)
 
+const RPC_TIMEOUT = 10000
+
 //CONSTANTS
 export const constants = {
   INDEX_MAX: 4294967295, //seed index
   KEYS_MAX: 10000, //max keys to export
   RPC_MAX: 500, //max rpc requests of same type, for example pending blocks
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
-  RPC_SERVER: 'https://rpc.nanoticker.info/api/node-api'
+  RPC_SERVER: 'https://rpc.nanoticker.info/api/node-api',
+  RPC_LIMIT: 'You have sent too many RPC requests. Try again in a hour.'
+}
+
+class RPCError extends Error {
+  constructor(code, ...params) {
+    super(...params)
+
+    // Maintains proper stack trace for where our error was thrown (only available on V8)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, RPCError)
+    }
+
+    this.name = 'RPCError'
+    // Custom debugging information
+    this.code = code
+  }
 }
 
 // QR css
@@ -334,7 +352,8 @@ export function setURLParams(params) {
   }
 }
 
-// Post data to remote interface
+// Post data with no error handling
+/*
 export async function postData(data = {}) {
   // Default options are marked with *
   const response = await fetch(constants.RPC_SERVER, {
@@ -352,16 +371,17 @@ export async function postData(data = {}) {
   })
   return await response.json(); // parses JSON response into native JavaScript objects
 }
+*/
 
-export async function postDataTimout(data = {}) {
-  const FETCH_TIMEOUT = 5000;
+// Post data with timeout and catch errors
+export async function postDataTimeout(data = {}) {
   let didTimeOut = false;
 
-  new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
       const timeout = setTimeout(function() {
           didTimeOut = true;
           reject(new Error('Request timed out'));
-      }, FETCH_TIMEOUT);
+      }, RPC_TIMEOUT);
 
       fetch(constants.RPC_SERVER, {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -380,12 +400,17 @@ export async function postDataTimout(data = {}) {
           // Clear the timeout as cleanup
           clearTimeout(timeout);
           if(!didTimeOut) {
-              console.log('fetch good! ', response);
-              resolve(response);
+            if(response.status === 200) {
+                resolve(response);
+            }
+            else {
+              //console.log('Bad RPC http status!');
+              throw new RPCError(response.status, "HTTP status "+response.status)
+            }
           }
       })
       .catch(function(err) {
-          console.log('fetch failed! ', err);
+          //console.log('RPC fetch failed! ', err);
 
           // Rejection already happened with setTimeout
           if(didTimeOut) return;
@@ -393,12 +418,13 @@ export async function postDataTimout(data = {}) {
           reject(err);
       });
   })
-  .then(function() {
+  .then(async function(result) {
       // Request success and no timeout
-      console.log('good promise, no timeout! ');
+      return await result.json()
   })
+  /*Catch error upstream instead
   .catch(function(err) {
       // Error: response error, request timeout or runtime error
-      console.log('promise error! ', err);
-  });
+      console.log('RPC error! ', err);
+  });*/
 }

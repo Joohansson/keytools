@@ -256,6 +256,7 @@ class SigningTool extends Component {
       activeAmountId: '0', // NANO=0, raw=1
       jsonOneLine: false, //if the output is one line or not
       jsonOneLineText: 'Simple',
+      fetchingRPC: false,
     }
 
     this.clearText = this.clearText.bind(this)
@@ -269,6 +270,7 @@ class SigningTool extends Component {
     this.publishBlock = this.publishBlock.bind(this)
     this.getRPC = this.getRPC.bind(this)
     this.changeAmountType = this.changeAmountType.bind(this)
+    this.handleRPCError = this.handleRPCError.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
@@ -489,6 +491,7 @@ class SigningTool extends Component {
       qrActive: '',
       qrContent: '',
       qrHidden: true,
+      fetchingRPC: false,
     },function() {
       if (this.state.selectedOption === '4') {
         this.setParams(true) //include block hash in params
@@ -497,6 +500,24 @@ class SigningTool extends Component {
         this.setParams(false)
       }
     })
+  }
+
+  handleRPCError(error) {
+    this.setState({fetchingRPC: false})
+    if (error.code) {
+      console.log("RPC request failed: "+error.message)
+      // IP blocked
+      if (error.code === 429) {
+        toast(helpers.constants.RPC_LIMIT, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+      else {
+        toast("RPC request failed: "+error.message, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+    }
+    else {
+      console.log("RPC request failed: "+error)
+      toast("RPC request failed. See console (CTRL+F12).", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+    }
   }
 
   // loop qr state 1x, 2x, 4x
@@ -1564,9 +1585,10 @@ class SigningTool extends Component {
       let outputBlock = this.state.outputRaw
       // set watch_work to false to avoid the endpoint node to recalculate work
       outputBlock.watch_work = 'false'
-      console.log(outputBlock)
-      helpers.postData(outputBlock)
+      this.setState({fetchingRPC: true})
+      helpers.postDataTimeout(outputBlock)
       .then((data) => {
+        this.setState({fetchingRPC: false})
         if (data.hash) {
           console.log("Processed block hash: "+data.hash)
           if (data.hash === this.state.blockHash) {
@@ -1584,6 +1606,9 @@ class SigningTool extends Component {
           })
         }
       })
+      .catch(function(error) {
+        this.handleRPCError(error)
+      }.bind(this))
     }
     else {
       this.inputToast = toast("There is no valid block to process.", helpers.getToast(helpers.toastType.ERROR_AUTO))
@@ -1653,8 +1678,10 @@ class SigningTool extends Component {
     }
 
     if (Object.keys(command).length > 0) {
-      helpers.postData(command)
+      this.setState({fetchingRPC: true})
+      helpers.postDataTimeout(command)
       .then((data) => {
+        this.setState({fetchingRPC: false})
         var fail = false
         switch (value) {
           case 'previous':
@@ -1712,8 +1739,8 @@ class SigningTool extends Component {
         }
       })
       .catch(function(error) {
-          console.log(error)
-      })
+        this.handleRPCError(error)
+      }.bind(this))
     }
   }
 
@@ -1775,7 +1802,7 @@ class SigningTool extends Component {
           <FormControl id="link" aria-describedby="link" value={this.state.link} title={this.state.title_link} placeholder={this.state.place_link} maxLength="65" onChange={this.handleLinkChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='link' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className={this.state.selectedOption === "1" || this.state.selectedOption === "2" ? 'fas fa-cloud-download-alt':'hidden'} title="Live network request: The next pending hash" value='pending' onClick={this.getRPC}></Button>
+            <Button variant="outline-secondary" className={this.state.selectedOption === "1" || this.state.selectedOption === "2" ? 'fas fa-cloud-download-alt':'hidden'} title="Live network request: The next pending hash" disabled={this.state.fetchingRPC} value='pending' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.link} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'link' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='link' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1790,7 +1817,7 @@ class SigningTool extends Component {
           <FormControl id="previous" aria-describedby="previous" value={this.state.previous} title={this.state.title_previous} placeholder={this.state.text_previous === 'N/A' ? 'Not needed':'ABC123... or abc123...'} maxLength="64" onChange={this.handlePreviousChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='previous' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className="fas fa-cloud-download-alt" title="Live network request: Frontier hash of the address" value='previous' onClick={this.getRPC}></Button>
+            <Button variant="outline-secondary" className="fas fa-cloud-download-alt" title="Live network request: Frontier hash of the address" disabled={this.state.fetchingRPC} value='previous' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.previous} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'previous' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='previous' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1805,7 +1832,7 @@ class SigningTool extends Component {
           <FormControl id="rep" aria-describedby="rep" value={this.state.rep} title={this.state.title_rep} placeholder={this.state.text_rep === 'N/A' ? 'Not needed':'nano_xxx... or xrb_xxx...'} maxLength="65" onChange={this.handleRepChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='rep' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className={this.state.selectedOption === "2" ? 'hidden':'fas fa-cloud-download-alt'} title="Live network request: The address representative" value='rep' onClick={this.getRPC}></Button>
+            <Button variant="outline-secondary" className={this.state.selectedOption === "2" ? 'hidden':'fas fa-cloud-download-alt'} title="Live network request: The address representative" disabled={this.state.fetchingRPC} value='rep' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.rep} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'rep' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='rep' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1820,7 +1847,7 @@ class SigningTool extends Component {
           <FormControl id="currBalance" aria-describedby="currBalance" value={this.state.currBalance} title={this.state.title_currBalance} placeholder={this.state.text_currBalance === 'N/A' ? 'Not needed':'Current balance in raw'} maxLength="48" onChange={this.handleCurrBalanceChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='currBalance' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className="fas fa-cloud-download-alt" title="Live network request: Current balance of the address" value='currBalance' onClick={this.getRPC}></Button>
+            <Button variant="outline-secondary" className="fas fa-cloud-download-alt" title="Live network request: Current balance of the address" disabled={this.state.fetchingRPC} value='currBalance' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.currBalance} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'currBalance' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='currBalance' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1842,7 +1869,7 @@ class SigningTool extends Component {
           <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title={this.state.title_amount} placeholder={this.state.place_amount} maxLength="48" onChange={this.handleAmountChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className={this.state.selectedOption === "1" || this.state.selectedOption === "2" ? 'fas fa-cloud-download-alt':'hidden'} title="Live network request: The pending amount" value='amount' onClick={this.getRPC}></Button>
+            <Button variant="outline-secondary" className={this.state.selectedOption === "1" || this.state.selectedOption === "2" ? 'fas fa-cloud-download-alt':'hidden'} title="Live network request: The pending amount" disabled={this.state.fetchingRPC} value='amount' onClick={this.getRPC}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
             <Button variant="outline-secondary" className={this.state.qrActive === 'amount' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='amount' onClick={this.handleQRChange}></Button>
           </InputGroup.Append>
@@ -1937,7 +1964,7 @@ class SigningTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <Button variant="primary" onClick={this.sample}>Sample</Button>
-          <Button variant="primary" disabled={!this.state.validOutput} onClick={this.publishBlock}>Publish Block</Button>
+          <Button variant="primary" disabled={!this.state.validOutput || this.state.fetchingRPC} onClick={this.publishBlock}>Publish Block</Button>
           <Button variant="primary" onClick={this.clearAll}>Clear All</Button>
         </InputGroup>
 
