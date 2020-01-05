@@ -251,8 +251,8 @@ class SigningTool extends Component {
       title_link: this.linkTitle[0],
       place_link: this.linkPlace[0],
       place_amount: this.amountPlace[0],
-      activeAmount: this.amounts[0],
       title_pow: this.powTitle[0],
+      activeAmount: this.amounts[0],
       activeAmountId: '0', // NANO=0, raw=1
       jsonOneLine: false, //if the output is one line or not
       jsonOneLineText: 'Simple',
@@ -1561,7 +1561,11 @@ class SigningTool extends Component {
   // Publish the json block
   publishBlock() {
     if (this.state.validOutput) {
-      helpers.postData(this.state.outputRaw)
+      let outputBlock = this.state.outputRaw
+      // set watch_work to false to avoid the endpoint node to recalculate work
+      outputBlock.watch_work = 'false'
+      console.log(outputBlock)
+      helpers.postData(outputBlock)
       .then((data) => {
         if (data.hash) {
           console.log("Processed block hash: "+data.hash)
@@ -1719,10 +1723,10 @@ class SigningTool extends Component {
         <div className="noprint">
           <p>Create and Sign blocks off-chain to be published with an on-chain node</p>
           <ul>
-            <li>Inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a></li>
+            <li>Inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a> and good reps from <a href="https://nanocharts.info/need-a-representative">nanocharts</a></li>
             <li>Live data comes from the <a href="https://node.nanoticker.info/nano.html">NanoTicker node</a>. You should double check with an explorer.</li>
-            <li>The final JSON can be published directly to the network with Publish Block</li>
-            <li>Hover on text fields to show more details or have a look at this <a href="#">Video Tutorial</a></li>
+            <li>The final block can be published from this site but no rework will be done to increase PoW priority</li>
+            <li>Hover on text fields to show more details or have a look at this <a href="https://medium.com/@d84/how-to-make-secure-nano-transactions-using-an-offline-device-93713d217377">Video Tutorial</a></li>
           </ul>
         </div>
         <InputGroup size="sm" className="mb-3">
@@ -1923,7 +1927,7 @@ class SigningTool extends Component {
               Process Command
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" placeholder="" value={this.state.output} readOnly/>
+          <FormControl id="output-area" aria-describedby="output" as="textarea" rows="4" placeholder="" value={this.state.output} readOnly/>
           <InputGroup.Append>
             <Button variant="outline-secondary" onClick={this.oneLine}>{this.state.jsonOneLineText}</Button>
             <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>

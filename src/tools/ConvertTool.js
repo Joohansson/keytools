@@ -21,9 +21,6 @@ class ConvertTool extends Component {
       qrSize: 512,
       activeQR: '',
       qrState: 0,  //qr size
-      rawBtnActive: false,
-      nanoBtnActive: false,
-      MnanoBtnActive: false,
       qrHidden: true,
     }
 

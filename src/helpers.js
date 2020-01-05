@@ -14,6 +14,7 @@ namedNumber.setDictionary(namedNumberDictionary)
 export const constants = {
   INDEX_MAX: 4294967295, //seed index
   KEYS_MAX: 10000, //max keys to export
+  RPC_MAX: 500, //max rpc requests of same type, for example pending blocks
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
   RPC_SERVER: 'https://rpc.nanoticker.info/api/node-api'
 }
@@ -350,4 +351,54 @@ export async function postData(data = {}) {
     body: JSON.stringify(data) // body data type must match "Content-Type" header
   })
   return await response.json(); // parses JSON response into native JavaScript objects
+}
+
+export async function postDataTimout(data = {}) {
+  const FETCH_TIMEOUT = 5000;
+  let didTimeOut = false;
+
+  new Promise(function(resolve, reject) {
+      const timeout = setTimeout(function() {
+          didTimeOut = true;
+          reject(new Error('Request timed out'));
+      }, FETCH_TIMEOUT);
+
+      fetch(constants.RPC_SERVER, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *client
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+      })
+      .then(function(response) {
+          // Clear the timeout as cleanup
+          clearTimeout(timeout);
+          if(!didTimeOut) {
+              console.log('fetch good! ', response);
+              resolve(response);
+          }
+      })
+      .catch(function(err) {
+          console.log('fetch failed! ', err);
+
+          // Rejection already happened with setTimeout
+          if(didTimeOut) return;
+          // Reject with error
+          reject(err);
+      });
+  })
+  .then(function() {
+      // Request success and no timeout
+      console.log('good promise, no timeout! ');
+  })
+  .catch(function(err) {
+      // Error: response error, request timeout or runtime error
+      console.log('promise error! ', err);
+  });
 }

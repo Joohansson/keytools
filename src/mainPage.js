@@ -8,15 +8,15 @@ import $ from 'jquery'
 import donation from './img/donation.png';
 import Hotkeys from 'react-hot-keys'
 import { Start, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-  SigningTool, WorkGeneratorTool, VanityTool, QRTool, MessengerTool} from './tools'
-const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'QR', "MSG"]
+  SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool} from './tools'
+const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG"]
 
 class MainPage extends Component {
   constructor(props) {
     super(props)
     this.tools = ['0: HOME', '1: Unit Converter', '2: Key Converter', '3: Paper Wallet Generator ', '4: Payment Card', '5: Mass Wallet Generator',
     '6: Mass Keypair Extractor', '7: Find Address in Seed', '8: Off-chain Signing', '9: PoW Generator',
-    '10: Vanity Address Generator', '11: QR Generator / Reader', '12: Offline Audio Messenger']
+    '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,
@@ -248,9 +248,57 @@ class MainPage extends Component {
         }
         break
 
+        // Inspector Tool
+        case 'inspector':
+        toolId = 11
+        let i_type = helpers.getUrlParams().type
+        let i_address = helpers.getUrlParams().address
+        let i_block = helpers.getUrlParams().block
+        let i_count = helpers.getUrlParams().count
+        let i_reverse = helpers.getUrlParams().reverse
+        let i_threshold = helpers.getUrlParams().threshold
+        let i_threstype = helpers.getUrlParams().threstype
+
+        if (typeof i_type !== 'undefined') {
+          this.setState({
+            type: i_type
+          })
+        }
+        if (typeof i_address !== 'undefined') {
+          this.setState({
+            address: i_address
+          })
+        }
+        if (typeof i_block !== 'undefined') {
+          this.setState({
+            block: i_block
+          })
+        }
+        if (typeof i_count !== 'undefined') {
+          this.setState({
+            count: i_count
+          })
+        }
+        if (typeof i_reverse !== 'undefined') {
+          this.setState({
+            reverse: i_reverse
+          })
+        }
+        if (typeof i_threshold !== 'undefined') {
+          this.setState({
+            threshold: i_threshold
+          })
+        }
+        if (typeof i_threstype !== 'undefined') {
+          this.setState({
+            threstype: i_threstype
+          })
+        }
+        break
+
         // QRTool
         case 'qr':
-        toolId = 11
+        toolId = 12
         let q_type = helpers.getUrlParams().type
         if (typeof q_type !== 'undefined') {
           this.setState({
@@ -261,7 +309,7 @@ class MainPage extends Component {
 
         // MessengerTool
         case 'msg':
-        toolId = 12
+        toolId = 13
         break
 
         default:
@@ -373,6 +421,10 @@ class MainPage extends Component {
 
       case 'ctrl+shift+alt+2':
       this.selectTool(12)
+      break
+
+      case 'ctrl+shift+alt+3':
+      this.selectTool(13)
       break
 
       default:
@@ -624,6 +676,7 @@ class MainPage extends Component {
             {(active === 'SIGN') && <SigningTool {...this} /> }
             {(active === 'POW') && <WorkGeneratorTool {...this} /> }
             {(active === 'VANITY') && <VanityTool {...this} /> }
+            {(active === 'INSPECTOR') && <InspectTool {...this} /> }
             {(active === 'QR') && <QRTool {...this} /> }
             {(active === 'MSG') && <MessengerTool {...this} /> }
           </div>
