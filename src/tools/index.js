@@ -11,6 +11,7 @@ import WorkGeneratorTool from './WorkGeneratorTool.js'
 import QRTool from './QRTool.js'
 import MessengerTool from './MessengerTool.js'
 import VanityTool from './VanityTool.js'
+import InspectTool from './InspectTool.js'
 
 export {Start, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-SigningTool, WorkGeneratorTool, QRTool, MessengerTool, VanityTool}
+SigningTool, WorkGeneratorTool, QRTool, MessengerTool, VanityTool, InspectTool}

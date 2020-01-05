@@ -96,9 +96,20 @@ a:hover, a:focus {
   margin-top: 2vh;
 }
 
-.dropdown-toggle {
+.tool-dropdown .dropdown-toggle {
   font-size: calc(10px + 1.1vmin);
   width: 400px;
+  text-align: left;
+}
+
+.command-dropdown {
+  margin-top: 2vh;
+  margin-bottom: 15px;
+}
+
+.command-dropdown .dropdown-toggle {
+  font-size: calc(10px + 0.8vmin);
+  width: 300px;
   text-align: left;
 }
 
@@ -312,6 +323,11 @@ a:hover, a:focus {
 .vanity-number {
   color: #4a90e2;
   font-weight: bold;
+}
+
+/* INSPECTOR TOOL */
+.command-help {
+  margin-bottom: 15px;
 }
 
 /* Visible content to activate if no javascript */
