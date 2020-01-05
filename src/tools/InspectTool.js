@@ -26,8 +26,7 @@ class InspectTool extends Component {
       'Returns the delegators and their balance for given address/account.',
       'Returns a list of pairs of account and block hash representing the head block starting at given address/account up to count.',
       'Returns a list of block hashes which have not yet been received by this account. Only includes confirmed blocks.',
-      'Publish a JSON block to the network. Rework will not be done if the network is busy and PoW difficulty is low.',
-      'Rebroadcast blocks starting at hash to the network',
+      'Publish a JSON block to the network. Rework will NOT be done if the network is busy and PoW difficulty is low.',
     ]
     this.commandURLS = [
       'https://docs.nano.org/commands/rpc-protocol/#account_info',
@@ -41,7 +40,6 @@ class InspectTool extends Component {
       'https://docs.nano.org/commands/rpc-protocol/#frontiers',
       'https://docs.nano.org/commands/rpc-protocol/#pending',
       'https://docs.nano.org/commands/rpc-protocol/#process',
-      'https://docs.nano.org/commands/rpc-protocol/#republish',
     ]
 
     // Amount dropdown titles
@@ -81,6 +79,7 @@ class InspectTool extends Component {
       activeAmount: this.amounts[0],
       activeAmountId: '0', // NANO=0, raw=1
       outputRows: 16,
+      fetchingRPC: false,
     }
 
     this.updateQR = this.updateQR.bind(this)
@@ -98,6 +97,7 @@ class InspectTool extends Component {
     this.handleJsonChange = this.handleJsonChange.bind(this)
     this.setMax = this.setMax.bind(this)
     this.selectThreshold = this.selectThreshold.bind(this)
+    this.handleRPCError = this.handleRPCError.bind(this)
   }
 
   componentDidMount = () => {
@@ -382,11 +382,30 @@ class InspectTool extends Component {
       validAmount: true, //threshold
       activeAmount: this.amounts[0],
       activeAmountId: '0', // NANO=0, raw=1
+      fetchingRPC: false,
     },function() {
         this.updateQR()
         this.setParams()
       }
     )
+  }
+
+  handleRPCError(error) {
+    this.setState({fetchingRPC: false})
+    if (error.code) {
+      console.log("RPC request failed: "+error.message)
+      // IP blocked
+      if (error.code === 429) {
+        toast(helpers.constants.RPC_LIMIT, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+      else {
+        toast("RPC request failed: "+error.message, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      }
+    }
+    else {
+      console.log("RPC request failed: "+error)
+      toast("RPC request failed. See console (CTRL+F12).", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+    }
   }
 
   // loop qr state 1x, 2x, 4x
@@ -616,7 +635,7 @@ class InspectTool extends Component {
       })
     }
     catch(error) {
-      this.inputToast = toast("Bad output JSON, check console (CTRL+F12)", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      toast("Bad output JSON, check console (CTRL+F12)", helpers.getToast(helpers.toastType.ERROR_AUTO))
       console.log("Bad JSON: "+error)
     }
     this.updateQR()
@@ -649,7 +668,9 @@ class InspectTool extends Component {
         command.pending = "true"
       }
       else {
-        this.inputToast = toast("Need a valid address.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid address.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -661,7 +682,9 @@ class InspectTool extends Component {
         command.count = this.state.count
       }
       else {
-        this.inputToast = toast("Need a valid address and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid address and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -682,7 +705,9 @@ class InspectTool extends Component {
         command.json_block = "true"
       }
       else {
-        this.inputToast = toast("Need a valid block hash.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid block hash.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -699,7 +724,9 @@ class InspectTool extends Component {
         command.reverse = this.state.reverse
       }
       else {
-        this.inputToast = toast("Need a valid block hash and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid block hash and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -710,7 +737,9 @@ class InspectTool extends Component {
         command.account = this.state.address
       }
       else {
-        this.inputToast = toast("Need a valid address.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid address.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -722,7 +751,9 @@ class InspectTool extends Component {
         command.count = this.state.count
       }
       else {
-        this.inputToast = toast("Need a valid address and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid address and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -739,7 +770,9 @@ class InspectTool extends Component {
         }
       }
       else {
-        this.inputToast = toast("Need a valid address and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid address and count.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -753,7 +786,9 @@ class InspectTool extends Component {
         command.block = block
       }
       else {
-        this.inputToast = toast("Need a valid JSON block.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (! toast.isActive(this.inputToast)) {
+          this.inputToast = toast("Need a valid JSON block.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        }
         fail = true
       }
       break
@@ -768,8 +803,11 @@ class InspectTool extends Component {
     }
 
     if (Object.keys(command).length > 0) {
-      helpers.postData(command)
+      this.setState({fetchingRPC: true})
+      helpers.postDataTimeout(command)
+      //helpers.postData(command)
       .then((data) => {
+        this.setState({fetchingRPC: false})
         var fail = false
         switch (value) {
           case 'ACCINFO':
@@ -815,7 +853,14 @@ class InspectTool extends Component {
 
           case 'PENDING':
           if (data.blocks) {
-            this.writeOutput({count: Object.keys(data.blocks).length, blocks: data.blocks})
+            // sum all raw amounts
+            var raw = '0'
+            Object.keys(data.blocks).forEach(function(key) {
+                raw = helpers.bigAdd(raw,parseInt(data.blocks[key].amount))
+            })
+            console.log(raw)
+            let nanoAmount = helpers.rawToMnano(raw)
+            this.writeOutput({count: Object.keys(data.blocks).length, raw: raw, NANO: nanoAmount, blocks: data.blocks})
           }
           else {
             fail = true
@@ -831,13 +876,13 @@ class InspectTool extends Component {
         }
 
         if (fail) {
-          this.inputToast = toast("Bad RPC response.)", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          toast("Bad RPC response.", helpers.getToast(helpers.toastType.ERROR_AUTO))
           this.writeOutput(data)
         }
       })
       .catch(function(error) {
-          console.log(error)
-      })
+        this.handleRPCError(error)
+      }.bind(this))
     }
   }
 
@@ -943,7 +988,7 @@ class InspectTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.getRPC}>Node Request</Button>
+          <Button variant="primary" disabled={this.state.fetchingRPC} onClick={this.getRPC}>Node Request</Button>
           <Button variant="primary" onClick={this.clearAll}>Clear All</Button>
         </InputGroup>
 

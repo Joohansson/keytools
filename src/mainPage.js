@@ -636,7 +636,7 @@ class MainPage extends Component {
             enableMultiContainer
             containerId={'error-auto-long'}
             position="top-left"
-            autoClose={4000}
+            autoClose={5000}
             hideProgressBar={false}
             newestOnTop={true}
             closeOnClick
