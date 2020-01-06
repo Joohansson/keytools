@@ -7,7 +7,7 @@ import * as helpers from './helpers'
 import $ from 'jquery'
 import donation from './img/donation.png';
 import Hotkeys from 'react-hot-keys'
-import { Start, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
+import { Start, Terms, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
   SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool} from './tools'
 const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG"]
 
@@ -28,6 +28,7 @@ class MainPage extends Component {
     this.selectTool = this.selectTool.bind(this)
     this.showDonateModal = this.showDonateModal.bind(this)
     this.collapse = this.collapse.bind(this)
+    this.showTerms = this.showTerms.bind(this)
   }
 
   componentDidMount = () => {
@@ -369,6 +370,12 @@ class MainPage extends Component {
     };
   }
 
+  showTerms() {
+    this.setState({
+      activeToolName: 'TERMS',
+    })
+  }
+
   onKeyDown(keyName, e, handle) {
     switch (keyName) {
       case 'shift+alt+0':
@@ -556,6 +563,7 @@ class MainPage extends Component {
     var active = this.state.activeToolName
     return (
       <div>
+        <div className="background-noise"></div>
         <Hotkeys
           keyName="shift+alt+0,shift+alt+1,shift+alt+2,shift+alt+3,shift+alt+4,shift+alt+5,shift+alt+6,shift+alt+7,shift+alt+8,shift+alt+9,ctrl+shift+alt+0,ctrl+shift+alt+1,ctrl+shift+alt+2"
           onKeyDown={this.onKeyDown.bind(this)}
@@ -666,6 +674,7 @@ class MainPage extends Component {
         <div className="content-wrapper" ref="contentWrapper">
           <div className="content">
             {(active === 'HOME') && <Start /> }
+            {(active === 'TERMS') && <Terms /> }
             {(active === 'CONVERT') && <ConvertTool {...this} /> }
             {(active === 'SEED') && <SeedTool {...this} /> }
             {(active === 'PAPER') && <PaperWalletTool {...this} /> }
@@ -688,7 +697,7 @@ class MainPage extends Component {
             <FormControl as="textarea" rows="4" placeholder="Memo for copying data between tools"/>
           </InputGroup>
           <div className="footer-text">
-            <span className="link-span" onClick={this.collapse}>{this.state.collapseText}</span> | <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span>
+            <span className="link-span" onClick={this.collapse}>{this.state.collapseText}</span> | <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span> | <span className="link-span" onClick={this.showTerms}>Terms</span>
           </div>
         </footer>
       </div>
