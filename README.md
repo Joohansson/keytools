@@ -1,10 +1,13 @@
 # KeyTools - High performance Nano web tools written with reactJS
 * Can be run from local file system offline by downloading [this zip package](https://github.com/Joohansson/keytools/raw/master/keytools.zip)
-* Hosted by github pages at https://tools.nanos.cc
+* Hosted by [github pages](https://github.com/Joohansson/keytools/tree/gh-pages) via https://tools.nanos.cc
 
 ## Developer instructions
 
-### Prepare for build (Ubuntu example)`
+### Prepare for build (Ubuntu or Windows)
+Install nodejs and npm
+* [Ubuntu](https://tecadmin.net/install-latest-nodejs-npm-on-ubuntu/)
+* [Windows](https://www.guru99.com/download-install-node-js.html)
 
 `apt-get install`\
 `git clone https://github.com/Joohansson/keytools`\
@@ -33,14 +36,15 @@ Your app is ready to be deployed!
 3. Alter the row at the bottom: <export default MyTool>
 4. Change tools/index.js: Add <import MyTool from './MyTool.js'>
 5. Change tools/index.js: Add the new class to <export {ConvertTool,...>
-6. Change mainPage.js: Add the new class to <import { ConvertTool,...>
-7. Change mainPage.js: Add the new entry to <const tools = ['CONVERT'...>
-8. Change mainPage.js: Add a tool dropdown title to <this.tools = ['1: Unit Converter',...>
+6. Change mainPage.js: Add the new class to <import { Start, Terms, ConvertTool,...>
+7. Change mainPage.js: Add the new entry to <const tools = ['HOME', 'CONVERT',...>
+8. Change mainPage.js: Add a tool dropdown title to <this.tools = ['0: HOME', '1: Unit Converter',...>
 9. Change mainPage.js: Add tool at <{(active === 'CONVERT') && <ConvertTool {...this} /> }...>
 10. Change mainPage.js: Add a section to control URL params at <switch (tool) {...>
-11. The new tool should now be available from the main dropdown selector. Happy coding!
+11. For hotkeys, search for this and add appropriate key: shift+alt+0
+12. The new tool should now be available from the main dropdown selector. Happy coding!
 
-## Used Nice Libraries
+## Some Nice Libraries Used
 
 * [Nano library - Nano-currency-js](https://github.com/marvinroger/nanocurrency-js)
 * [Nano library - Nano-currency-web-js](https://github.com/numsu/nanocurrency-web-js)
@@ -51,7 +55,7 @@ Your app is ready to be deployed!
 * [Auditable high-security cryptographic library - Tweetnacl](https://tweetnacl.js.org/)
 * [Messaging over sound - Chirp](https://developers.chirp.io/)
 
-## Inspiration
+## Inspiration Hall of Fame
 
 * Nanoo tools: https://nanoo.tools/
 * Nanoaddr: https://nanoaddr.io
