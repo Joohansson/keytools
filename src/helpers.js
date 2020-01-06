@@ -108,7 +108,7 @@ export function isNumeric(val) {
   }
 }
 
-// Return number of logical processors
+// Return number of logical processors (not suppoerted on most mobile browsers)
 export function getHardwareConcurrency() {
   var threads =  window.navigator.hardwareConcurrency || 1;
   if (threads >= 12) {
@@ -427,4 +427,86 @@ export async function postDataTimeout(data = {}) {
       // Error: response error, request timeout or runtime error
       console.log('RPC error! ', err);
   });*/
+}
+
+/* Helper functions to detect CPU concurrency */
+var blobUrl = URL.createObjectURL(new Blob(['(',
+  function() {
+    // eslint-disable-next-line no-restricted-globals
+    self.addEventListener('message', function(e) {
+      // run worker for 4 ms
+      var st = Date.now();
+      var et = st + 4;
+      while(Date.now() < et);
+      // eslint-disable-next-line no-restricted-globals
+      self.postMessage({st: st, et: et});
+    });
+  }.toString(),
+')()'], {type: 'application/javascript'}));
+
+export function sample(max, samples, numWorkers, callback) {
+  if(samples === 0) {
+    // get overlap average
+    var avg = Math.floor(max.reduce(function(avg, x) {
+      return avg + x;
+    }, 0) / max.length);
+    avg = Math.max(1, avg);
+    if (avg >= 12) {
+      avg-=2 //save two thread for handling the site
+    }
+    else if (avg >= 6) {
+      avg-=1 //save one threads for handling the site
+    }
+    return callback(null, avg);
+  }
+  map(numWorkers, function(err, results) {
+    max.push(reduce(numWorkers, results));
+    sample(max, samples - 1, numWorkers, callback);
+  });
+}
+
+function map(numWorkers, callback) {
+  var workers = [];
+  var results = [];
+  for(var i = 0; i < numWorkers; ++i) {
+    var worker = new Worker(blobUrl);
+    worker.addEventListener('message', function(e) {
+      results.push(e.data);
+      if(results.length === numWorkers) {
+        for(var i = 0; i < numWorkers; ++i) {
+          workers[i].terminate();
+        }
+        callback(null, results);
+      }
+    });
+    workers.push(worker);
+  }
+  for(i = 0; i < numWorkers; ++i) {
+    workers[i].postMessage(i);
+  }
+}
+
+function reduce(numWorkers, results) {
+  // find overlapping time windows
+  var overlaps = [];
+  for(var n = 0; n < numWorkers; ++n) {
+    var r1 = results[n];
+    var overlap = overlaps[n] = [];
+    for(var i = 0; i < numWorkers; ++i) {
+      if(n === i) {
+        continue;
+      }
+      var r2 = results[i];
+      if((r1.st > r2.st && r1.st < r2.et) ||
+        (r2.st > r1.st && r2.st < r1.et)) {
+        overlap.push(i);
+      }
+    }
+  }
+  // get maximum overlaps ... don't include overlapping worker itself
+  // as the main JS process was also being scheduled during the work and
+  // would have to be subtracted from the estimate anyway
+  return overlaps.reduce(function(max, overlap) {
+    return Math.max(max, overlap.length);
+  }, 0);
 }

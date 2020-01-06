@@ -58,18 +58,18 @@ class FindAddressTool extends Component {
 
   componentDidMount = () => {
     if (window.Worker) {
-      var threads = helpers.getHardwareConcurrency()
-
-      for (let i = 0; i < threads; i += 1) {
-        let worker = new FindWorker()
-        worker.addEventListener("message", event => {
-          this.workerListener(event)
-        })
-        this.workers.push(worker);
-      }
-
-      this.maxThreads = threads
-      this.threads = threads
+      // Detect hardware concurrency (available logical CPU threads)
+      // realThreads not working on some mobiles, use that as backup if the other method fails
+      var realThreads = helpers.getHardwareConcurrency()
+      this.setupWorkers(realThreads)
+      helpers.sample([], 10, 16, function(err, threads) {
+        if (threads > realThreads) {
+          console.log("Available estimated logical CPUs: " + threads)
+          toast("Estimated processing threads: " + threads, helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+          // setup one more time if larger
+          this.setupWorkers(threads)
+        }
+      }.bind(this));
     }
     else {
       console.log("Web workers not supported")
@@ -84,6 +84,20 @@ class FindAddressTool extends Component {
   // Defines the url params
   setParams() {
     helpers.setURLParams('?tool='+toolParam)
+  }
+
+  setupWorkers(threads) {
+    this.workers = []
+    for (let i = 0; i < threads; i += 1) {
+      let worker = new FindWorker()
+      worker.addEventListener("message", event => {
+        this.workerListener(event)
+      })
+      this.workers.push(worker);
+    }
+
+    this.maxThreads = threads
+    this.threads = threads
   }
 
   //Clear text from input field
