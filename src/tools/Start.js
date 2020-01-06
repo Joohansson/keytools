@@ -22,7 +22,7 @@ class Start extends Component {
         <ul>
           <li>Secret keys are made from <a href="https://tweetnacl.js.org/#/">TweetNaCl</a>, a high-security cryptographic library</li>
           <li>The site works offline or by <a href="https://github.com/Joohansson/keytools/raw/master/keytools.zip">downloading</a> and running the index.html from a secure local file system</li>
-          <li>There are zero cookies/trackers, no keys are shared via URL and no data is stored other than on device RAM</li>
+          <li>No cookies or analytics trackers exists and no data entered on the site are stored remotely</li>
         </ul>
         <h4>ACCESSIBLE</h4>
         <ul>
@@ -35,7 +35,7 @@ class Start extends Component {
         <h4>AUDITABLE</h4>
         <ul>
           <li>Open sourced on <a href="https://github.com/Joohansson/keytools">Github</a></li>
-          <li>This site is directly hosted on <a href="https://github.com/Joohansson/keytools/tree/gh-pages">Github Pages</a> via Cloudflare</li>
+          <li>This site is directly hosted on <a href="https://github.com/Joohansson/keytools/tree/gh-pages">Github Pages</a> and protected by Cloudflare</li>
         </ul>
         <h4>FREE</h4>
         <ul>
