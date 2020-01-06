@@ -1,6 +1,17 @@
 import React, { Component } from 'react'
+import * as helpers from '../helpers'
+const toolParam = 'terms'
 
 class Terms extends Component {
+  componentDidMount = () => {
+    this.setParams()
+  }
+
+  // Defines the url params
+  setParams(type) {
+    helpers.setURLParams('?tool='+toolParam)
+  }
+
   render() {
     return (
       <div>
