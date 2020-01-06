@@ -9,7 +9,6 @@ Install nodejs and npm
 * [Ubuntu](https://tecadmin.net/install-latest-nodejs-npm-on-ubuntu/)
 * [Windows](https://www.guru99.com/download-install-node-js.html)
 
-`apt-get install`\
 `git clone https://github.com/Joohansson/keytools`\
 `cd keytools`\
 `npm install`
