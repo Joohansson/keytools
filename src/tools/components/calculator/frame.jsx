@@ -60,8 +60,10 @@ class Calculator extends React.Component {
         // convert the answer (in number) to String
         var answer
         try {
-          if (eval(this.state.question) !== undefined) {
-            answer = eval(this.state.question).toString();
+          // eslint-disable-next-line no-eval
+          var res = (0, eval)(this.state.question)
+          if (res !== undefined) {
+            answer = res.toString();
           }
           else {
             return //no value to calculate

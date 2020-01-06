@@ -29,6 +29,7 @@ class MainPage extends Component {
     this.showDonateModal = this.showDonateModal.bind(this)
     this.collapse = this.collapse.bind(this)
     this.showTerms = this.showTerms.bind(this)
+    this.showStart = this.showStart.bind(this)
   }
 
   componentDidMount = () => {
@@ -39,9 +40,16 @@ class MainPage extends Component {
     // Read URL params
     var tool = helpers.getUrlParams().tool
     var toolId = 0
+    var terms = false
 
     if (typeof tool !== 'undefined') {
       switch (tool) {
+        // SeedTool
+        case 'terms':
+        toolId = 0
+        terms = true
+        break
+
         // ConvertTool
         case 'convert':
         toolId = 1
@@ -321,11 +329,16 @@ class MainPage extends Component {
     else {
       toolId = 0
     }
+
     this.setState({
       activeTool: this.tools[toolId],
       activeToolId: toolId,
       activeToolName: tools[toolId],
     })
+
+    if (terms) {
+      this.showTerms()
+    }
 
     // Define global modal component
     $.fn.psendmodal = function() {
@@ -372,7 +385,17 @@ class MainPage extends Component {
 
   showTerms() {
     this.setState({
+      activeTool: this.tools[0],
+      activeToolId: 0,
       activeToolName: 'TERMS',
+    })
+  }
+
+  showStart() {
+    this.setState({
+      activeTool: this.tools[0],
+      activeToolId: 0,
+      activeToolName: tools[0],
     })
   }
 
@@ -673,6 +696,9 @@ class MainPage extends Component {
         <div className="line noprint"></div>
         <div className="content-wrapper" ref="contentWrapper">
           <div className="content">
+            <div className={this.state.activeToolName === 'TERMS' ? '':'hidden'}>
+              <p><span className="link-span" onClick={this.showStart}>Close</span></p>
+            </div>
             {(active === 'HOME') && <Start /> }
             {(active === 'TERMS') && <Terms /> }
             {(active === 'CONVERT') && <ConvertTool {...this} /> }
