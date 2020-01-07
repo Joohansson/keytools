@@ -334,6 +334,7 @@ class InspectTool extends Component {
       case 'address':
       this.setState({
         address: '',
+        validAddress: false,
       },
       function() {
         this.setParams()
@@ -343,6 +344,7 @@ class InspectTool extends Component {
       case 'block':
       this.setState({
         block: '',
+        validBlock: false,
       },
       function() {
         this.setParams()
