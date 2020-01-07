@@ -16,6 +16,7 @@ class PaymentTool extends Component {
     this.state = {
       address: '',
       amount: '',
+      message: 'Nano Payment',
       validAddress: false,
       validAmount: false,
       qrContent: '',
@@ -25,6 +26,7 @@ class PaymentTool extends Component {
 
     this.handleAddressChange = this.handleAddressChange.bind(this)
     this.handleAmountChange = this.handleAmountChange.bind(this)
+    this.handleMessageChange = this.handleMessageChange.bind(this)
     this.clearText = this.clearText.bind(this)
     this.sample = this.sample.bind(this)
     this.updateQR = this.updateQR.bind(this)
@@ -36,6 +38,7 @@ class PaymentTool extends Component {
     // Read URL params from parent and construct new quick path
     var address = this.props.state.address
     var amount = this.props.state.amount
+    var message = this.props.state.message
 
     if (address) {
       this.addressChange(address)
@@ -43,40 +46,55 @@ class PaymentTool extends Component {
     if (amount) {
       this.amountChange(amount)
     }
+    if (message) {
+      this.messageChange(message)
+    }
 
-    if (!address && !amount) {
+    if (!address && !amount && !message) {
       this.setParams()
     }
   }
 
   // Defines the url params
   setParams() {
-    helpers.setURLParams('?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount)
+    helpers.setURLParams('?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&message=' + this.state.message)
   }
 
   //Clear text from input field
   clearText(event) {
     switch(event.target.value) {
       case 'address':
-        this.setState({
-          address: '',
-          validAddress: false
-        },
-        function() {
-          this.updateQR()
-          this.setParams()
-        })
-        break
+      this.setState({
+        address: '',
+        validAddress: false
+      },
+      function() {
+        this.updateQR()
+        this.setParams()
+      })
+      break
+
       case 'amount':
-        this.setState({
-          amount: '',
-          validAmount: false
-        },
-        function() {
-          this.updateQR()
-          this.setParams()
-        })
-        break
+      this.setState({
+        amount: '',
+        validAmount: false
+      },
+      function() {
+        this.updateQR()
+        this.setParams()
+      })
+      break
+
+      case 'message':
+      this.setState({
+        message: '',
+      },
+      function() {
+        this.updateQR()
+        this.setParams()
+      })
+      break
+
       default:
         break
     }
@@ -150,6 +168,20 @@ class PaymentTool extends Component {
     })
   }
 
+  handleMessageChange(event) {
+    this.messageChange(event.target.value)
+  }
+
+  messageChange(message) {
+    this.setState({
+      message: message,
+    },
+    function() {
+      this.updateQR()
+      this.setParams()
+    })
+  }
+
   updateQR() {
     let address = this.state.address
     let amount = this.state.amount
@@ -190,6 +222,7 @@ class PaymentTool extends Component {
       validAddress: true,
       amount: '0.1',
       validAmount: true,
+      message: 'Donate to KeyTools'
     },
     function() {
       this.updateQR()
@@ -205,12 +238,10 @@ class PaymentTool extends Component {
     return (
       <div>
         <div className="noprint">
-          <p>Generate and Share a Payment Card or Pay it now</p>
+          <p>Generate and Share or <strong>PAY NOW</strong></p>
           <ul>
-            <li>Scan QR with a wallet. The amount is included</li>
-            <li>Open in Wallet may work depending on wallet installed</li>
-            <li>The URL path above can be shared with anyone</li>
-            <li>Right click and save QR image to embed on any site or print it</li>
+            <li>Scan QR with a wallet. The amount is included.</li>
+            <li>Open in Wallet may work depending on wallet installed.</li>
           </ul>
         </div>
         <div className="noprint">
@@ -240,13 +271,28 @@ class PaymentTool extends Component {
             </InputGroup.Append>
           </InputGroup>
 
-          <Button variant="primary" onClick={this.sample}>Sample</Button>
-          <a className="btn btn-primary" id="wallet-btn" href="https://keytools.nanos.cc" role="button">Open in Wallet</a>
-          <Button variant="primary" onClick={this.print}>Print QR</Button>
-        </div>
+          <InputGroup size="sm" className="mb-3">
+            <InputGroup.Prepend>
+              <InputGroup.Text id="message">
+                Message
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl id="message" aria-describedby="message" value={this.state.message} title="Optional custom message" placeholder="Optional" maxLength="30" onChange={this.handleMessageChange} autoComplete="off"/>
+            <InputGroup.Append>
+              <Button variant="outline-secondary" className="fas fa-times-circle" value='message' onClick={this.clearText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.message} onClick={helpers.copyText}></Button>
+            </InputGroup.Append>
+          </InputGroup>
 
-        <div className={ this.state.qrHidden ? "hidden" : ""}>
-          <div className={helpers.qrClassesContainer[this.state.qrState]}>
+          <InputGroup size="sm" className="mb-3">
+            <Button variant="primary" onClick={this.sample}>Sample</Button>
+            <a className="btn btn-primary" id="wallet-btn" href="https://keytools.nanos.cc" role="button">Open in Wallet</a>
+            <Button variant="primary" onClick={this.print}>Print QR</Button>
+            <Button variant="primary" value={'https://tools.nanos.cc/?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&message=' + this.state.message.split(' ').join('%20')} onClick={helpers.copyText}>Copy Share Link</Button>
+          </InputGroup>
+        </div>
+        <div>
+          <div className={helpers.qrClassesContainer[this.state.qrState]+" QR-container-payment"}>
             <QrImageStyle className={helpers.qrClassesImg[this.state.qrState]} content={this.state.qrContent} onClick={this.double} title="Click to toggle size" size={this.state.qrSize} />
           </div>
         </div>
