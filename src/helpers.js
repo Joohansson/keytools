@@ -7,6 +7,7 @@ import * as convert from './modules/conversion'
 import namedNumber from 'hsimp-named-number'
 import namedNumberDictionary from 'hsimp-named-number/named-number-dictionary.json'
 import nacl from 'tweetnacl/nacl';
+import { Base64 } from 'js-base64';
 
 namedNumber.setDictionary(namedNumberDictionary)
 
@@ -19,7 +20,8 @@ export const constants = {
   RPC_MAX: 500, //max rpc requests of same type, for example pending blocks
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
   RPC_SERVER: 'https://rpc.nanoticker.info/api/node-api',
-  RPC_LIMIT: 'You have sent too many RPC requests. Try again in a hour.'
+  RPC_LIMIT: 'You have sent too many RPC requests. Try again in a hour.',
+  RPC_CREDS: 'rpc:DoNotCopyThisPassword'
 }
 
 class RPCError extends Error {
@@ -389,8 +391,9 @@ export async function postDataTimeout(data = {}) {
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
           // 'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ' + Base64.encode(constants.RPC_CREDS)
         },
         redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *client

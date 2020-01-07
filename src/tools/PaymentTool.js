@@ -185,16 +185,17 @@ class PaymentTool extends Component {
   updateQR() {
     let address = this.state.address
     let amount = this.state.amount
+    let message = this.state.message.split(' ').join('%20')
     var raw = ''
     var url = ''
 
     // allow both address and amount, or only address
     if (address !== '' && amount !== '') {
       raw = helpers.MnanoToRaw(this.state.amount)
-      url = 'nano:' + this.state.address + '?amount=' + raw
+      url = 'nano:' + this.state.address + '?amount=' + raw + '?message=' + message
     }
     else if (address !== ''){
-      url = 'nano:' + address
+      url = 'nano:' + address + '?message=' + message
     }
     else {
       url = '#'
