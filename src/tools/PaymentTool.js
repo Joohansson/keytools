@@ -16,7 +16,7 @@ class PaymentTool extends Component {
     this.state = {
       address: '',
       amount: '',
-      message: 'Nano Payment',
+      message: '',
       validAddress: false,
       validAmount: false,
       qrContent: '',

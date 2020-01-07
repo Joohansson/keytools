@@ -122,6 +122,7 @@ class PaperWalletTool extends Component {
           <p>Generate simple paper wallets with a SEED, ADDRESS & MNEMONIC</p>
           <ul>
             <li>The address is derived using seed index 0</li>
+            <li>The seed from the Vanity Address Generator works here too!</li>
           </ul>
 
           <InputGroup size="sm" className="mb-3 has-clear">

@@ -16,7 +16,7 @@ class Start extends Component {
     return (
       <div>
         <img src={Logo} width="300" alt="logo"/>
-        <p>NANO KeyTools is a set of high performance web tools for <a href="https://nano.org">Nano Currency</a></p>
+        <p><strong>KeyTools</strong> is a set of high performance web tools for <a href="https://nano.org">Nano Currency</a></p>
         <br/>
         <h4>SECURE</h4>
         <ul>
