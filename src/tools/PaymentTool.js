@@ -192,10 +192,10 @@ class PaymentTool extends Component {
     // allow both address and amount, or only address
     if (address !== '' && amount !== '') {
       raw = helpers.MnanoToRaw(this.state.amount)
-      url = 'nano:' + this.state.address + '?amount=' + raw + '?message=' + message
+      url = 'nano:' + this.state.address + '?amount=' + raw + '&message=' + message
     }
     else if (address !== ''){
-      url = 'nano:' + address + '?message=' + message
+      url = 'nano:' + address + '&message=' + message
     }
     else {
       url = '#'
