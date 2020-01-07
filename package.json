@@ -70,6 +70,7 @@
     "gulp-zip": "^5.0.1",
     "hsimp-named-number": "^0.1.3",
     "jquery": "^3.4.1",
+    "js-base64": "^2.5.1",
     "jsqr": "^1.2.0",
     "nano-webgl-pow": "^1.0.0",
     "nanocurrency": "npm:nanocurrency@^2.3.0",
