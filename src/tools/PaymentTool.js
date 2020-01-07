@@ -287,7 +287,7 @@ class PaymentTool extends Component {
 
           <InputGroup size="sm" className="mb-3">
             <Button variant="primary" onClick={this.sample}>Sample</Button>
-            <a className="btn btn-primary" id="wallet-btn" href="https://keytools.nanos.cc" role="button">Open in Wallet</a>
+            <a className="btn btn-primary" id="wallet-btn" href="https://tools.nanos.cc" role="button">Open in Wallet</a>
             <Button variant="primary" onClick={this.print}>Print QR</Button>
             <Button variant="primary" value={'https://tools.nanos.cc/?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&message=' + this.state.message.split(' ').join('%20')} onClick={helpers.copyText}>Copy Share Link</Button>
           </InputGroup>
