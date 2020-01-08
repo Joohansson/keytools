@@ -21,7 +21,7 @@ export const constants = {
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
   RPC_SERVER: 'https://rpc.nanoticker.info/api/node-api',
   RPC_LIMIT: 'You have sent too many RPC requests. Try again in a hour.',
-  RPC_CREDS: 'rpc:DoNotCopyThisPassword'
+  RPC_CREDS: 'rpc:NotStoredOnGithub'
 }
 
 class RPCError extends Error {
