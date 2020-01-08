@@ -28,6 +28,8 @@
     "start-old": "react-scripts start",
     "build-old": "react-scripts build",
     "test-old": "react-scripts test",
+    "generate-build-version": "node generate-build-version",
+    "prebuild": "npm run generate-build-version",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build && gulp zip",
     "test": "react-app-rewired test --env=jsdom",

@@ -730,7 +730,7 @@ class MainPage extends Component {
             <FormControl as="textarea" rows="4" placeholder="Memo for copying data between tools"/>
           </InputGroup>
           <div className="footer-text">
-            <span className="link-span" onClick={this.collapse}>{this.state.collapseText}</span> | <span className="link-span" onClick={this.showOwnerModal}>About Owner</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span> | <span className="link-span" onClick={this.showTerms}>Terms</span>
+            <span className="link-span" onClick={this.collapse}>{this.state.collapseText}</span> | <span className="link-span" onClick={this.showOwnerModal}>About</span> | <a href="https://github.com/Joohansson/keytools">Github</a> | <a href="https://nano.org">Nano</a> | <span className="link-span" onClick={this.showDonateModal}>Donate</span> | <span className="link-span" onClick={this.showTerms}>Terms</span>
           </div>
         </footer>
       </div>
