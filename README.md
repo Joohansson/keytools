@@ -15,6 +15,7 @@ Install nodejs and npm
 `npm install`
 
 ### Test application
+Create an empty file in the src folder called rpc.js. It usually contains credentials for connecting to the RPC server and that is not shared publicly. You will not be able to use the Network Inspector tool or read RPC data in off-chain signing without these credentials or setting up your own RPC server.
 
 `npm start`
 

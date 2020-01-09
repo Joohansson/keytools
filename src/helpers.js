@@ -20,9 +20,9 @@ export const constants = {
   KEYS_MAX: 10000, //max keys to export
   RPC_MAX: 500, //max rpc requests of same type, for example pending blocks
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
-  RPC_SERVER: rpc.config.RPC_SERVER,
-  RPC_LIMIT: rpc.config.RPC_LIMIT,
-  RPC_CREDS: rpc.config.RPC_CREDS
+  RPC_SERVER: rpc.RPC_SERVER,
+  RPC_LIMIT: rpc.RPC_LIMIT,
+  RPC_CREDS: rpc.RPC_CREDS
 }
 
 class RPCError extends Error {
