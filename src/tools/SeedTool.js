@@ -392,6 +392,7 @@ class SeedTool extends Component {
     this.setState({
       seed: '',
       mnemonic: '',
+      index: '0',
       privKey: priv.toUpperCase(),
       pubKey: pubKey.toUpperCase(),
       address: nano.deriveAddress(pubKey, {useNanoPrefix: true}),
@@ -424,6 +425,7 @@ class SeedTool extends Component {
     this.setState({
       seed: '',
       mnemonic: '',
+      index: '0',
       privKey: '',
       pubKey: pub,
       address: nano.deriveAddress(pub, {useNanoPrefix: true}),
@@ -456,6 +458,7 @@ class SeedTool extends Component {
     this.setState({
       seed: '',
       mnemonic: '',
+      index: '0',
       privKey: '',
       pubKey: nano.derivePublicKey(address),
       address: address,
