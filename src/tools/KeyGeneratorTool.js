@@ -230,7 +230,7 @@ class KeyGeneratorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.generate} disabled={this.state.generating}>Generate</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.generate} disabled={this.state.generating}>Generate</Button>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">

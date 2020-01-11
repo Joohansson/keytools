@@ -353,9 +353,9 @@ class WorkGeneratorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.generateWork} disabled={!this.state.validWorkHash || this.state.generating}>Generate PoW</Button>
-          <Button variant="primary" onClick={this.sample}>Sample</Button>
-          <Button variant="primary" onClick={this.clearOutput}>Clear</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.generateWork} disabled={!this.state.validWorkHash || this.state.generating}>Generate PoW</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.sample}>Sample</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.clearOutput}>Clear</Button>
         </InputGroup>
 
         <InputGroup size="sm" className='mb-3'>

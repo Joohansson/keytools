@@ -151,9 +151,9 @@ class PaperWalletTool extends Component {
             </InputGroup.Append>
           </InputGroup>
 
-          <Button variant="primary" onClick={this.generate}>Generate Wallet</Button>
-          <Button variant="primary" onClick={this.print}>Print</Button>
-          <Button variant="primary" onClick={this.download}>Download</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.generate}>Generate New</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.print}>Print</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.download}>Download</Button>
         </div>
 
         <div className="QR-container-paper">

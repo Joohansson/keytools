@@ -354,7 +354,7 @@ class QRTool extends Component {
               </InputGroup.Append>
             </InputGroup>
 
-            <Button variant="primary" onClick={this.print}>Print QR</Button>
+            <Button className="btn-medium" variant="primary" onClick={this.print}>Print QR</Button>
           </div>
         </div>
 
@@ -380,7 +380,7 @@ class QRTool extends Component {
               <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
             </InputGroup.Append>
           </InputGroup>
-          <Button variant="primary" onClick={this.reset}>Reset</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.reset}>Reset</Button>
         </div>
 
         <div className={this.state.selectedOption!=='2' ? 'hidden':'qr-reader-wrapper'}>
@@ -417,10 +417,10 @@ class QRTool extends Component {
             </InputGroup.Prepend>
             <FormControl id="output-area" aria-describedby="output" as="textarea" rows="6" value={this.state.output} placeholder="Waiting for QR image file..." readOnly/>
             <InputGroup.Append>
-              <Button variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
+              <Button className="btn-medium"variant="outline-secondary" className="fas fa-copy" onClick={helpers.copyOutput}></Button>
             </InputGroup.Append>
           </InputGroup>
-          <Button variant="primary" onClick={this.reset}>Reset</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.reset}>Reset</Button>
         </div>
       </div>
     )

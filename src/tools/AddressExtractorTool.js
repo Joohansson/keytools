@@ -399,8 +399,8 @@ class AddressExtractorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.generate} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) || this.state.generating}>Generate</Button>
-          <Button variant="primary" onClick={this.sample} disabled={this.state.generating}>Random Seed</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.generate} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex) || this.state.generating}>Generate</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.sample} disabled={this.state.generating}>Random Seed</Button>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
