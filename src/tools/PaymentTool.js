@@ -17,6 +17,7 @@ class PaymentTool extends Component {
       address: '',
       amount: '',
       message: '',
+      isPay: false,
       validAddress: false,
       validAmount: false,
       qrContent: '',
@@ -28,6 +29,7 @@ class PaymentTool extends Component {
     this.handleAmountChange = this.handleAmountChange.bind(this)
     this.handleMessageChange = this.handleMessageChange.bind(this)
     this.clearText = this.clearText.bind(this)
+    this.clearAll = this.clearAll.bind(this)
     this.sample = this.sample.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.double = this.double.bind(this)
@@ -42,6 +44,9 @@ class PaymentTool extends Component {
 
     if (address) {
       this.addressChange(address)
+      this.setState({
+        isPay: true,
+      })
     }
     if (amount) {
       this.amountChange(amount)
@@ -98,6 +103,23 @@ class PaymentTool extends Component {
       default:
         break
     }
+  }
+
+  //Clear text from input field
+  clearAll() {
+    this.setState({
+      address: '',
+      amount: '',
+      message: '',
+      isPay: false,
+      validAddress: false,
+      validAmount: false,
+      qrContent: '',
+    },
+    function() {
+      this.updateQR()
+      this.setParams()
+    })
   }
 
   // Loop qr state 1x, 2x, 4x
@@ -239,14 +261,20 @@ class PaymentTool extends Component {
     return (
       <div>
         <div className="noprint">
-          <p>Generate and Share or <strong>PAY NOW</strong></p>
-          <ul>
-            <li>Scan QR with a wallet. The amount is included.</li>
+          <p className={this.state.isPay ? "hidden":""}>Generate a Payment Card</p>
+          <p className={this.state.isPay ? "":"hidden"}>Pay NANO to <a href={'https://nanocrawler.cc/explorer/account/' + this.state.address}>{this.state.address.slice(0,13) + '...' + this.state.address.slice(-8)}</a></p>
+
+          <ul className={this.state.isPay ? "hidden":""}>
+            <li>Print QR or share the URL with anyone!</li>
+          </ul>
+
+          <ul className={this.state.isPay ? "":"hidden"}>
+            <li>Scan QR with a <a href="https://nano.org/pay">wallet</a>. The amount is included.</li>
             <li>Open in Wallet may work depending on wallet installed.</li>
           </ul>
         </div>
         <div className="noprint">
-          <InputGroup size="sm" className="mb-3">
+          <InputGroup size="sm" className={this.state.isPay ? "hidden":"mb-3"}>
             <InputGroup.Prepend>
               <InputGroup.Text id="account">
                 Address
@@ -262,10 +290,10 @@ class PaymentTool extends Component {
           <InputGroup size="sm" className="mb-3">
             <InputGroup.Prepend>
               <InputGroup.Text id="amount">
-                NANO
+                Amount [NANO]
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title="Payment amount in NANO" maxLength="32" onChange={this.handleAmountChange} autoComplete="off"/>
+            <FormControl id="amount" aria-describedby="amount" value={this.state.amount} title="Payment amount in NANO" placeholder="Optional amount included in QR" maxLength="32" onChange={this.handleAmountChange} autoComplete="off"/>
             <InputGroup.Append>
               <Button variant="outline-secondary" className="fas fa-times-circle" value='amount' onClick={this.clearText}></Button>
               <Button variant="outline-secondary" className="fas fa-copy" value={this.state.amount} onClick={helpers.copyText}></Button>
@@ -275,10 +303,10 @@ class PaymentTool extends Component {
           <InputGroup size="sm" className="mb-3">
             <InputGroup.Prepend>
               <InputGroup.Text id="message">
-                Message
+                Optional Note
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="message" aria-describedby="message" value={this.state.message} title="Optional custom message" placeholder="Optional" maxLength="30" onChange={this.handleMessageChange} autoComplete="off"/>
+            <FormControl id="message" aria-describedby="message" value={this.state.message} title="Transaction note included in QR" placeholder="Transaction note included in QR" maxLength="30" onChange={this.handleMessageChange} autoComplete="off"/>
             <InputGroup.Append>
               <Button variant="outline-secondary" className="fas fa-times-circle" value='message' onClick={this.clearText}></Button>
               <Button variant="outline-secondary" className="fas fa-copy" value={this.state.message} onClick={helpers.copyText}></Button>
@@ -286,10 +314,12 @@ class PaymentTool extends Component {
           </InputGroup>
 
           <InputGroup size="sm" className="mb-3">
-            <Button variant="primary" onClick={this.sample}>Sample</Button>
-            <a className="btn btn-primary" id="wallet-btn" href="https://tools.nanos.cc" role="button">Open in Wallet</a>
-            <Button variant="primary" onClick={this.print}>Print QR</Button>
-            <Button variant="primary" value={'https://tools.nanos.cc/?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&message=' + this.state.message.split(' ').join('%20')} onClick={helpers.copyText}>Copy Share Link</Button>
+            <Button className={this.state.isPay ? "hidden":"btn-medium"} variant="primary" onClick={this.sample}>Sample</Button>
+            <Button className={this.state.isPay ? "btn-medium":"hidden"} variant="primary" value={this.state.address} onClick={helpers.copyText}>Copy Address</Button>
+            <a className={this.state.isPay ? "btn-medium btn btn-primary":"hidden"} id="wallet-btn" href="https://tools.nanos.cc" role="button">Open in Wallet</a>
+            <Button variant="primary" className={this.state.isPay ? "hidden":"btn-medium"} onClick={this.print}>Print QR</Button>
+            <Button variant="primary" className={this.state.isPay ? "hidden":"btn-medium"} value={'https://tools.nanos.cc/?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&message=' + this.state.message.split(' ').join('%20')} onClick={helpers.copyText}>Copy Link</Button>
+            <Button className={this.state.isPay ? "btn-medium":"hidden"} variant="primary" onClick={this.clearAll}>Create New</Button>
           </InputGroup>
         </div>
         <div>

@@ -1,7 +1,7 @@
 # KeyTools - High performance Nano web tools written with reactJS
 * Can be run from local file system offline by downloading [this zip package](https://github.com/Joohansson/keytools/raw/master/keytools.zip)
 * Hosted by [github pages](https://github.com/Joohansson/keytools/tree/gh-pages) via https://tools.nanos.cc
-* Current version: 0.2.0
+* Current version: 1.0.1
 
 ## Developer instructions
 
@@ -14,9 +14,13 @@ Install nodejs and npm
 `cd keytools`\
 `npm install`
 
-### Test application
-Create an empty file in the src folder called rpc.js. It usually contains credentials for connecting to the RPC server and that is not shared publicly. You will not be able to use the Network Inspector tool or read RPC data in off-chain signing without these credentials or setting up your own RPC server.
+Create an empty file in the src folder called rpc.js. It usually contains credentials for connecting to the RPC server and that is not shared publicly. However, you will not be able to use the Network Inspector tool or read RPC data in off-chain signing without these credentials or setting up your own RPC server. The file is needed to build the app.
+Syntax of the file:
+`export const RPC_SERVER = 'https://myApiServer/'`
+`export const RPC_LIMIT = 'Message when blocked by the API.'`
+`export const RPC_CREDS = 'username:password'`
 
+### Test application
 `npm start`
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.

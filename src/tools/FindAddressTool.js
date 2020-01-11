@@ -577,8 +577,8 @@ class FindAddressTool extends Component {
         </table>
 
         <InputGroup className="mb-3">
-          <Button variant="primary" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || (!this.state.searching && this.state.workersRunning > 0)}>{this.state.generateText}</Button>
-          <Button variant="primary" onClick={this.sample} disabled={this.state.searching}>Sample</Button>
+          <Button variant="primary" className="btn-medium" onClick={this.search} disabled={!(this.state.validSeed && this.state.validAddress && this.state.validEndIndex && this.state.validStartIndex) || (!this.state.searching && this.state.workersRunning > 0)}>{this.state.generateText}</Button>
+          <Button variant="primary" className="btn-medium" onClick={this.sample} disabled={this.state.searching}>Sample</Button>
         </InputGroup>
       </div>
     )

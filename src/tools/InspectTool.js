@@ -990,8 +990,8 @@ class InspectTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" disabled={this.state.fetchingRPC} onClick={this.getRPC}>Node Request</Button>
-          <Button variant="primary" onClick={this.clearAll}>Clear All</Button>
+          <Button className="btn-medium" variant="primary" disabled={this.state.fetchingRPC} onClick={this.getRPC}>Node Request</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.clearAll}>Clear All</Button>
         </InputGroup>
 
         <div className={ this.state.qrHidden ? "hidden" : ""}>

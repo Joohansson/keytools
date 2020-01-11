@@ -485,7 +485,7 @@ class MessengerTool extends React.Component {
             </ul>
 
             <InputGroup size="sm" className="mb-3">
-              <Button variant="primary" onClick={this.startSDK}>Start</Button>
+              <Button className="btn-medium" variant="primary" onClick={this.startSDK}>Start</Button>
             </InputGroup>
         </div>
 
@@ -597,7 +597,7 @@ class MessengerTool extends React.Component {
           </InputGroup>
 
           {/* DECRYPTION BUTTON */}
-          <Button variant="primary" disabled={this.state.decryptDisabled}
+          <Button className="btn-medium" variant="primary" disabled={this.state.decryptDisabled}
             onClick={() => {
                 //Decrypt message
                 //var result = document.getElementById("resultTxt").value
@@ -626,7 +626,7 @@ class MessengerTool extends React.Component {
           </Button>
 
           {/* DOWNLOAD BUTTON */}
-          <Button variant="primary" disabled={this.state.decryptDisabled}
+          <Button className="btn-medium" variant="primary" disabled={this.state.decryptDisabled}
             onClick={() => {
               //Download the bytes shown in text textarea
               this.downloadByteArray()
@@ -634,7 +634,7 @@ class MessengerTool extends React.Component {
           </Button>
 
           {/* RESET BUTTON */}
-          <Button variant="primary"
+          <Button className="btn-medium" variant="primary"
             onClick={() => {
               //Reset textarea
               this.setState({

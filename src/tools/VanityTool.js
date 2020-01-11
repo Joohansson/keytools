@@ -571,8 +571,8 @@ class VanityTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.generate} disabled={(!this.state.validPrefix && !this.state.validSuffix) || (!this.state.generating && this.state.workersRunning > 0) || this.state.addressesFound >= this.state.maxWallets}>{this.state.generateText}</Button>
-          <Button variant="primary" onClick={this.reset} disabled={this.state.generating}>Reset</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.generate} disabled={(!this.state.validPrefix && !this.state.validSuffix) || (!this.state.generating && this.state.workersRunning > 0) || this.state.addressesFound >= this.state.maxWallets}>{this.state.generateText}</Button>
+          <Button className="btn-medium" variant="primary" onClick={this.reset} disabled={this.state.generating}>Reset</Button>
         </InputGroup>
 
         <table className="vanity-stats">
