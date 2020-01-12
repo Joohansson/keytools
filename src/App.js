@@ -2,28 +2,20 @@ import React, { Component } from 'react'
 import './App.css'
 import './print.css';
 import MainPage from './mainPage'
-// https://github.com/flexdinesh/cache-busting-example
-//https://dev.to/flexdinesh/cache-busting-a-react-app-22lk
-import CacheBuster from './CacheBuster'
+import packageJson from '../package.json';
+global.appVersion = packageJson.version;
 
 class App extends Component {
+  componentDidMount() {
+    console.log(`You are running version - ${global.appVersion}. If something is broken, try loading a new version by clearing the cache with CTRL+F5 or Apple + R.`);
+  }
+
   render() {
     return (
-      <CacheBuster>
-        {({ loading, isLatestVersion, refreshCacheAndReload }) => {
-          if (loading) return null;
-          if (!loading && !isLatestVersion) {
-            refreshCacheAndReload();
-          }
-
-          return (
-            <div className="App">
-              <MainPage />
-            </div>
-          );
-        }}
-      </CacheBuster>
-    );
+      <div className="App">
+        <MainPage />
+      </div>
+    )
   }
 }
 
