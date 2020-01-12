@@ -16,8 +16,9 @@ Install nodejs and npm
 
 Create an empty file in the src folder called rpc.js. It usually contains credentials for connecting to the RPC server and that is not shared publicly. However, you will not be able to use the Network Inspector tool or read RPC data in off-chain signing without these credentials or setting up your own RPC server. The file is needed to build the app.
 Syntax of the file:
-`export const RPC_SERVER = 'https://myApiServer/'`
-`export const RPC_LIMIT = 'Message when blocked by the API.'`
+
+`export const RPC_SERVER = 'https://myApiServer/'`\
+`export const RPC_LIMIT = 'Message when blocked by the API.'`\
 `export const RPC_CREDS = 'username:password'`
 
 ### Test application
