@@ -154,7 +154,7 @@ class KeyGeneratorTool extends Component {
       for (i=0; i < parseInt(this.state.count); i++) {
         var seed = helpers.genSecureKey()
         seed = seed.toUpperCase()
-        let privKey = nano_old.deriveSecretKey(seed, i)
+        let privKey = nano_old.deriveSecretKey(seed, 0)
         let pubKey = nano_old.derivePublicKey(privKey)
         let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
