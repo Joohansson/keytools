@@ -14,8 +14,8 @@ class SigningTool extends Component {
     this.inputToast = null //disallow duplicates
 
     this.addressText = [
-      'Sending Address',
-      'Receiving Address',
+      'Source Address',
+      'Account Address',
       'Opening Address',
       'Account Address',
       'N/A',
@@ -51,7 +51,7 @@ class SigningTool extends Component {
     ]
 
     this.linkText = [
-      'Receiving Address',
+      'Dest. Address',
       'Pending Hash',
       'Pending Hash',
       'N/A',
@@ -68,17 +68,17 @@ class SigningTool extends Component {
     ]
 
     this.previousTitle = [
-      'The last recorded block hash for the sending address.',
-      'The last recorded block hash for the receiving address.',
+      'The last recorded block hash for the source address.',
+      'The last recorded block hash for the account address.',
       'N/A',
       'The last recorded block hash for the account address.',
       'N/A',
     ]
 
     this.repTitle = [
-      'The sending account\'s representative. If it differs from currently set, it will force a change to the new one.',
-      'The receving account\'s representative. If it differs from currently set, it will force a change to the new one.',
-      'The receving account\'s representative. If it differs from currently set, it will force a change to the new one.',
+      'The source account\'s representative. If it differs from currently set, it will force a change to the new one.',
+      'The account\'s representative. If it differs from currently set, it will force a change to the new one.',
+      'The account\'s representative. If it differs from currently set, it will force a change to the new one.',
       'The account\'s new representative.',
       'N/A',
     ]
