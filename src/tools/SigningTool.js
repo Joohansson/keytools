@@ -38,10 +38,10 @@ class SigningTool extends Component {
     ]
 
     this.currBalanceText = [
-      'Current Balance',
-      'Current Balance',
+      'Balance Now',
+      'Balance Now',
       'N/A',
-      'Current Balance',
+      'Balance Now',
       'N/A',
     ]
 
@@ -211,6 +211,7 @@ class SigningTool extends Component {
       previous: '',
       rep: '',
       currBalance: '',
+      currBalanceRaw: '',
       amount: '',
       link: '',
       privKey: '',
@@ -237,6 +238,7 @@ class SigningTool extends Component {
       qrHidden: true,
       qrSize: 512,
       qrState: 0,  //qr size
+      nanoBalanceActive: false, //if the show NANO button is toggled
       text_address: this.addressText[0],
       text_previous: this.previousText[0],
       text_rep: this.repText[0],
@@ -271,6 +273,7 @@ class SigningTool extends Component {
     this.getRPC = this.getRPC.bind(this)
     this.changeAmountType = this.changeAmountType.bind(this)
     this.handleRPCError = this.handleRPCError.bind(this)
+    this.showNanoBalance = this.showNanoBalance.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
     this.webGLWidth = 512
@@ -340,7 +343,7 @@ class SigningTool extends Component {
     }
     else {
       params = params + '&address='+this.state.address + '&link='+this.state.link +
-      '&previous='+this.state.previous + '&rep='+this.state.rep + '&balance='+this.state.currBalance + '&amount='+this.state.amount + '&amounttype='+this.state.activeAmountId
+      '&previous='+this.state.previous + '&rep='+this.state.rep + '&balance='+this.state.currBalanceRaw + '&amount='+this.state.amount + '&amounttype='+this.state.activeAmountId
     }
     helpers.setURLParams(params)
   }
@@ -391,6 +394,7 @@ class SigningTool extends Component {
       case 'currBalance':
       this.setState({
         currBalance: '',
+        currBalanceRaw: '',
         validCurrBalance: false
       },
       function() {
@@ -468,6 +472,7 @@ class SigningTool extends Component {
       previous: '',
       rep: '',
       currBalance: '',
+      currBalanceRaw: '',
       amount: '',
       link: '',
       privKey: '',
@@ -492,6 +497,9 @@ class SigningTool extends Component {
       qrContent: '',
       qrHidden: true,
       fetchingRPC: false,
+      nanoBalanceActive: false,
+      activeAmount: this.amounts[0],
+      activeAmountId: '0',
     },function() {
       if (this.state.selectedOption === '4') {
         this.setParams(true) //include block hash in params
@@ -717,7 +725,8 @@ class SigningTool extends Component {
       }
       this.setState({
         currBalance: balance,
-        validCurrBalance: false
+        currBalanceRaw: '',
+        validCurrBalance: false,
       },
       function() {
         this.hashBlock()
@@ -726,6 +735,8 @@ class SigningTool extends Component {
     }
     this.setState({
       currBalance: balance,
+      currBalanceRaw: balance, //the real value used downstream
+      nanoBalanceActive: false,
       validCurrBalance: true,
     },
     function() {
@@ -776,6 +787,43 @@ class SigningTool extends Component {
     function() {
       this.hashBlock()
     })
+  }
+
+  handleNanoBalance = changeEvent => {
+    if (this.state.nanoBalanceActive) {
+      this.showNanoBalance(false)
+    }
+    else {
+      this.showNanoBalance(true)
+    }
+  }
+
+  // Toggle NANO instead of raw
+  showNanoBalance(enable = false) {
+    // Show NANO
+    if (enable) {
+      let raw = this.state.currBalanceRaw //original raw value
+      if (!nano.checkAmount(raw)) {
+        // do not warn when start typing dot
+        if (this.state.currBalance !== '') {
+          if (! toast.isActive(this.inputToast)) {
+            this.inputToast = toast("Invalid Nano Amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          }
+        }
+        return
+      }
+      this.setState({
+        currBalance: helpers.rawToMnano(raw),
+        nanoBalanceActive: true,
+      })
+    }
+    // Show raw (reset)
+    else {
+      this.setState({
+        currBalance: this.state.currBalanceRaw,
+        nanoBalanceActive: false,
+      })
+    }
   }
 
   handleBlockHashChange = changeEvent => {
@@ -1079,7 +1127,7 @@ class SigningTool extends Component {
 
       case 'currBalance':
       this.setState({
-        qrContent: this.state.currBalance,
+        qrContent: this.state.currBalanceRaw,
       })
       break
 
@@ -1146,8 +1194,11 @@ class SigningTool extends Component {
       rep: this.sampleText[i].REP,
       validRep: true,
       currBalance:this.sampleText[i].BALANCE,
+      currBalanceRaw:this.sampleText[i].BALANCE,
       validCurrBalance: true,
       amount: this.sampleText[i].AMOUNT,
+      activeAmount: this.amounts[0],
+      activeAmountId: '0',
       validAmount: true,
       privKey:this.sampleText[i].PRIV,
       validPrivKey: true,
@@ -1157,6 +1208,7 @@ class SigningTool extends Component {
       validBlockHash: true,
       signWorkHash:this.sampleText[i].SIGNWORKHASH,
       validSignWorkHash: true,
+      nanoBalanceActive: false,
     },
     function() {
       // warn if work if not matching
@@ -1261,7 +1313,7 @@ class SigningTool extends Component {
     switch (this.state.selectedOption) {
       // SEND BLOCK
       case '0':
-      newBalance = helpers.bigSubtract(this.state.currBalance,amount)
+      newBalance = helpers.bigSubtract(this.state.currBalanceRaw,amount)
 
       // check that the new balance is not negative
       if (helpers.bigIsNegative(newBalance)) {
@@ -1274,7 +1326,7 @@ class SigningTool extends Component {
 
       // RECEIVE BLOCK
       case '1':
-      newBalance = helpers.bigAdd(this.state.currBalance,amount)
+      newBalance = helpers.bigAdd(this.state.currBalanceRaw,amount)
 
       // check that the new balance is valid
       if (!nano.checkAmount(newBalance)) {
@@ -1292,7 +1344,7 @@ class SigningTool extends Component {
 
       // CHANGE BLOCK
       case '3':
-      newBalance = this.state.currBalance
+      newBalance = this.state.currBalanceRaw
       break
 
       // SIGN BLOCK
@@ -1469,6 +1521,9 @@ class SigningTool extends Component {
       if (!hasSignature) {
         block = nano.createBlock(this.state.privKey,{balance:this.state.adjustedBalance, representative:this.state.rep,
         work:this.state.work, link:link, previous:previous})
+        // replace xrb with nano (old library)
+        block.block.account = block.block.account.replace('xrb', 'nano')
+        block.block.link_as_account = block.block.link_as_account.replace('xrb', 'nano')
       }
       // create the block using signature
       else {
@@ -1492,7 +1547,6 @@ class SigningTool extends Component {
           {type:'state', account:this.state.address, previous:previous, representative:this.state.rep, balance:this.state.adjustedBalance,
           link:link, link_as_account:linkAddress, work:this.state.work, signature:this.state.privKey}}
       }
-
 
       // check that the new block is valid
       let pubKey = nano.derivePublicKey(block.block.account)
@@ -1843,8 +1897,9 @@ class SigningTool extends Component {
             <InputGroup.Text id="currBalance">
               {this.state.text_currBalance}
             </InputGroup.Text>
+            <Button variant="outline-secondary" className={this.state.nanoBalanceActive ? "btn-active" : ""} title="Show balance in NANO" onClick={this.handleNanoBalance}><strong>N</strong></Button>
           </InputGroup.Prepend>
-          <FormControl id="currBalance" aria-describedby="currBalance" value={this.state.currBalance} title={this.state.title_currBalance} placeholder={this.state.text_currBalance === 'N/A' ? 'Not needed':'Current balance in raw'} maxLength="48" onChange={this.handleCurrBalanceChange} autoComplete="off"/>
+          <FormControl id="currBalance" aria-describedby="currBalance" value={this.state.currBalance} disabled={this.state.nanoBalanceActive} title={this.state.title_currBalance} placeholder={this.state.text_currBalance === 'N/A' ? 'Not needed':'Current balance in raw'} maxLength="48" onChange={this.handleCurrBalanceChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='currBalance' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-cloud-download-alt" title="Live network request: Current balance of the address" disabled={this.state.fetchingRPC} value='currBalance' onClick={this.getRPC}></Button>
