@@ -1,6 +1,9 @@
 {
   "name": "keytools",
   "version": "1.0.5",
+  "bin": {
+    "keytools-ui": "bin/www.js"
+  },
   "private": true,
   "homepage": ".",
   "license": "MIT",

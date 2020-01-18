@@ -49,6 +49,32 @@ Your app is ready to be deployed!
 11. For hotkeys, search for this and add appropriate key: shift+alt+0
 12. The new tool should now be available from the main dropdown selector. Happy coding!
 
+### Running locally from npx
+
+Simply call
+
+```bash
+npx -p github:Joohansson/keytools keytools-ui
+```
+
+### Running locally as a binary
+
+Install keytools as a global binary with
+
+```bash
+npm i -g github:Joohansson/keytools
+```
+
+to install from GitHub.
+
+Then, once installed, simply call
+
+```bash
+keytools-ui
+```
+
+from the command line.
+
 ## Some Nice Libraries Used
 
 * [Nano library - Nano-currency-js](https://github.com/marvinroger/nanocurrency-js)
