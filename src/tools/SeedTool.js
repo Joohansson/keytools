@@ -531,11 +531,11 @@ class SeedTool extends Component {
           <div className="derivation-title">Derivation Method:</div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="send-check" value="0" checked={this.state.selectedDerivationMethod === "0"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="send-check">Nano Default</label>
+            <label className="form-check-label" htmlFor="send-check">Nano Default (Blake2b)</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="receive-check" value="1" checked={this.state.selectedDerivationMethod === "1"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="receive-check">Ledger/Magnum</label>
+            <label className="form-check-label" htmlFor="receive-check">Ledger/Magnum (BIP39/44)</label>
           </div>
         </InputGroup>
 
