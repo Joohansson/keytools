@@ -12,9 +12,9 @@ class InspectTool extends Component {
 
     this.inputToast = null //disallow duplicates
     this.commandNames = ['Account Info', 'Account History', 'Active Difficulty', 'Available Supply', 'Block Info', 'Block Count', 'Block Chain', 'Delegators', 'Frontiers',
-    'Pending Blocks', 'Process Block']
+    'Pending Blocks', 'Process Block', 'Reps Online']
     this.commands = ['ACCINFO', 'ACCHISTORY', 'ACTIVEDIFF', 'SUPPLY', 'BLOCKINFO', 'COUNT', 'CHAIN', 'DELEGATORS', 'FRONTIERS',
-    'PENDING', 'PROCESS']
+    'PENDING', 'PROCESS', 'REPSONLINE']
     this.commandHelps = [
       'Retreieves information for a given address/account. Only works for accounts that have received their first transaction and have an entry on the ledger, will return "Account not found" otherwise.',
       'Reports send/receive information for an address/account. Response will start with the latest block for the account (the frontier), and will list all blocks back to the open block of this account or limited by Count.',
@@ -27,6 +27,7 @@ class InspectTool extends Component {
       'Returns a list of pairs of account and block hash representing the head block starting at given address/account up to count.',
       'Returns a list of block hashes which have not yet been received by this account. Only includes confirmed blocks.',
       'Publish a JSON block to the network. Rework will NOT be done if the network is busy and PoW difficulty is low.',
+      'Returns a list of online representative accounts that have voted recently',
     ]
     this.commandURLS = [
       'https://docs.nano.org/commands/rpc-protocol/#account_info',
@@ -40,6 +41,7 @@ class InspectTool extends Component {
       'https://docs.nano.org/commands/rpc-protocol/#frontiers',
       'https://docs.nano.org/commands/rpc-protocol/#pending',
       'https://docs.nano.org/commands/rpc-protocol/#process',
+      'https://docs.nano.org/commands/rpc-protocol/#representatives_online',
     ]
 
     // Amount dropdown titles
@@ -318,6 +320,17 @@ class InspectTool extends Component {
           thresholdVisible: false,
           jsonVisible: true,
           outputRows: 3,
+        })
+        break
+
+        case 'REPSONLINE':
+        this.setState({
+          accountVisible: false,
+          blockVisible: false,
+          countVisible: false,
+          reverseVisible: false,
+          thresholdVisible: false,
+          jsonVisible: false,
         })
         break
 
@@ -795,6 +808,10 @@ class InspectTool extends Component {
       }
       break
 
+      case 'REPSONLINE':
+      command.action = 'representatives_online'
+      break
+
       default:
       break
     }
@@ -870,6 +887,10 @@ class InspectTool extends Component {
           break
 
           case 'PROCESS':
+          this.writeOutput(data)
+          break
+
+          case 'REPSONLINE':
           this.writeOutput(data)
           break
 
