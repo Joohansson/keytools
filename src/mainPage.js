@@ -15,7 +15,7 @@ class MainPage extends Component {
   constructor(props) {
     super(props)
     this.tools = ['0: HOME', '1: Unit Converter', '2: Key Converter', '3: Paper Wallet Generator ', '4: Payment Card', '5: Mass Wallet Generator',
-    '6: Mass Keypair Extractor', '7: Find Address in Seed', '8: Off-chain Signing', '9: PoW Generator',
+    '6: Mass Keypair Extractor', '7: Find Address in Seed', '8: Block Processor', '9: PoW Generator',
     '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger']
     this.state = {
       activeTool: this.tools[0],

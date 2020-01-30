@@ -1802,12 +1802,13 @@ class SigningTool extends Component {
     return (
       <div>
         <div className="noprint">
-          <p>Create and Sign blocks off-chain to be published with an on-chain node</p>
+          <p>Dev Wallet to Create, Sign and Publish Blocks</p>
           <ul>
             <li>Inputs can be obtained from a <a href="https://nanocrawler.cc">block explorer</a> and good reps from <a href="https://nanocharts.info/need-a-representative">nanocharts</a></li>
-            <li>Live data comes from the <a href="https://node.nanoticker.info/nano.html">NanoTicker node</a>. You should double check with an explorer.</li>
-            <li>The final block can be published from this site but no rework will be done to increase PoW priority</li>
+            <li>Live data comes from the <a href="https://node.nanoticker.info/nano.html">NanoTicker node</a>. Advised to double check with an explorer.</li>
+            <li><strong>For security:</strong> Transfer the block hash to an offline device (via QR) to return a signature from a private key.</li>
             <li>Hover on text fields to show more details or have a look at this <a href="https://medium.com/nanocurrency/93713d217377">Video Tutorial</a></li>
+            <li>The final block can be published from this site but no rework will be done to increase PoW priority</li>
           </ul>
         </div>
         <InputGroup size="sm" className="mb-3">
