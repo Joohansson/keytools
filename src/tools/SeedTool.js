@@ -290,6 +290,17 @@ class SeedTool extends Component {
     }
 
     let seed = bip39.mnemonicToEntropy(mnemonic).toUpperCase()
+    // seed must be 64 or the nano wallet can't be created. This is the reason 12-words can't be used because the seed would be 32 in length
+    if (seed.length !== 64) {
+      this.setState({
+        mnemonic: mnemonic
+      },
+      function() {
+        this.updateQR()
+      })
+      this.inputToast = toast("Mnemonic not 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      return
+    }
     let nanowallet = wallet.generate(seed)
     var privKey
     if (this.state.selectedDerivationMethod === '0') {
