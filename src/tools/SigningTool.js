@@ -1829,8 +1829,8 @@ class SigningTool extends Component {
             <label className="form-check-label" htmlFor="change-check">CHANGE REP</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="change-check" value="4" checked={this.state.selectedOption === "4"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="change-check">SIGN BLOCK</label>
+            <input className="form-check-input" type="radio" id="sign-check" value="4" checked={this.state.selectedOption === "4"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="sign-check">SIGN BLOCK</label>
           </div>
         </InputGroup>
 
