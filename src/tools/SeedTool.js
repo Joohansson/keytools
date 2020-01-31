@@ -106,7 +106,7 @@ class SeedTool extends Component {
     }
   }
 
-  // Select CPU load
+  // Select derivation method
   handleOptionChange = changeEvent => {
     this.derivationChange(changeEvent.target.value)
   }
