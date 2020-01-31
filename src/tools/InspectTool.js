@@ -862,7 +862,8 @@ class InspectTool extends Component {
             this.writeOutput({count: Object.keys(data.delegators).length, delegators: data.delegators})
           }
           else {
-            fail = true
+            toast("No delegators found.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+            this.writeOutput(data)
           }
           break
 
@@ -875,14 +876,15 @@ class InspectTool extends Component {
             // sum all raw amounts
             var raw = '0'
             Object.keys(data.blocks).forEach(function(key) {
-                raw = helpers.bigAdd(raw,parseInt(data.blocks[key].amount))
+                raw = helpers.bigAdd(raw,data.blocks[key].amount)
             })
             console.log(raw)
             let nanoAmount = helpers.rawToMnano(raw)
             this.writeOutput({count: Object.keys(data.blocks).length, raw: raw, NANO: nanoAmount, blocks: data.blocks})
           }
           else {
-            fail = true
+            toast("No pending found.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+            this.writeOutput(data)
           }
           break
 
