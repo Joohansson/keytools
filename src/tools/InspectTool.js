@@ -608,12 +608,12 @@ class InspectTool extends Component {
     }
     else {
       // convert to raw if needed
-      if (this.state.activeAmountId === '0') {
+      if (this.state.activeAmountId === '0' && parseFloat(amount) >= 0) {
         raw = helpers.MnanoToRaw(amount)
       }
     }
 
-    if (amount !== '' && !nano.checkAmount(raw)) {
+    if (amount !== '' && (!nano.checkAmount(raw) || parseInt(raw) < 0)) {
       // do not warn when start typing dot
       if (raw[raw.length - 1] !== '.') {
         if (! toast.isActive(this.inputToast)) {
