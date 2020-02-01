@@ -779,6 +779,7 @@ class InspectTool extends Component {
         command.account = this.state.address
         command.count = this.state.count
         command.source = 'true'
+        command.sorting = 'true'
         command.include_only_confirmed = 'true'
         if (this.state.raw !== '') {
           command.threshold = this.state.raw
