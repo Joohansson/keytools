@@ -1931,7 +1931,7 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={this.state.selectedOption === "4" ? 'hidden':''}>OUTPUT</div>
+        <div className={this.state.selectedOption === "4" ? 'hidden':'input-title'}>OUTPUT</div>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="blockHash">
@@ -1946,7 +1946,7 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={this.state.selectedOption === "4" ? 'hidden':''}>SIGN WITH PRIVATE KEY OR SIGNATURE AND PROVIDE PROOF OF WORK</div>
+        <div className={this.state.selectedOption === "4" ? 'hidden':'input-title'}>SIGN WITH PRIVATE KEY OR SIGNATURE AND PROVIDE PROOF OF WORK</div>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="privKey">
