@@ -18,6 +18,9 @@ const RPC_TIMEOUT = 10000
 export const constants = {
   INDEX_MAX: 4294967295, //seed index
   KEYS_MAX: 10000, //max keys to export
+  SWEEP_BLAKE_MAX: 10000, //max keys to sweep using blake2b derivation
+  SWEEP_BIP_MAX: 10, //max keys to sweep using bip39 derivation
+  SWEEP_MAX_PENDING: 1000, // max pending blocks to process per run
   RPC_MAX: 500, //max rpc requests of same type, for example pending blocks
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
   RPC_SERVER: rpc.RPC_SERVER,
@@ -353,6 +356,15 @@ export function setURLParams(params) {
       //console.log(error)
     }
   }
+}
+
+// Check if string is hexdecimal
+export function isHex(h) {
+  let re = /^[0-9a-fA-F]+$/
+  if (re.test(h)) {
+    return true
+  }
+  return false
 }
 
 // Post data with no error handling

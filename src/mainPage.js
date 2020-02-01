@@ -8,15 +8,15 @@ import $ from 'jquery'
 import donation from './img/donation.png';
 import Hotkeys from 'react-hot-keys'
 import { Start, Terms, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-  SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool} from './tools'
-const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG"]
+  SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool, SweepTool} from './tools'
+const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG", "SWEEP"]
 
 class MainPage extends Component {
   constructor(props) {
     super(props)
     this.tools = ['0: HOME', '1: Unit Converter', '2: Key Converter', '3: Paper Wallet Generator ', '4: Payment Card', '5: Mass Wallet Generator',
     '6: Mass Keypair Extractor', '7: Find Address in Seed', '8: Block Processor', '9: PoW Generator',
-    '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger']
+    '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger', '14: Wallet Sweeper']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,
@@ -327,6 +327,11 @@ class MainPage extends Component {
         toolId = 13
         break
 
+        // SweepTool
+        case 'sweep':
+        toolId = 14
+        break
+
         default:
         toolId = 0
         break
@@ -463,6 +468,10 @@ class MainPage extends Component {
       this.selectTool(13)
       break
 
+      case 'ctrl+shift+alt+4':
+      this.selectTool(14)
+      break
+
       default:
       break
     }
@@ -504,6 +513,10 @@ class MainPage extends Component {
       init: undefined,
       prefix: undefined,
       suffix: undefined,
+      block: undefined,
+      reverse: undefined,
+      threshold: undefined,
+      threstype: undefined,
       activeTool: this.tools[eventKey],
       activeToolId: eventKey,
       activeToolName: tools[eventKey],
@@ -721,6 +734,7 @@ class MainPage extends Component {
             {(active === 'INSPECTOR') && <InspectTool {...this} /> }
             {(active === 'QR') && <QRTool {...this} /> }
             {(active === 'MSG') && <MessengerTool {...this} /> }
+            {(active === 'SWEEP') && <SweepTool {...this} /> }
           </div>
         </div>
 

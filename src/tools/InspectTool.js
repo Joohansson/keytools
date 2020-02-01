@@ -879,7 +879,6 @@ class InspectTool extends Component {
             Object.keys(data.blocks).forEach(function(key) {
                 raw = helpers.bigAdd(raw,data.blocks[key].amount)
             })
-            console.log(raw)
             let nanoAmount = helpers.rawToMnano(raw)
             this.writeOutput({count: Object.keys(data.blocks).length, raw: raw, NANO: nanoAmount, blocks: data.blocks})
           }
