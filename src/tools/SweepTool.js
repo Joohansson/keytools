@@ -76,16 +76,12 @@ class SweepTool extends Component {
     window.NanoWebglPow.height = this.webGLHeight
 
     // Read URL params from parent and construct new quick path
-    var threshold = this.props.state.threshold
-    if (threshold) {
-      this.thresholdChange(threshold)
-    }
     this.setParams()
   }
 
   // Defines the url params
   setParams() {
-    helpers.setURLParams('?tool='+toolParam + '&threshold='+this.state.threshold )
+    helpers.setURLParams('?tool='+toolParam)
   }
 
   // Change active threshold unit on dropdown select
