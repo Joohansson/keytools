@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
+import { wallet } from 'nanocurrency-web'
 import * as bip39 from 'bip39'
 import 'nano-webgl-pow'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import $ from 'jquery'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import MainPage from '../mainPage'
 import {toast } from 'react-toastify'
 const toolParam = 'sweep'
@@ -30,7 +33,6 @@ class SweepTool extends Component {
       maxPending: helpers.constants.SWEEP_MAX_PENDING,
       amount: '', //threshold
       raw: '', //amount in raw
-      selectedDerivationMethod: '0',
       validSeed: false,
       validAddress: false,
       validStartIndex: true,
@@ -64,6 +66,7 @@ class SweepTool extends Component {
     this.processIndexRecursive = this.processIndexRecursive.bind(this)
     this.handleRPCError = this.handleRPCError.bind(this)
     this.sweep = this.sweep.bind(this)
+    this.sweepContinue = this.sweepContinue.bind(this)
     this.clearText = this.clearText.bind(this)
     this.appendLog = this.appendLog.bind(this)
   }
@@ -106,6 +109,12 @@ class SweepTool extends Component {
     this.setState({
       startIndex: 0
     })
+    // check end index
+    if (this.state.validEndIndex) {
+      if (this.state.endIndex > 0+helpers.constants.SWEEP_MAX_INDEX) {
+        this.setState({endIndex: 0+helpers.constants.SWEEP_MAX_INDEX})
+      }
+    }
   }
 
   // set max value for end index
@@ -113,6 +122,12 @@ class SweepTool extends Component {
     this.setState({
       endIndex: helpers.constants.INDEX_MAX
     })
+    // check start index
+    if (this.state.validStartIndex) {
+      if (this.state.startIndex < helpers.constants.INDEX_MAX-helpers.constants.SWEEP_MAX_INDEX) {
+        this.setState({startIndex: helpers.constants.INDEX_MAX-helpers.constants.SWEEP_MAX_INDEX})
+      }
+    }
   }
 
   // set max value for pending limit
@@ -127,16 +142,19 @@ class SweepTool extends Component {
       console.log("RPC request failed: "+error.message)
       // IP blocked
       if (error.code === 429) {
-        toast(helpers.constants.RPC_LIMIT, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        toast(helpers.constants.RPC_LIMIT, helpers.getToast(helpers.toastType.ERROR))
       }
       else {
-        toast("RPC request failed: "+error.message, helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+        toast("RPC request failed: "+error.message, helpers.getToast(helpers.toastType.ERROR))
       }
     }
     else {
       console.log("RPC request failed: "+error)
-      toast("RPC request failed. See console (CTRL+F12).", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+      toast("RPC request failed. See console (CTRL+F12).", helpers.getToast(helpers.toastType.ERROR))
     }
+    this.setState({
+      sweeping: false
+    })
   }
 
   // Clear text from input field
@@ -178,19 +196,6 @@ class SweepTool extends Component {
     $('#output-area').scrollTop($('#output-area')[0].scrollHeight)
   }
 
-  // Select derivation method
-  handleOptionChange = changeEvent => {
-    this.derivationChange(changeEvent.target.value)
-  }
-
-  derivationChange(val) {
-    this.setState({
-      selectedDerivationMethod: val
-    },function() {
-      this.setParams()
-    })
-  }
-
   // Validate type of master key. Seed and private key can't be differentiated
   checkMasterKey(key) {
     // validate nano seed or private key
@@ -217,9 +222,18 @@ class SweepTool extends Component {
   }
 
   seedChange(seed) {
-    this.setState({
-      seed: seed
-    })
+    if (this.checkMasterKey(seed)) {
+      this.setState({
+        seed: seed,
+        validSeed: true
+      })
+    }
+    else {
+      this.setState({
+        seed: seed,
+        validSeed: false
+      })
+    }
   }
 
   handleAddressChange(event) {
@@ -274,6 +288,12 @@ class SweepTool extends Component {
       })
       return
     }
+    // check end index
+    if (this.state.validEndIndex) {
+      if (this.state.endIndex > index+helpers.constants.SWEEP_MAX_INDEX) {
+        this.setState({endIndex: index+helpers.constants.SWEEP_MAX_INDEX})
+      }
+    }
     this.setState({
       validStartIndex: true
     })
@@ -306,6 +326,12 @@ class SweepTool extends Component {
         validEndIndex: false
       })
       return
+    }
+    // check start index
+    if (this.state.validStartIndex) {
+      if (this.state.startIndex < index-helpers.constants.SWEEP_MAX_INDEX) {
+        this.setState({startIndex: index-helpers.constants.SWEEP_MAX_INDEX})
+      }
     }
     this.setState({
       validEndIndex: true
@@ -380,6 +406,23 @@ class SweepTool extends Component {
     })
   }
 
+  confirmAccount(account, callback) {
+    confirmAlert({
+      title: 'Confirm Sweep',
+      message: 'Are you 100% sure you wish to send all funds to: '+ account,
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => callback(true)
+        },
+        {
+          label: 'No',
+          onClick: () => callback(false)
+        }
+      ]
+    });
+  }
+
   // Generate proof of work
   generateWork(inputHash, powCallback) {
     window.NanoWebglPow(inputHash,
@@ -398,7 +441,7 @@ class SweepTool extends Component {
   // Process final send block
   processSend(privKey, previous, sendCallback) {
     let pubKey = nano_old.derivePublicKey(privKey)
-    let address = nano.deriveAddress(this.pubKey, {useNanoPrefix: true})
+    let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
     // make an extra check on valid destination
     if (this.state.validAddress && nano.checkAddress(this.state.address)) {
@@ -414,7 +457,7 @@ class SweepTool extends Component {
 
         // publish block for each iteration
         let jsonBlock = {action: "process",  json_block: "true",  subtype:"send", watch_work:"false", block: block.block}
-        helpers.postDataTimeout(jsonBlock)
+        helpers.postDataTimeout(jsonBlock,helpers.constants.RPC_SWEEP_SERVER)
         .then(function(data) {
           if (data.hash) {
             this.inputToast = toast("Funds transferred!", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
@@ -429,6 +472,7 @@ class SweepTool extends Component {
         }.bind(this))
         .catch(function(error) {
           this.handleRPCError(error)
+          sendCallback()
         }.bind(this))}.bind(this)
       )
     }
@@ -472,7 +516,7 @@ class SweepTool extends Component {
         // publish block for each iteration
         let jsonBlock = {action: "process",  json_block: "true",  subtype:this.subType, watch_work:"false", block: block.block}
         this.subType = 'receive' // only the first block can be an open block, reset for next loop
-        helpers.postDataTimeout(jsonBlock)
+        helpers.postDataTimeout(jsonBlock,helpers.constants.RPC_SWEEP_SERVER)
         .then((data) => {
           if (data.hash) {
             this.inputToast = toast("Processed pending hash", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
@@ -510,6 +554,9 @@ class SweepTool extends Component {
         toast("An unknown error occurred while generating PoW", helpers.getToast(helpers.toastType.ERROR))
         console.log("An unknown error occurred while generating PoW" + error)
       }
+      this.setState({
+        sweeping: false
+      })
       return
     }
   }
@@ -533,7 +580,7 @@ class SweepTool extends Component {
     }
 
     // retrive from RPC
-    helpers.postDataTimeout(command)
+    helpers.postDataTimeout(command,helpers.constants.RPC_SWEEP_SERVER)
     .then(function(data) {
       // if there are any pending, process them
       if (data.blocks) {
@@ -592,7 +639,7 @@ class SweepTool extends Component {
     var subType = 'open'
 
     // retrive from RPC
-    helpers.postDataTimeout(command)
+    helpers.postDataTimeout(command,helpers.constants.RPC_SWEEP_SERVER)
     .then((data) => {
       var validResponse = false
       // if frontier is returned it means the account has been opened and we create a receive block
@@ -638,8 +685,8 @@ class SweepTool extends Component {
 
   // Recursively process private keys from index range
   processIndexRecursive(privKeys, keyCount) {
-    let privKey = privKeys[keyCount]
-
+    let privKey = privKeys[keyCount][0]
+    this.appendLog("Checking index " + privKeys[keyCount][2] + " using " + privKeys[keyCount][1])
     this.processAccount(privKey, function() {
       // continue with the next pending
       keyCount += 1
@@ -648,7 +695,7 @@ class SweepTool extends Component {
       }
       // all private keys have been processed
       else {
-        this.appendLog("All indexes processed!")
+        this.appendLog("Finished!")
         this.setState({
           sweeping: false
         })
@@ -656,8 +703,72 @@ class SweepTool extends Component {
     }.bind(this))
   }
 
+  async sweepContinue() {
+    this.setState({
+      sweeping: true
+    })
+
+    let keyType = this.checkMasterKey(this.state.seed)
+    if (this.state.validEndIndex && this.state.validStartIndex && this.state.validMaxPending && this.state.validAmount) {
+      await nano_old.init()
+      var seed = '', privKey
+      // input is mnemonic
+      if (keyType === 'mnemonic') {
+        seed = bip39.mnemonicToEntropy(this.state.seed).toUpperCase()
+        // seed must be 64 or the nano wallet can't be created. This is the reason 12-words can't be used because the seed would be 32 in length
+        if (seed.length !== 64) {
+          this.inputToast = toast("Mnemonic not 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          return
+        }
+      }
+
+      // nano seed or private key
+      if (keyType === 'nano_seed' || seed !== '' || keyType === 'bip32_seed') {
+        // check if a private key first (no index)
+        this.appendLog("Checking if input is a private key")
+        if (seed === '') { // seed from input, no mnemonic
+          seed = this.state.seed
+        }
+        this.processAccount(seed, function() {
+          // done checking if private key, continue interpret as seed
+          var i
+          var privKeys = []
+          // start with blake2b derivation
+          if (keyType !== 'bip32_seed') {
+            for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
+              privKey = nano_old.deriveSecretKey(seed, i)
+              privKeys.push([privKey, 'blake2b', i])
+            }
+          }
+          // also check all indexes using bip39/44 derivation
+          var bip32Seed
+          // take 128 char bip32 seed directly from input or convert it from a 64 char nano seed (entropy)
+          if (keyType === 'bip32_seed') {
+            bip32Seed = this.state.seed
+          }
+          else {
+            bip32Seed = wallet.generate(seed).seed
+          }
+
+          let accounts = wallet.accounts(bip32Seed, this.state.startIndex, this.state.endIndex)
+          var k = 0
+          for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
+            privKey = accounts[k].privateKey
+            k += 1
+            privKeys.push([privKey, 'bip39/44', i])
+          }
+          this.processIndexRecursive(privKeys, 0)
+        }.bind(this))
+      }
+
+    }
+    else {
+      new MainPage().notifyInvalidFormat()
+    }
+  }
+
   /* Start generation of addresses */
-  async sweep() {
+  sweep() {
     // check that max number is not exceeded
     if (parseInt(this.state.endIndex) - parseInt(this.state.startIndex) > helpers.constants.KEYS_MAX) {
       if (! toast.isActive(this.inputToast)) {
@@ -672,32 +783,16 @@ class SweepTool extends Component {
       return
     }
 
-    this.setState({
-      sweeping: true
-    })
-
-    let keyType = this.checkMasterKey(this.state.seed)
-    if (this.state.validEndIndex && this.state.validStartIndex && this.state.validMaxPending && this.state.validAmount) {
-      await nano_old.init()
-      console.log(keyType)
-      var privKey, pubKey, address
-      // nano seed or private key
-      if (keyType === 'nano_seed') {
-        // check private key first (no index)
-        this.processAccount(this.state.seed, () => {
-          var i
-          let seed = this.state.seed
-          var privKeys = []
-          for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
-            privKey = nano_old.deriveSecretKey(seed, i)
-            privKeys.push(privKey)
-          }
-          this.processIndexRecursive(privKeys, 0)
-        })
-      }
+    // let user confirm account
+    if (this.state.address !== '') {
+      this.confirmAccount(this.state.address, function(confirmed) {
+        if (confirmed) {
+          this.sweepContinue()
+        }
+      }.bind(this))
     }
     else {
-      new MainPage().notifyInvalidFormat()
+      this.sweepContinue()
     }
   }
 
@@ -707,6 +802,7 @@ class SweepTool extends Component {
         <p>Automatically transfers ALL funds from a wallet</p>
         <ul>
           <li>It will search the index range and retreive pending transactions (with threshold) first if existing</li>
+          <li>It will derive private keys using both default blake2b and bip39/44 for Ledger recovery support</li>
           <li>For large amounts it's recommended to <a href="/?tool=sign">sign transactions manually</a> using an offline device</li>
           <li>PoW is computed locally using webGL2, which means the browser must have support for it</li>
           <li>Please avoid using the source wallet elsewhere while this process is running</li>
@@ -731,27 +827,11 @@ class SweepTool extends Component {
               Destination
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="account" aria-describedby="account" value={this.state.address} disabled={this.state.sweeping} title="Nano address to send all funds to" maxLength="65" placeholder="nano_xxx... (leave blank to only process pending)" onChange={this.handleAddressChange} autoComplete="off"/>
+          <FormControl id="account" aria-describedby="account" value={this.state.address} disabled={this.state.sweeping} title="Nano address to send all funds to. If blank, funds will not be transferred." maxLength="65" placeholder="nano_xxx... (leave blank to only process pending)" onChange={this.handleAddressChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='address' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.address} onClick={helpers.copyText}></Button>
           </InputGroup.Append>
-        </InputGroup>
-
-        <InputGroup size="sm" className="mb-3">
-          <div className="derivation-title">Derivation Method:</div>
-          <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="0-check" value="0" checked={this.state.selectedDerivationMethod === "0"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="send-check">Auto (Slower)</label>
-          </div>
-          <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="1-check" value="1" checked={this.state.selectedDerivationMethod === "1"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="send-check">Nano Default (Blake2b)</label>
-          </div>
-          <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="2-check" value="2" checked={this.state.selectedDerivationMethod === "2"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="receive-check">Ledger/Magnum (BIP39/44)</label>
-          </div>
         </InputGroup>
 
         <div className="input-title">ACCOUNT RANGE (IGNORE IF USING PRIVATE KEYS)</div>
@@ -761,7 +841,7 @@ class SweepTool extends Component {
               Start Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Min: 0" maxLength="10"onChange={this.handleStartIndexChange} autoComplete="off"/>
+          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Max range is 100 to limit RPC load." maxLength="10"onChange={this.handleStartIndexChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMin}>Min</Button>
           </InputGroup.Append>
@@ -773,7 +853,7 @@ class SweepTool extends Component {
               End Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max: 4,294,967,295" maxLength="10" onChange={this.handleEndIndexChange} autoComplete="off"/>
+          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max range is 100 to limit RPC load." maxLength="10" onChange={this.handleEndIndexChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
@@ -809,7 +889,7 @@ class SweepTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button variant="primary" onClick={this.sweep} disabled={!(this.state.validEndIndex && this.state.validStartIndex && this.state.validMaxPending && this.state.validAmount) || this.state.sweeping}>START PROCESS</Button>
+          <Button variant="primary" onClick={this.sweep} disabled={!(this.state.validSeed && this.state.validEndIndex && this.state.validStartIndex && this.state.validMaxPending && this.state.validAmount) || this.state.sweeping}>START PROCESS</Button>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">

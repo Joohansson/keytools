@@ -420,6 +420,32 @@ a:hover, a:focus {
   }
 }
 
+/* Confirm Alert */
+.react-confirm-alert-overlay {
+    background: rgba(0, 0, 0, 0.6) !important;
+    opacity: 0 !important;
+}
+
+.react-confirm-alert {
+    max-width: 90% !important;
+}
+
+.react-confirm-alert-body {
+    font-family: inherit !important;
+    width: 100% !important;
+    padding: 30px !important;
+    text-align: left !important;
+    background: #fff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13) !important;
+    color: #666 !important;
+    overflow-wrap: break-word !important;
+}
+
+.react-confirm-alert-body h1 {
+  font-size: 2.0rem;
+}
+
 /********************************************************************************************************************************************
 	Modal content
 ********************************************************************************************************************************************/
