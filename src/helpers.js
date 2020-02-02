@@ -18,9 +18,12 @@ const RPC_TIMEOUT = 10000
 export const constants = {
   INDEX_MAX: 4294967295, //seed index
   KEYS_MAX: 10000, //max keys to export
+  SWEEP_MAX_INDEX: 100, //max keys to sweep using blake2b derivation
+  SWEEP_MAX_PENDING: 1000, // max pending blocks to process per run
   RPC_MAX: 500, //max rpc requests of same type, for example pending blocks
   SAMPLE_PAYMENT_ADDRESS: 'nano_1gur37mt5cawjg5844bmpg8upo4hbgnbbuwcerdobqoeny4ewoqshowfakfo',
   RPC_SERVER: rpc.RPC_SERVER,
+  RPC_SWEEP_SERVER: rpc.RPC_SWEEP_SERVER,
   RPC_LIMIT: rpc.RPC_LIMIT,
   RPC_CREDS: rpc.RPC_CREDS
 }
@@ -355,6 +358,15 @@ export function setURLParams(params) {
   }
 }
 
+// Check if string is hexdecimal
+export function isHex(h) {
+  let re = /^[0-9a-fA-F]+$/
+  if (re.test(h)) {
+    return true
+  }
+  return false
+}
+
 // Post data with no error handling
 /*
 export async function postData(data = {}) {
@@ -377,7 +389,7 @@ export async function postData(data = {}) {
 */
 
 // Post data with timeout and catch errors
-export async function postDataTimeout(data = {}) {
+export async function postDataTimeout(data = {}, server=constants.RPC_SERVER) {
   let didTimeOut = false;
 
   return new Promise(function(resolve, reject) {
@@ -386,7 +398,7 @@ export async function postDataTimeout(data = {}) {
           reject(new Error('Request timed out'));
       }, RPC_TIMEOUT);
 
-      fetch(constants.RPC_SERVER, {
+      fetch(server, {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, *cors, same-origin
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

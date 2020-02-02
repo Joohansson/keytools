@@ -608,12 +608,12 @@ class InspectTool extends Component {
     }
     else {
       // convert to raw if needed
-      if (this.state.activeAmountId === '0') {
+      if (this.state.activeAmountId === '0' && parseFloat(amount) >= 0) {
         raw = helpers.MnanoToRaw(amount)
       }
     }
 
-    if (amount !== '' && !nano.checkAmount(raw)) {
+    if (amount !== '' && (!nano.checkAmount(raw) || parseInt(raw) < 0)) {
       // do not warn when start typing dot
       if (raw[raw.length - 1] !== '.') {
         if (! toast.isActive(this.inputToast)) {
@@ -779,6 +779,7 @@ class InspectTool extends Component {
         command.account = this.state.address
         command.count = this.state.count
         command.source = 'true'
+        command.sorting = 'true'
         command.include_only_confirmed = 'true'
         if (this.state.raw !== '') {
           command.threshold = this.state.raw
@@ -862,7 +863,8 @@ class InspectTool extends Component {
             this.writeOutput({count: Object.keys(data.delegators).length, delegators: data.delegators})
           }
           else {
-            fail = true
+            toast("No delegators found.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+            this.writeOutput(data)
           }
           break
 
@@ -875,14 +877,14 @@ class InspectTool extends Component {
             // sum all raw amounts
             var raw = '0'
             Object.keys(data.blocks).forEach(function(key) {
-                raw = helpers.bigAdd(raw,parseInt(data.blocks[key].amount))
+                raw = helpers.bigAdd(raw,data.blocks[key].amount)
             })
-            console.log(raw)
             let nanoAmount = helpers.rawToMnano(raw)
             this.writeOutput({count: Object.keys(data.blocks).length, raw: raw, NANO: nanoAmount, blocks: data.blocks})
           }
           else {
-            fail = true
+            toast("No pending found.", helpers.getToast(helpers.toastType.ERROR_AUTO))
+            this.writeOutput(data)
           }
           break
 

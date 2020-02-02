@@ -1829,8 +1829,8 @@ class SigningTool extends Component {
             <label className="form-check-label" htmlFor="change-check">CHANGE REP</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="change-check" value="4" checked={this.state.selectedOption === "4"} onChange={this.handleOptionChange}/>
-            <label className="form-check-label" htmlFor="change-check">SIGN BLOCK</label>
+            <input className="form-check-input" type="radio" id="sign-check" value="4" checked={this.state.selectedOption === "4"} onChange={this.handleOptionChange}/>
+            <label className="form-check-label" htmlFor="sign-check">SIGN BLOCK</label>
           </div>
         </InputGroup>
 
@@ -1931,7 +1931,7 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={this.state.selectedOption === "4" ? 'hidden':''}>OUTPUT</div>
+        <div className={this.state.selectedOption === "4" ? 'hidden':'input-title'}>OUTPUT</div>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="blockHash">
@@ -1946,7 +1946,7 @@ class SigningTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <div className={this.state.selectedOption === "4" ? 'hidden':''}>SIGN WITH PRIVATE KEY OR SIGNATURE AND PROVIDE PROOF OF WORK</div>
+        <div className={this.state.selectedOption === "4" ? 'hidden':'input-title'}>SIGN WITH PRIVATE KEY OR SIGNATURE AND PROVIDE PROOF OF WORK</div>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="privKey">

@@ -106,7 +106,7 @@ class SeedTool extends Component {
     }
   }
 
-  // Select CPU load
+  // Select derivation method
   handleOptionChange = changeEvent => {
     this.derivationChange(changeEvent.target.value)
   }
@@ -301,12 +301,12 @@ class SeedTool extends Component {
       this.inputToast = toast("Mnemonic not 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
       return
     }
-    let nanowallet = wallet.generate(seed)
     var privKey
     if (this.state.selectedDerivationMethod === '0') {
       privKey = nano_old.deriveSecretKey(seed, index)
     }
     else {
+      let nanowallet = wallet.generate(seed)
       let accounts = wallet.accounts(nanowallet.seed, index, index)
       privKey = accounts[0].privateKey
     }
