@@ -363,6 +363,9 @@ class SweepTool extends Component {
   }
 
   thresholdChange(amount, isRaw = false) {
+    if (amount === '.') {
+      amount = '0.'
+    }
     var raw = amount
     // force raw
     if (isRaw) {
@@ -380,8 +383,8 @@ class SweepTool extends Component {
 
     if (amount !== '' && (!nano.checkAmount(raw) || parseInt(raw) < 0)) {
       // do not warn when start typing dot
-      if (raw[raw.length - 1] !== '.') {
-        if (! toast.isActive(this.inputToast)) {
+      if (amount[amount.length - 1] !== '.') {
+        if (!toast.isActive(this.inputToast)) {
           this.inputToast = toast("Invalid Nano Amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
         }
       }
