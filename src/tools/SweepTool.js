@@ -200,10 +200,10 @@ class SweepTool extends Component {
         return 'nano_seed'
       }
     }
-    // validate bip32 seed
+    // validate bip39 seed
     if (key.length === 128) {
       if (helpers.isHex(key)) {
-        return 'bip32_seed'
+        return 'bip39_seed'
       }
     }
     // validate mnemonic
@@ -719,7 +719,7 @@ class SweepTool extends Component {
       }
 
       // nano seed or private key
-      if (keyType === 'nano_seed' || seed !== '' || keyType === 'bip32_seed') {
+      if (keyType === 'nano_seed' || seed !== '' || keyType === 'bip39_seed') {
         // check if a private key first (no index)
         this.appendLog("Checking if input is a private key")
         if (seed === '') { // seed from input, no mnemonic
@@ -730,23 +730,23 @@ class SweepTool extends Component {
           var i
           var privKeys = []
           // start with blake2b derivation
-          if (keyType !== 'bip32_seed') {
+          if (keyType !== 'bip39_seed') {
             for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
               privKey = nano_old.deriveSecretKey(seed, i)
               privKeys.push([privKey, 'blake2b', i])
             }
           }
           // also check all indexes using bip39/44 derivation
-          var bip32Seed
-          // take 128 char bip32 seed directly from input or convert it from a 64 char nano seed (entropy)
-          if (keyType === 'bip32_seed') {
-            bip32Seed = this.state.seed
+          var bip39Seed
+          // take 128 char bip39 seed directly from input or convert it from a 64 char nano seed (entropy)
+          if (keyType === 'bip39_seed') {
+            bip39Seed = this.state.seed
           }
           else {
-            bip32Seed = wallet.generate(seed).seed
+            bip39Seed = wallet.generate(seed).seed
           }
 
-          let accounts = wallet.accounts(bip32Seed, this.state.startIndex, this.state.endIndex)
+          let accounts = wallet.accounts(bip39Seed, this.state.startIndex, this.state.endIndex)
           var k = 0
           for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
             privKey = accounts[k].privateKey
@@ -810,7 +810,7 @@ class SweepTool extends Component {
               Secret Key
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} disabled={this.state.sweeping} title="64 hex Nano seed, 128 hex bip32 seed, 64 hex private key or 24-word mnemonic" placeholder="Nano seed, bip32 seed, private key or 24-word passphrase" maxLength="1000" onChange={this.handleSeedChange} autoComplete="off"/>
+          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} disabled={this.state.sweeping} title="64 hex Nano seed, 128 hex bip39 seed, 64 hex private key or 24-word mnemonic" placeholder="Nano seed, bip39 seed, private key or 24-word passphrase" maxLength="1000" onChange={this.handleSeedChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText}></Button>
