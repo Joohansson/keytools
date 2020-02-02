@@ -57,6 +57,16 @@ a:hover, a:focus {
   cursor: pointer;
 }
 
+.new-version-snippet {
+  position: absolute;
+  top: 3px;
+  right: 10px;
+}
+
+.new-version-snippet p {
+  font-size: 1em;
+}
+
 .link-span {
   color: #4a90e2;
   text-decoration: none;
