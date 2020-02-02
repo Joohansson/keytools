@@ -276,7 +276,7 @@ class SweepTool extends Component {
       invalid = true
     }
     if (invalid) {
-      if (index !== '') {
+      if (event.target.value !== '') {
         new MainPage().notifyInvalidFormat()
       }
       this.setState({
@@ -315,7 +315,7 @@ class SweepTool extends Component {
       invalid = true
     }
     if (invalid) {
-      if (index !== '') {
+      if (event.target.value !== '') {
         new MainPage().notifyInvalidFormat()
       }
       this.setState({
@@ -797,7 +797,7 @@ class SweepTool extends Component {
       <div>
         <p>Automatically transfers ALL funds from a wallet</p>
         <ul>
-          <li>It will search the index range and retreive pending transactions (with threshold) first if existing</li>
+          <li>It will search the index range and retrieve pending transactions (with threshold) first if existing</li>
           <li>It will derive private keys using both default blake2b and bip39/44 for Ledger recovery support</li>
           <li>For large amounts it's recommended to <a href="/?tool=sign">sign transactions manually</a> using an offline device</li>
           <li>PoW is computed locally using webGL2, which means the browser must have support for it</li>
