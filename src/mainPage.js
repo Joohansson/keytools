@@ -7,9 +7,11 @@ import * as helpers from './helpers'
 import $ from 'jquery'
 import donation from './img/donation.png';
 import Hotkeys from 'react-hot-keys'
+import packageJson from '../package.json';
 import { Start, Terms, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
   SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool, SweepTool} from './tools'
 const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG", "SWEEP"]
+global.appVersion = packageJson.version;
 
 class MainPage extends Component {
   constructor(props) {
@@ -33,6 +35,8 @@ class MainPage extends Component {
   }
 
   componentDidMount = () => {
+    console.log(`You are running version - ${global.appVersion}. If something is broken, try loading a new version by clearing the cache with CTRL+F5 or Apple + R.`);
+    
     // Set footer height
     var contentWrapper = this.refs.contentWrapper
     contentWrapper.style.bottom = "40px"
