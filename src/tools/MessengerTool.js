@@ -1,7 +1,6 @@
 /* Joohansson 2019 */
 import React from 'react';
-import { Chirp } from 'chirpsdk'
-import SimpleCrypto from "simple-crypto-js";
+import { Chirp } from 'chirpsdk';
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
@@ -211,7 +210,6 @@ class MessengerTool extends React.Component {
     }
 
     var payload = new Uint8Array(["Unknown"])
-    var simpleCrypto = new SimpleCrypto(key)
 
     //If file imported, convert to base64 because UTF8 is not enough for non-text files
     if (this.state.payload.length > 0) {
@@ -219,14 +217,27 @@ class MessengerTool extends React.Component {
       message = this.uint8ToBase64(payload)
     }
     //Encrypt message if key is given
-    if (key.length > 0 && message.length > 0) {
-      message = simpleCrypto.encrypt(message)
+    if (key.length >= 16 && message.length > 0) {
+      let cryptr = require('simple-encryptor')(key)
+      message = cryptr.encrypt(message)
+    }
+
+    if (key.length > 0 && key.length < 16) {
+      this.setState({
+        disabled: true
+      })
     }
 
     //Valid message
     if (message.length > 0) {
       payload = new TextEncoder('utf-8').encode(message)
-      this.setState({ disabled: false })
+      //Make sure encryption key is at least 16 chars (if used)
+      if (key.length > 0 && key.length < 16) {
+        this.setState({ disabled: true })
+      }
+      else {
+        this.setState({ disabled: false })
+      }
 
       //Divide payload into several 32 byte payloads and calculate parts needed
       this.payloadChunks = this.chunkArray(payload, 32)
@@ -539,7 +550,7 @@ class MessengerTool extends React.Component {
                 Encryption Key
               </InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl id="pswInput" aria-describedby="encryption" value={this.state.password} title="Encrypt message to avoid audio interception." placeholder="Optional" autoComplete="off"
+            <FormControl id="pswInput" aria-describedby="encryption" value={this.state.password} maxLength="128" title="Encrypt message to avoid audio interception. Key must be at least 16 chars." placeholder="Optional (must be at least 16 chars)" autoComplete="off"
               onChange={(event) => {
                 this.handleMessageChange(this.state.message, event.target.value)
               }}/>
@@ -606,8 +617,8 @@ class MessengerTool extends React.Component {
 
                 var decrypted = ""
                 try {
-                  var simpleCrypto = new SimpleCrypto(key.value)
-                  decrypted = simpleCrypto.decrypt(result)
+                  var cryptr = require('simple-encryptor')(key.value)
+                  decrypted = cryptr.decrypt(result)
                 }
                 catch(error) {
                   console.error("Could not decrypt data.")

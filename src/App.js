@@ -14,7 +14,7 @@ const App: React.FC<{}> = () => {
   if (!isIE && !isEdge) {
     auto = true
   }
-  const { isLatestVersion, emptyCacheStorage } = useClearCache({'auto':auto});
+  const { isLatestVersion, emptyCacheStorage } = useClearCache({'duration':1000*3600*24*365, 'auto':auto});
 
   return (
     <div className="App">

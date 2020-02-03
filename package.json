@@ -1,6 +1,6 @@
 {
   "name": "keytools",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "private": true,
   "homepage": ".",
   "license": "MIT",
@@ -87,7 +87,7 @@
     "react-scripts": "3.3.0",
     "react-toastify": "^5.4.1",
     "sass": "^1.24.0",
-    "simple-crypto-js": "^2.2.0",
+    "simple-encryptor": "^3.0.0",
     "tweetnacl": "^1.0.1",
     "typescript": "^3.7.4"
   },
