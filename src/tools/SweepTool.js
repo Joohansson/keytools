@@ -766,7 +766,7 @@ class SweepTool extends Component {
     }
   }
 
-  /* Start generation of addresses */
+  /* Start the sweeping */
   sweep() {
     // check that max number is not exceeded
     if (parseInt(this.state.endIndex) - parseInt(this.state.startIndex) > helpers.constants.KEYS_MAX) {
@@ -840,7 +840,7 @@ class SweepTool extends Component {
               Start Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Max range is 100 to limit RPC load." maxLength="10"onChange={this.handleStartIndexChange} autoComplete="off"/>
+          <FormControl id="startIndex" aria-describedby="startIndex" value={this.state.startIndex} title="Start index integer. Max range is 100 to not hit the backend rate limiter." maxLength="10"onChange={this.handleStartIndexChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMin}>Min</Button>
           </InputGroup.Append>
@@ -852,7 +852,7 @@ class SweepTool extends Component {
               End Index
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max range is 100 to limit RPC load." maxLength="10" onChange={this.handleEndIndexChange} autoComplete="off"/>
+          <FormControl id="endIndex" aria-describedby="endIndex" value={this.state.endIndex} title="End index integer. Max range is 100 to not hit the backend rate limiter." maxLength="10" onChange={this.handleEndIndexChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="max-btn" onClick={this.setMax}>Max</Button>
           </InputGroup.Append>
@@ -884,7 +884,7 @@ class SweepTool extends Component {
               }.bind(this))}
             </DropdownButton>
           </InputGroup.Prepend>
-          <FormControl id="threshold" aria-describedby="threshold" value={this.state.amount} title="Pending amounts below this limit will not be included." maxLength="39" placeholder="Pending threshold - Leave blank for no limit" onChange={this.handleThresholdChange} autoComplete="off"/>
+          <FormControl id="threshold" aria-describedby="threshold" value={this.state.amount} title="Pending amounts below this limit will not be included." maxLength="39" placeholder="Pending dust limit - Leave blank to collect all" onChange={this.handleThresholdChange} autoComplete="off"/>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
