@@ -1,6 +1,6 @@
 {
   "name": "keytools",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "homepage": ".",
   "license": "MIT",
@@ -57,6 +57,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "big-integer": "^1.6.48",
+    "bigdecimal": "^0.6.1",
     "bignumber": "^1.1.0",
     "bip39": "^3.0.2",
     "bootstrap": "^4.4.1",

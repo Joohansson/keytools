@@ -14,6 +14,7 @@ import MessengerTool from './MessengerTool.js'
 import VanityTool from './VanityTool.js'
 import InspectTool from './InspectTool.js'
 import SweepTool from './SweepTool.js'
+import DifficultyTool from './DifficultyTool.js'
 
 export {Start, Terms, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-SigningTool, WorkGeneratorTool, QRTool, MessengerTool, VanityTool, InspectTool, SweepTool}
+SigningTool, WorkGeneratorTool, QRTool, MessengerTool, VanityTool, InspectTool, SweepTool, DifficultyTool}

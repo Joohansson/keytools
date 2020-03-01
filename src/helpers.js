@@ -3,6 +3,7 @@ import { css } from 'glamor';
 import $ from 'jquery'
 import * as nano from 'nanocurrency'
 import bigInt from 'big-integer'
+import bigDec from 'bigdecimal' //https://github.com/iriscouch/bigdecimal.js
 import * as convert from './modules/conversion'
 import namedNumber from 'hsimp-named-number'
 import namedNumberDictionary from 'hsimp-named-number/named-number-dictionary.json'
@@ -25,7 +26,15 @@ export const constants = {
   RPC_SERVER: rpc.RPC_SERVER,
   RPC_SWEEP_SERVER: rpc.RPC_SWEEP_SERVER,
   RPC_LIMIT: rpc.RPC_LIMIT,
-  RPC_CREDS: rpc.RPC_CREDS
+  RPC_CREDS: rpc.RPC_CREDS,
+  WORK_THRESHOLD_0125X: '0xFFFFFE00', // 1/8x
+  WORK_THRESHOLD_ORIGINAL: '0xFFFFFFC0',
+  WORK_THRESHOLD_2X: '0xFFFFFFE0',
+  WORK_THRESHOLD_4X: '0xFFFFFFF0',
+  WORK_THRESHOLD_8X: '0xFFFFFFF8',
+  WORK_THRESHOLD_16X: '0xFFFFFFFC',
+  WORK_THRESHOLD_32X: '0xFFFFFFFE',
+  WORK_THRESHOLD_64X: '0xFFFFFFFF',
 }
 
 class RPCError extends Error {
@@ -108,6 +117,23 @@ export function isNumeric(val) {
   let isnum = /^-?\d*\.?\d*$/.test(val)
   if (isnum && String(val).slice(-1) !== '.') {
     return true
+  }
+  else {
+    return false
+  }
+}
+
+// Check if numeric and larger than 0 string
+export function isValidDiffMultiplier(val) {
+  //numerics and last character is not a dot and number of dots is 0 or 1
+  let isnum = /^-?\d*\.?\d*$/.test(val)
+  if (isnum && String(val).slice(-1) !== '.') {
+    if (parseFloat(val) > 0) {
+      return true
+    }
+    else {
+      return false
+    }
   }
   else {
     return false
@@ -365,6 +391,24 @@ export function isHex(h) {
     return true
   }
   return false
+}
+
+// Determine new difficulty from base difficulty (hexadecimal string) and a multiplier (float). Returns hex string
+export function difficulty_from_multiplier(multiplier, base_difficulty) {
+  let big64 = bigDec.BigDecimal(2).pow(64)
+  let big_multiplier = bigDec.BigDecimal(multiplier)
+  let big_base = bigDec.BigDecimal(bigDec.BigInteger(base_difficulty,16))
+  let mode = bigDec.RoundingMode.HALF_DOWN()
+  return big64.subtract((big64.subtract(big_base).divide(big_multiplier,0,mode))).toBigInteger().toString(16)
+}
+
+// Determine new multiplier from base difficulty (hexadecimal string) and target difficulty (hexadecimal string). Returns float
+export function multiplier_from_difficulty(difficulty, base_difficulty) {
+  let big64 = bigDec.BigDecimal(2).pow(64)
+  let big_diff = bigDec.BigDecimal(bigDec.BigInteger(difficulty,16))
+  let big_base = bigDec.BigDecimal(bigDec.BigInteger(base_difficulty,16))
+  let mode = bigDec.RoundingMode.HALF_DOWN()
+  return parseFloat(big64.subtract(big_base).divide(big64.subtract(big_diff),10,mode).toString())
 }
 
 // Post data with no error handling

@@ -9,8 +9,8 @@ import donation from './img/donation.png';
 import Hotkeys from 'react-hot-keys'
 import packageJson from '../package.json';
 import { Start, Terms, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-  SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool, SweepTool} from './tools'
-const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG", "SWEEP"]
+  SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool, SweepTool, DifficultyTool} from './tools'
+const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG", "SWEEP", "DIFF"]
 global.appVersion = packageJson.version;
 
 class MainPage extends Component {
@@ -18,7 +18,7 @@ class MainPage extends Component {
     super(props)
     this.tools = ['0: HOME', '1: Unit Converter', '2: Key Converter', '3: Paper Wallet Generator ', '4: Payment Card', '5: Mass Wallet Generator',
     '6: Mass Keypair Extractor', '7: Find Address in Seed', '8: Block Processor', '9: PoW Generator',
-    '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger', '14: Wallet Sweeper']
+    '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger', '14: Wallet Sweeper', '15: PoW Threshold Converter']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,
@@ -342,6 +342,29 @@ class MainPage extends Component {
         toolId = 14
         break
 
+        // DifficultyTool
+        case 'difficulty':
+        toolId = 15
+        let baseDiff = helpers.getUrlParams().basediff
+        let newDiff = helpers.getUrlParams().newdiff
+        let multiplier = helpers.getUrlParams().multiplier
+        if (typeof baseDiff !== 'undefined') {
+          this.setState({
+            baseDiff: baseDiff
+          })
+        }
+        if (typeof newDiff !== 'undefined') {
+          this.setState({
+            newDiff: newDiff
+          })
+        }
+        if (typeof multiplier !== 'undefined') {
+          this.setState({
+            multiplier: multiplier
+          })
+        }
+        break
+
         default:
         toolId = 0
         break
@@ -482,6 +505,10 @@ class MainPage extends Component {
       this.selectTool(14)
       break
 
+      case 'ctrl+shift+alt+5':
+      this.selectTool(15)
+      break
+
       default:
       break
     }
@@ -528,6 +555,8 @@ class MainPage extends Component {
       reverse: undefined,
       threshold: undefined,
       threstype: undefined,
+      baseDiff: undefined,
+      newDiff: undefined,
       activeTool: this.tools[eventKey],
       activeToolId: eventKey,
       activeToolName: tools[eventKey],
@@ -619,7 +648,8 @@ class MainPage extends Component {
         <div className="background-noise"></div>
         <Hotkeys
           keyName="shift+alt+0,shift+alt+1,shift+alt+2,shift+alt+3,shift+alt+4,shift+alt+5,shift+alt+6,shift+alt+7,
-          shift+alt+8,shift+alt+9,ctrl+shift+alt+0,ctrl+shift+alt+1,ctrl+shift+alt+2,ctrl+shift+alt+3,ctrl+shift+alt+4"
+          shift+alt+8,shift+alt+9,ctrl+shift+alt+0,ctrl+shift+alt+1,ctrl+shift+alt+2,ctrl+shift+alt+3,ctrl+shift+alt+4,
+          ctrl+shift+alt+5"
           onKeyDown={this.onKeyDown.bind(this)}
         />
 
@@ -746,6 +776,7 @@ class MainPage extends Component {
             {(active === 'QR') && <QRTool {...this} /> }
             {(active === 'MSG') && <MessengerTool {...this} /> }
             {(active === 'SWEEP') && <SweepTool {...this} /> }
+            {(active === 'DIFF') && <DifficultyTool {...this} /> }
           </div>
         </div>
 
