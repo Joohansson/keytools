@@ -36,7 +36,7 @@ class MainPage extends Component {
 
   componentDidMount = () => {
     console.log(`You are running version - ${global.appVersion}. If something is broken, try loading a new version by clearing the cache with CTRL+F5 or Apple + R.`);
-    
+
     // Set footer height
     var contentWrapper = this.refs.contentWrapper
     contentWrapper.style.bottom = "40px"
@@ -220,6 +220,7 @@ class MainPage extends Component {
         toolId = 9
         let p_hash = helpers.getUrlParams().hash
         let p_load = helpers.getUrlParams().load
+        let p_multiplier = helpers.getUrlParams().multiplier
         if (typeof p_hash !== 'undefined') {
           this.setState({
             hash: p_hash
@@ -228,6 +229,11 @@ class MainPage extends Component {
         if (typeof p_load !== 'undefined') {
           this.setState({
             load: p_load
+          })
+        }
+        if (typeof p_multiplier !== 'undefined') {
+          this.setState({
+            multiplier: p_multiplier
           })
         }
         break
@@ -514,6 +520,7 @@ class MainPage extends Component {
       hash: undefined,
       workHash: undefined,
       load: undefined,
+      multiplier: undefined,
       init: undefined,
       prefix: undefined,
       suffix: undefined,

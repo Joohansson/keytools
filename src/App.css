@@ -309,7 +309,7 @@ a:hover, a:focus {
 }
 
 .index-checkbox {
-  margin-bottom: 13px;
+  margin-bottom: 5px;
 }
 
 /* Using radio buttons as title */
@@ -320,7 +320,7 @@ a:hover, a:focus {
 
 /* RADIO BUTTONS */
 .gpu-load-title, .derivation-title {
-  margin-right: 30px;
+  width: 100px;
 }
 
 /* AUDIO MESSENGER */
