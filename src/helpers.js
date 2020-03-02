@@ -408,7 +408,7 @@ export function multiplier_from_difficulty(difficulty, base_difficulty) {
   let big_diff = bigDec.BigDecimal(bigDec.BigInteger(difficulty,16))
   let big_base = bigDec.BigDecimal(bigDec.BigInteger(base_difficulty,16))
   let mode = bigDec.RoundingMode.HALF_DOWN()
-  return parseFloat(big64.subtract(big_base).divide(big64.subtract(big_diff),10,mode).toString())
+  return big64.subtract(big_base).divide(big64.subtract(big_diff),32,mode).toPlainString()
 }
 
 // Post data with no error handling

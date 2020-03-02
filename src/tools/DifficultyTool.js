@@ -32,14 +32,33 @@ class DifficultyTool extends Component {
     var newDiff = this.props.state.newDiff
     var multiplier = this.props.state.multiplier
 
-    if (baseDiff) {
-      this.baseChange(baseDiff)
+    if (baseDiff && newDiff) {
+      this.setState({
+        baseDifficulty: baseDiff,
+        newDifficulty: newDiff,
+        validBase: true,
+        validNew: true,
+      },
+      function() {
+        this.newChange(newDiff)
+      })
     }
-    if (newDiff) {
-      this.newChange(newDiff)
+    else if (baseDiff && multiplier) {
+      this.setState({
+        baseDifficulty: baseDiff,
+        multiplier: multiplier,
+        validBase: true,
+        validMultiplier: true,
+      },
+      function() {
+        this.multiplierChange(multiplier)
+      })
     }
-    else if (multiplier) {
-      this.multiplierChange(multiplier)
+    else if (baseDiff) {
+      this.setState({
+        baseDifficulty: baseDiff,
+        validBase: true,
+      })
     }
     if (!baseDiff && !newDiff && !multiplier) {
       this.setParams()
@@ -109,16 +128,20 @@ class DifficultyTool extends Component {
       this.setState({
         baseDifficulty: val,
         validBase: false,
+        validMultiplier: false,
+        multiplier: '',
       },
       function() {
         this.setParams('baseDiff')
       })
       return
     }
+    this.inputToast = toast("Valid threshold entered", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
     this.setState({
       baseDifficulty: val,
       multiplier: this.state.validNew ? helpers.multiplier_from_difficulty(this.state.newDifficulty, val).toString(): '',
       validBase: true,
+      validMultiplier: true,
     },
     function() {
       this.setParams('baseDiff')
@@ -140,15 +163,18 @@ class DifficultyTool extends Component {
         newDifficulty: val,
         multiplier: '',
         validNew: false,
+        validMultiplier: false,
       },
       function() {
         this.setParams('newDiff')
       })
       return
     }
+    this.inputToast = toast("Valid threshold entered", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
     this.setState({
       newDifficulty: val,
       validNew: true,
+      validMultiplier: true,
       multiplier: this.state.validBase ? helpers.multiplier_from_difficulty(val,this.state.baseDifficulty).toString(): '',
     },
     function() {
@@ -161,7 +187,7 @@ class DifficultyTool extends Component {
   }
   multiplierChange(val) {
     if (!helpers.isValidDiffMultiplier(val)) {
-      if (val !== '' && val.slice(-1) !== '.') {
+      if (val !== '' && val.slice(-1) !== '.' && val.slice(-1) !== '0') {
         if (!toast.isActive(this.inputToast)) {
           this.inputToast = toast("Not a valid positive natural or decimal number", helpers.getToast(helpers.toastType.ERROR_AUTO))
         }
@@ -170,6 +196,7 @@ class DifficultyTool extends Component {
         newDifficulty: '',
         multiplier: val,
         validMultiplier: false,
+        validNew: false,
       },
       function() {
         this.setParams('multiplier')
@@ -177,10 +204,16 @@ class DifficultyTool extends Component {
       return
     }
 
+    let newDiff = this.state.validBase ? helpers.difficulty_from_multiplier(val,this.state.baseDifficulty): ''
+    if (newDiff.charAt(0) === '-' || newDiff.length > 16) {
+      newDiff = ''
+    }
+
     this.setState({
       multiplier: val,
       validMultiplier: true,
-      newDifficulty: this.state.validBase ? helpers.difficulty_from_multiplier(val,this.state.baseDifficulty): '',
+      validnew: true,
+      newDifficulty: newDiff,
     },
     function() {
       this.setParams('multiplier')
@@ -228,7 +261,7 @@ class DifficultyTool extends Component {
               Multiplier
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.multiplier} title="Difficulty multiplier. Positive Natural or Decimal number" maxLength="32" placeholder="Positive natural or decimal number such as 2 or 13.5" onChange={this.handleMultiplierChange} autoComplete="off"/>
+          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.multiplier} title="Difficulty multiplier. Positive Natural or Decimal number" maxLength="50" placeholder="Positive natural or decimal number such as 2 or 13.5" onChange={this.handleMultiplierChange} autoComplete="off"/>
           <InputGroup.Append>
           <Button variant="outline-secondary" className="fas fa-times-circle" value='multiplier' onClick={this.clearText}></Button>
           <Button variant="outline-secondary" className="fas fa-copy" value={this.state.multiplier} onClick={helpers.copyText}></Button>
