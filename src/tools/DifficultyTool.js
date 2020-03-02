@@ -23,6 +23,7 @@ class DifficultyTool extends Component {
     this.handleNewChange = this.handleNewChange.bind(this)
     this.handleMultiplierChange = this.handleMultiplierChange.bind(this)
     this.clearText = this.clearText.bind(this)
+    this.clearAll = this.clearAll.bind(this)
     this.setParams = this.setParams.bind(this)
   }
 
@@ -92,21 +93,38 @@ class DifficultyTool extends Component {
       case 'baseDiff':
         this.setState({
           baseDifficulty: '',
+          validBase: false,
         })
         break
       case 'newDiff':
         this.setState({
           newDifficulty: '',
+          validNew: false,
         })
         break
       case 'multiplier':
         this.setState({
           multiplier: '',
+          validMultiplier: false,
         })
         break
       default:
         break
     }
+  }
+
+  clearAll() {
+    this.setState({
+      baseDifficulty: '',
+      validBase: false,
+      newDifficulty: '',
+      validNew: false,
+      multiplier: '',
+      validMultiplier: false,
+    },
+    function() {
+      this.setParams()
+    })
   }
 
   // Validate if a 16 char hex string
@@ -266,6 +284,10 @@ class DifficultyTool extends Component {
           <Button variant="outline-secondary" className="fas fa-times-circle" value='multiplier' onClick={this.clearText}></Button>
           <Button variant="outline-secondary" className="fas fa-copy" value={this.state.multiplier} onClick={helpers.copyText}></Button>
           </InputGroup.Append>
+        </InputGroup>
+
+        <InputGroup className="mb-3">
+          <Button variant="primary" className="btn-medium" onClick={this.clearAll}>Clear All</Button>
         </InputGroup>
       </div>
     )
