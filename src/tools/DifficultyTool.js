@@ -264,6 +264,7 @@ class DifficultyTool extends Component {
         <ul>
           <li>The default base threshold is ffffffc000000000</li>
           <li>Since node v21 send/change blocks are using 8x multiplier and receive blocks 0.125x</li>
+          <li>More info about how this is calculated <a href="https://docs.nano.org/integration-guides/the-basics/#difficulty-multiplier">HERE</a></li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
