@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import removeTrailingZeros from 'remove-trailing-zeros'
+import bigDec from 'bigdecimal'
 import {toast } from 'react-toastify'
 const toolParam = 'difficulty'
 
@@ -26,6 +27,7 @@ class DifficultyTool extends Component {
     this.clearText = this.clearText.bind(this)
     this.clearAll = this.clearAll.bind(this)
     this.setParams = this.setParams.bind(this)
+    this.invertMultiplier = this.invertMultiplier.bind(this)
   }
 
   componentDidMount = () => {
@@ -126,6 +128,19 @@ class DifficultyTool extends Component {
     function() {
       this.setParams()
     })
+  }
+
+  invertMultiplier() {
+    if (this.state.multiplier !== '0') {
+      let mode = bigDec.RoundingMode.HALF_DOWN()
+      let newMulti = removeTrailingZeros(bigDec.BigDecimal(1).divide(bigDec.BigDecimal(this.state.multiplier),32,mode).toPlainString())
+      this.setState({
+        multiplier: newMulti,
+      },
+      function() {
+        this.multiplierChange(newMulti)
+      })
+    }
   }
 
   // Validate if a 16 char hex string
@@ -287,6 +302,7 @@ class DifficultyTool extends Component {
           <InputGroup.Append>
           <Button variant="outline-secondary" className="fas fa-times-circle" value='multiplier' onClick={this.clearText}></Button>
           <Button variant="outline-secondary" className="fas fa-copy" value={this.state.multiplier} onClick={helpers.copyText}></Button>
+          <Button variant="outline-secondary" disabled={!this.state.validMultiplier} title="8 will become 1/8 = 0.125" onClick={this.invertMultiplier}>1/x</Button>
           </InputGroup.Append>
         </InputGroup>
 
