@@ -212,7 +212,7 @@ class DifficultyTool extends Component {
     this.setState({
       multiplier: val,
       validMultiplier: true,
-      validnew: true,
+      validNew: true,
       newDifficulty: newDiff,
     },
     function() {
