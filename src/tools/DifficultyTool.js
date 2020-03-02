@@ -225,6 +225,9 @@ class DifficultyTool extends Component {
     let newDiff = this.state.validBase ? helpers.difficulty_from_multiplier(val,this.state.baseDifficulty): ''
     if (newDiff.charAt(0) === '-' || newDiff.length > 16) {
       newDiff = ''
+      if (!toast.isActive(this.inputToast)) {
+        this.inputToast = toast("Invalid multiplier", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
     }
 
     this.setState({
