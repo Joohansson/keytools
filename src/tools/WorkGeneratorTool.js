@@ -320,6 +320,7 @@ class WorkGeneratorTool extends Component {
         <p>Generate Proof of Work (PoW) from Input Hash</p>
         <ul>
           <li>The generator is using the GPU via webGL which is not supported in all browsers</li>
+          <li>1/8x threshold will only be valid for receive blocks after epoch activation with node v21</li>
           <li>Higher GPU Load is not always faster</li>
         </ul>
 
