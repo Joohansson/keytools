@@ -87,6 +87,7 @@
     "react-hot-keys": "^2.4.5",
     "react-scripts": "3.3.0",
     "react-toastify": "^5.4.1",
+    "remove-trailing-zeros": "^1.0.3",
     "sass": "^1.24.0",
     "simple-encryptor": "^3.0.0",
     "tweetnacl": "^1.0.1",

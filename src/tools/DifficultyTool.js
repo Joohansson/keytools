@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
+import removeTrailingZeros from 'remove-trailing-zeros'
 import {toast } from 'react-toastify'
 const toolParam = 'difficulty'
 
@@ -157,7 +158,7 @@ class DifficultyTool extends Component {
     this.inputToast = toast("Valid threshold entered", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
     this.setState({
       baseDifficulty: val,
-      multiplier: this.state.validNew ? helpers.multiplier_from_difficulty(this.state.newDifficulty, val).toString(): '',
+      multiplier: this.state.validNew ? removeTrailingZeros(helpers.multiplier_from_difficulty(this.state.newDifficulty, val).toString()): '',
       validBase: true,
       validMultiplier: true,
     },
@@ -193,7 +194,7 @@ class DifficultyTool extends Component {
       newDifficulty: val,
       validNew: true,
       validMultiplier: true,
-      multiplier: this.state.validBase ? helpers.multiplier_from_difficulty(val,this.state.baseDifficulty).toString(): '',
+      multiplier: this.state.validBase ? removeTrailingZeros(helpers.multiplier_from_difficulty(val,this.state.baseDifficulty).toString()): '',
     },
     function() {
       this.setParams('newDiff')
