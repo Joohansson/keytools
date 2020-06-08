@@ -165,6 +165,9 @@ class PaperWalletTool extends Component {
             <QrImageStyle className="QR-img-paper QR-img-paper-left" content={this.state.qrSeedContent} size={this.state.qrSize} />
             <NanoLogo className="paper-wallet-logo"/>
             <QrImageStyle className="QR-img-paper QR-img-paper-right" content={this.state.qrAddressContent} size={this.state.qrSize} />
+            <div className="address">
+              {this.state.qrAddressContent}
+            </div>
             <div className="mnemonic">
               {this.state.mnemonic}
             </div>
