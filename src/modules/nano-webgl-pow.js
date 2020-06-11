@@ -5,11 +5,15 @@
 
 // window.NanoWebglPow(hashHex, callback, progressCallback);
 // @param hashHex           String   Previous Block Hash as Hex String
+// @param threshold         String   Optional difficulty threshold (default=0xFFFFFFF8 since v21)
+//   Pass undefined to use default
 // @param callback          Function Called when work value found
 //   Receives single string argument, work value as hex
 // @param progressCallback  Function Optional
 //   Receives single argument: n, number of frames so far
 //   Return true to abort
+
+const defaultThreshold = '0xFFFFFFF8'
 
 function array_hex(arr, index, length) {
   let out='';
@@ -27,7 +31,7 @@ function hex_reverse(hex) {
   return out;
 }
 
-export function calculate(hashHex, threshold, width, height, callback, progressCallback) {
+export function calculate(hashHex, threshold = defaultThreshold, width, height, callback, progressCallback) {
   const canvas = document.createElement('canvas');
 
   canvas.width = width;
