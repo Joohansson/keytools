@@ -3,7 +3,8 @@ import * as nano from 'nanocurrency'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import {toast } from 'react-toastify'
-import 'nano-webgl-pow'
+//import 'nano-webgl-pow'
+import * as webglpow from '../modules/nano-webgl-pow'
 import QrImageStyle from './components/qrImageStyle'
 const toolParam = 'sign'
 
@@ -12,6 +13,11 @@ class SigningTool extends Component {
     super(props)
 
     this.inputToast = null //disallow duplicates
+
+    // default work threshold values for node v21
+    this.defaultSendPow = '0xFFFFFFF8'
+    //this.defaultGetPow = '0xFFFFFE00' //switch to this once the new pow kicks in
+    this.defaultGetPow = '0xFFFFFFF8'
 
     this.addressText = [
       'Source Address',
@@ -276,14 +282,14 @@ class SigningTool extends Component {
     this.showNanoBalance = this.showNanoBalance.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
-    this.webGLWidth = 512
-    this.webGLHeight = 1024
+    this.webglWidth = 512
+    this.webglHeight = 1024
   }
 
   // Init component
   componentDidMount() {
-    window.NanoWebglPow.width = this.webGLWidth
-    window.NanoWebglPow.height = this.webGLHeight
+    //window.NanoWebglPow.width = this.webglWidth
+    //window.NanoWebglPow.height = this.webglHeight
 
     // Read URL params from parent and construct new quick path
     var type = this.props.state.type
@@ -1394,11 +1400,18 @@ class SigningTool extends Component {
 
   generateWork() {
     var workInputHash = null
+    var threshold = undefined
     let sendType = this.state.selectedOption
     // use previous block hash for send, receive and change block
     if (sendType === '0' || sendType === '1' || sendType === '3') {
       if (this.state.validPrevious) {
         workInputHash = this.state.previous
+      }
+      if (sendType === '0' || sendType === '3') {
+        threshold = this.defaultSendPow
+      }
+      else if (sendType === '1') {
+        threshold = this.defaultGetPow
       }
     }
     // use public key for open block
@@ -1406,6 +1419,7 @@ class SigningTool extends Component {
       if (this.state.validAddress) {
         workInputHash = nano.derivePublicKey(this.state.address)
       }
+      threshold = this.defaultGetPow
     }
     // sign block is using its own input
     else if (sendType === '4') {
@@ -1417,14 +1431,16 @@ class SigningTool extends Component {
     if (workInputHash) {
       try {
         toast("Started generating PoW...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
-        window.NanoWebglPow(workInputHash,
+        //window.NanoWebglPow(workInputHash,
+        webglpow.calculate(workInputHash, threshold, this.webglWidth, this.webglHeight,
           (work, n) => {
               toast("Successfully generated PoW!", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
               this.workChange(work)
           },
           n => {
-            toast("Calculated " + helpers.addCommas(n*window.NanoWebglPow.width * window.NanoWebglPow.height) + " hashes...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
-          }
+            toast("Calculated " + helpers.addCommas(n*this.webglWidth * this.webglHeight) + " hashes...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+          },
+          //threshold
         )
       }
       catch(error) {

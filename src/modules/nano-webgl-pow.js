@@ -3,10 +3,12 @@
 // Author:  numtel <ben@latenightsketches.com>
 // License: MIT
 
-// window.NanoWebglPow(hashHex, callback, progressCallback);
+// window.NanoWebglPow(hashHex, threshold, width, height, callback, progressCallback);
 // @param hashHex           String   Previous Block Hash as Hex String
 // @param threshold         String   Optional difficulty threshold (default=0xFFFFFFF8 since v21)
 //   Pass undefined to use default
+// @param width             Int      Gpu load 1, must be power of 2 (default=512)
+// @param height            Int      Gpu load 2, must be power of 2 (default=512)
 // @param callback          Function Called when work value found
 //   Receives single string argument, work value as hex
 // @param progressCallback  Function Optional
@@ -14,6 +16,7 @@
 //   Return true to abort
 
 const defaultThreshold = '0xFFFFFFF8'
+const defaultSize = 512
 
 function array_hex(arr, index, length) {
   let out='';
@@ -31,7 +34,7 @@ function hex_reverse(hex) {
   return out;
 }
 
-export function calculate(hashHex, threshold = defaultThreshold, width, height, callback, progressCallback) {
+export function calculate(hashHex, threshold = defaultThreshold, width = defaultSize, height = defaultSize, callback, progressCallback) {
   const canvas = document.createElement('canvas');
 
   canvas.width = width;

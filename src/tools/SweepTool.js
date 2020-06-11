@@ -3,7 +3,8 @@ import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174' //must be used for high performance with derivePublicKey, including nano_old.init()
 import { wallet } from 'nanocurrency-web'
 import * as bip39 from 'bip39'
-import 'nano-webgl-pow'
+//import 'nano-webgl-pow'
+import * as webglpow from '../modules/nano-webgl-pow'
 import { Dropdown, DropdownButton, InputGroup, FormControl, Button} from 'react-bootstrap'
 import * as helpers from '../helpers'
 import $ from 'jquery'
@@ -18,6 +19,10 @@ class SweepTool extends Component {
     super(props)
 
     this.inputToast = null
+    // default work threshold values for node v21
+    this.defaultSendPow = '0xFFFFFFF8'
+    //this.defaultGetPow = '0xFFFFFE00' //switch to this once the new pow kicks in
+    this.defaultGetPow = '0xFFFFFFF8'
 
     // Threshold dropdown titles
     this.amounts = [
@@ -47,8 +52,8 @@ class SweepTool extends Component {
     }
 
     // Tuning for webGL PoW performance. 512 is default load
-    this.webGLWidth = 512
-    this.webGLHeight = 1024
+    this.webglWidth = 512
+    this.webglHeight = 1024
 
     this.setMin = this.setMin.bind(this)
     this.setMax = this.setMax.bind(this)
@@ -72,8 +77,8 @@ class SweepTool extends Component {
   }
 
   componentDidMount() {
-    window.NanoWebglPow.width = this.webGLWidth
-    window.NanoWebglPow.height = this.webGLHeight
+    //window.NanoWebglPow.width = this.webglWidth
+    //window.NanoWebglPow.height = this.webglHeight
 
     // Read URL params from parent and construct new quick path
     this.setParams()
@@ -423,8 +428,9 @@ class SweepTool extends Component {
   }
 
   // Generate proof of work
-  generateWork(inputHash, powCallback) {
-    window.NanoWebglPow(inputHash,
+  generateWork(inputHash, threshold, powCallback) {
+    //window.NanoWebglPow(inputHash,
+    webglpow.calculate(inputHash, threshold, this.webglWidth, this.webglHeight,
       (work, n) => {
           toast("Successfully generated PoW!", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
           this.appendLog("Generated PoW: " + work)
@@ -432,8 +438,9 @@ class SweepTool extends Component {
           powCallback(work)
       },
       n => {
-        toast("Calculated " + helpers.addCommas(n*window.NanoWebglPow.width * window.NanoWebglPow.height) + " hashes...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
-      }
+        toast("Calculated " + helpers.addCommas(n*this.webglWidth * this.webglHeight) + " hashes...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
+      },
+      //threshold
     )
   }
 
@@ -446,7 +453,7 @@ class SweepTool extends Component {
     if (this.state.validAddress && nano.checkAddress(this.state.address)) {
       this.inputToast = toast("Started transferring funds...", helpers.getToast(helpers.toastType.SUCCESS_AUTO))
       this.appendLog("Transfer started: " + address)
-      this.generateWork(previous, function(work) {
+      this.generateWork(previous, this.defaultSendPow, function(work) {
         // create the block with the work found
         let block = nano.createBlock(privKey, {balance:'0', representative:this.representative,
         work:work, link:this.state.address, previous:previous})
@@ -502,7 +509,7 @@ class SweepTool extends Component {
         // input hash is the opening address public key
         workInputHash = this.pubKey
       }
-      this.generateWork(workInputHash, (work) => {
+      this.generateWork(workInputHash, this.defaultGetPow, (work) => {
         // create the block with the work found
         let block = nano.createBlock(this.privKey,{balance:this.adjustedBalance, representative:this.representative,
         work:work, link:key, previous:this.previous})
