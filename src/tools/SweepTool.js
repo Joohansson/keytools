@@ -629,6 +629,10 @@ class SweepTool extends Component {
 
   // Process an account
   processAccount(privKey, accountCallback) {
+    if (privKey.length !== 64) {
+      accountCallback()
+      return
+    }
     this.pubKey = nano_old.derivePublicKey(privKey)
     let address = nano.deriveAddress(this.pubKey, {useNanoPrefix: true})
 
@@ -721,9 +725,10 @@ class SweepTool extends Component {
       // input is mnemonic
       if (keyType === 'mnemonic') {
         seed = bip39.mnemonicToEntropy(this.state.seed).toUpperCase()
+        var bip39Seed = helpers.uint8ToHex(await bip39.mnemonicToSeed(this.state.seed))
         // seed must be 64 or the nano wallet can't be created. This is the reason 12-words can't be used because the seed would be 32 in length
-        if (seed.length !== 64) {
-          this.inputToast = toast("Mnemonic not 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
+        if (seed.length !== 32 && seed.length !== 40 && seed.length !== 48 && seed.length !== 56 && seed.length !== 64) {
+          this.inputToast = toast("Mnemonic not 12,15,18,21 or 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
           return
         }
       }
@@ -740,19 +745,18 @@ class SweepTool extends Component {
           var i
           var privKeys = []
           // start with blake2b derivation
-          if (keyType !== 'bip39_seed') {
+          if (keyType !== 'bip39_seed' && seed.length === 64) {
             for (i=parseInt(this.state.startIndex); i <= parseInt(this.state.endIndex); i++) {
               privKey = nano_old.deriveSecretKey(seed, i)
               privKeys.push([privKey, 'blake2b', i])
             }
           }
           // also check all indexes using bip39/44 derivation
-          var bip39Seed
           // take 128 char bip39 seed directly from input or convert it from a 64 char nano seed (entropy)
           if (keyType === 'bip39_seed') {
             bip39Seed = this.state.seed
           }
-          else {
+          else if (seed.length === 64) {
             bip39Seed = wallet.generate(seed).seed
           }
 
@@ -820,7 +824,7 @@ class SweepTool extends Component {
               Secret Key
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} disabled={this.state.sweeping} title="64 hex Nano seed, 128 hex bip39 seed, 64 hex private key or 24-word mnemonic" placeholder="Nano seed, bip39 seed, private key or 24-word passphrase" maxLength="1000" onChange={this.handleSeedChange} autoComplete="off"/>
+          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} disabled={this.state.sweeping} title="64 hex Nano seed, 128 hex bip39 seed, 64 hex private key or 12,15,18,21,24-word mnemonic" placeholder="Nano seed, bip39 seed, private key or 12,15,18,21,24-word passphrase" maxLength="1000" onChange={this.handleSeedChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText}></Button>

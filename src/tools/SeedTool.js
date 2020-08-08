@@ -17,6 +17,7 @@ class SeedTool extends Component {
 
     this.state = {
       seed: '',
+      bip39Seed: '',
       mnemonic: '',
       selectedDerivationMethod: '0',
       index: '0',
@@ -112,12 +113,17 @@ class SeedTool extends Component {
   }
 
   derivationChange(val) {
-    this.setState({
-      selectedDerivationMethod: val
-    },function() {
-      this.indexChange(this.state.index) //use the same method as when changing the index
-      this.setParams()
-    })
+    if (val === '0' && this.state.bip39Seed.length === 128 && this.state.seed.length !== 64) {
+      this.inputToast = toast("The derivation method can't be used with that seed/mnemonic", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
+    }
+    else {
+      this.setState({
+        selectedDerivationMethod: val
+      },function() {
+        this.indexChange(this.state.index) //use the same method as when changing the index
+        this.setParams()
+      })
+    }
   }
 
   // loop qr state 1x, 2x, 4x
@@ -247,6 +253,7 @@ class SeedTool extends Component {
 
     this.setState({
       seed: seed,
+      bip39Seed: '',
       mnemonic: mnemonic,
       privKey: privKey.toUpperCase(),
       pubKey: pubKey.toUpperCase(),
@@ -261,7 +268,7 @@ class SeedTool extends Component {
     this.mnemonicChange(event.target.value)
   }
 
-  mnemonicChange(mnemonic) {
+  async mnemonicChange(mnemonic) {
     var index = this.state.index
     var invalid = false
     if (helpers.isNumeric(index)) {
@@ -276,38 +283,50 @@ class SeedTool extends Component {
 
     if (invalid) {
       this.setState({
-        mnemonic: mnemonic
+        mnemonic: mnemonic,
+        bip39Seed: ''
       },
       function() {
         this.updateQR()
       })
       if (mnemonic !== '' && this.state.index !== '') {
         if (! toast.isActive(this.inputToast)) {
-          this.inputToast = toast("Invalid 24-word phrase or index", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          this.inputToast = toast("Invalid phrase or index", helpers.getToast(helpers.toastType.ERROR_AUTO))
         }
       }
       return
     }
 
     let seed = bip39.mnemonicToEntropy(mnemonic).toUpperCase()
-    // seed must be 64 or the nano wallet can't be created. This is the reason 12-words can't be used because the seed would be 32 in length
-    if (seed.length !== 64) {
+    var bip39Seed = helpers.uint8ToHex(await bip39.mnemonicToSeed(mnemonic))
+    
+    // seed must be 64 or the nano wallet can't be created. Bip39/44 derivation will be forced for any mnemonic that is not 24 words
+    if (seed.length !== 32 && seed.length !== 40 && seed.length !== 48 && seed.length !== 56 && seed.length !== 64) {
       this.setState({
         mnemonic: mnemonic
       },
       function() {
         this.updateQR()
       })
-      this.inputToast = toast("Mnemonic not 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      this.inputToast = toast("Mnemonic not 12,15,18,21 or 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
       return
     }
     var privKey
     if (this.state.selectedDerivationMethod === '0') {
-      privKey = nano_old.deriveSecretKey(seed, index)
+      if (seed.length === 64) {
+        privKey = nano_old.deriveSecretKey(seed, index)
+      }
+      else {
+        // If words are not 24, force BIP39/44
+        this.derivationChange('1', false)
+      }
     }
-    else {
-      let nanowallet = wallet.generate(seed)
-      let accounts = wallet.accounts(nanowallet.seed, index, index)
+    if (this.state.selectedDerivationMethod !== '0' || seed.length !== 64) {
+      if (seed.length === 64) {
+        bip39Seed = wallet.generate(seed).seed
+      }
+      
+      let accounts = wallet.accounts(bip39Seed, index, index)
       privKey = accounts[0].privateKey
     }
     let pubKey = nano_old.derivePublicKey(privKey)
@@ -315,7 +334,8 @@ class SeedTool extends Component {
 
 
     this.setState({
-      seed: seed,
+      seed: seed.length === 64 ? seed: '',
+      bip39Seed: seed.length !== 64 ? bip39Seed : '',
       mnemonic: mnemonic,
       privKey: privKey.toUpperCase(),
       pubKey: pubKey.toUpperCase(),
@@ -334,7 +354,7 @@ class SeedTool extends Component {
     var invalid = false
     if (helpers.isNumeric(index)) {
       index = parseInt(index)
-      if (!nano.checkIndex(index) || !nano.checkSeed(this.state.seed)) {
+      if (!nano.checkIndex(index) || (!nano.checkSeed(this.state.seed) && this.state.bip39Seed.length !== 128)) {
         invalid = true
       }
     }
@@ -356,15 +376,31 @@ class SeedTool extends Component {
       return
     }
 
-    let nanowallet = wallet.generate(this.state.seed)
     var privKey
     if (this.state.selectedDerivationMethod === '0') {
-      privKey = nano_old.deriveSecretKey(this.state.seed, index)
+      if (this.state.seed.length === 64) {
+        privKey = nano_old.deriveSecretKey(this.state.seed, index)
+      }
+      else {
+        // If words are not 24, force BIP39/44
+        this.setState({
+          selectedDerivationMethod: '1'
+        })
+      }
     }
-    else {
-      let accounts = wallet.accounts(nanowallet.seed, index, index)
+
+    if (this.state.selectedDerivationMethod !== '0' || this.state.seed.length !== 64) {
+      var bip39Seed = ''
+      if (this.state.seed.length === 64) {
+        bip39Seed = wallet.generate(this.state.seed).seed
+      }
+      else {
+        bip39Seed = this.state.bip39Seed
+      }
+      let accounts = wallet.accounts(bip39Seed, index, index)
       privKey = accounts[0].privateKey
     }
+
     let pubKey = nano_old.derivePublicKey(privKey)
     let address = nano.deriveAddress(pubKey, {useNanoPrefix: true})
 
@@ -402,6 +438,7 @@ class SeedTool extends Component {
     let pubKey = nano_old.derivePublicKey(priv)
     this.setState({
       seed: '',
+      bip39Seed: '',
       mnemonic: '',
       index: '0',
       privKey: priv.toUpperCase(),
@@ -435,6 +472,7 @@ class SeedTool extends Component {
 
     this.setState({
       seed: '',
+      bip39Seed: '',
       mnemonic: '',
       index: '0',
       privKey: '',
@@ -468,6 +506,7 @@ class SeedTool extends Component {
 
     this.setState({
       seed: '',
+      bip39Seed: '',
       mnemonic: '',
       index: '0',
       privKey: '',
@@ -530,7 +569,7 @@ class SeedTool extends Component {
               Mnemonic
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="mnemonic" aria-describedby="mnemonic" value={this.state.mnemonic} title="The 24-word passphrase is interchangeable with the seed" placeholder="24 words pass phrase" onChange={this.handleMnemonicChange} autoComplete="off"/>
+          <FormControl id="mnemonic" aria-describedby="mnemonic" value={this.state.mnemonic} title="A 24-word passphrase is interchangeable with the seed" placeholder="12,15,18,21 or 24 words passphrase" onChange={this.handleMnemonicChange} autoComplete="off"/>
           <InputGroup.Append>
             <Button variant="outline-secondary" className="fas fa-times-circle" value='mnemonic' onClick={this.clearText}></Button>
             <Button variant="outline-secondary" className="fas fa-copy" value={this.state.mnemonic} onClick={helpers.copyText}></Button>

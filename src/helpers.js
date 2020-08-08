@@ -69,6 +69,22 @@ export function genSecureKey() {
   return rand.reduce((hex, idx) => hex + (`0${idx.toString(16)}`).slice(-2), '')
 }
 
+// uint8array to hex string
+export function uint8ToHex(uintValue) {
+  let hex = '';
+  let aux;
+  for (let i = 0; i < uintValue.length; i++) {
+    aux = uintValue[i].toString(16).toUpperCase();
+    if (aux.length === 1) {
+      aux = '0' + aux;
+    }
+    hex += aux;
+    aux = '';
+  }
+
+  return(hex);
+}
+
 // Add two big integers
 export function bigAdd(input,value) {
   let insert = bigInt(input)
@@ -263,16 +279,16 @@ export const MS_D = MS_H * 24;
 export const MS_W = MS_D * 7;
 export const MS_Y = MS_D * 365.25;
 
-export function plural(n: number, text1: string, textn: string): string {
+export function plural(n, text1, textn) {
   return n > 1 ? textn : text1;
 }
 
-function formatDurationWord(ms: number, ref: number, word1: string, wordn: string): string {
+function formatDurationWord(ms, ref, word1, wordn) {
   const value = Math.round(ms / ref);
   return `${value} ${plural(value, word1, wordn)}`;
 }
 
-export function formatDurationEstimation(ms: number): string {
+export function formatDurationEstimation(ms) {
   if (ms >= MS_Y * 1000) {
     const name = namedNumber(Math.round(ms / MS_Y));
     return `${name.getName()} years`;
