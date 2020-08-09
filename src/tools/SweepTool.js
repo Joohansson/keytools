@@ -722,10 +722,11 @@ class SweepTool extends Component {
     if (this.state.validEndIndex && this.state.validStartIndex && this.state.validMaxPending && this.state.validAmount) {
       await nano_old.init()
       var seed = '', privKey
+      var bip39Seed = ''
       // input is mnemonic
       if (keyType === 'mnemonic') {
         seed = bip39.mnemonicToEntropy(this.state.seed).toUpperCase()
-        var bip39Seed = helpers.uint8ToHex(await bip39.mnemonicToSeed(this.state.seed))
+        bip39Seed = bip39.mnemonicToSeedSync(this.state.seed).toString('hex')
         // seed must be 64 or the nano wallet can't be created. This is the reason 12-words can't be used because the seed would be 32 in length
         if (seed.length !== 32 && seed.length !== 40 && seed.length !== 48 && seed.length !== 56 && seed.length !== 64) {
           this.inputToast = toast("Mnemonic not 12,15,18,21 or 24 words", helpers.getToast(helpers.toastType.ERROR_AUTO))
@@ -758,6 +759,11 @@ class SweepTool extends Component {
           }
           else if (seed.length === 64) {
             bip39Seed = wallet.generate(seed).seed
+          }
+
+          if (bip39Seed.length !== 128) {
+            this.inputToast = toast("Bad input format!", helpers.getToast(helpers.toastType.ERROR_AUTO))
+            return
           }
 
           let accounts = wallet.accounts(bip39Seed, this.state.startIndex, this.state.endIndex)

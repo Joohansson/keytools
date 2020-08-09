@@ -298,7 +298,7 @@ class SeedTool extends Component {
     }
 
     let seed = bip39.mnemonicToEntropy(mnemonic).toUpperCase()
-    var bip39Seed = helpers.uint8ToHex(await bip39.mnemonicToSeed(mnemonic))
+    var bip39Seed = bip39.mnemonicToSeedSync(mnemonic).toString('hex')
     
     // seed must be 64 or the nano wallet can't be created. Bip39/44 derivation will be forced for any mnemonic that is not 24 words
     if (seed.length !== 32 && seed.length !== 40 && seed.length !== 48 && seed.length !== 56 && seed.length !== 64) {
