@@ -14,13 +14,10 @@ class WorkGeneratorTool extends Component {
 
     this.webGLPower = [256,512,1024,2048,4096,8192,16384]
     this.difficulties = [
-      helpers.constants.WORK_THRESHOLD_0125X,
       helpers.constants.WORK_THRESHOLD_ORIGINAL,
       helpers.constants.WORK_THRESHOLD_2X,
       helpers.constants.WORK_THRESHOLD_4X,
-      helpers.constants.WORK_THRESHOLD_8X,
-      helpers.constants.WORK_THRESHOLD_16X,
-      helpers.constants.WORK_THRESHOLD_32X,
+      helpers.constants.WORK_THRESHOLD_8X
     ]
     this.webglWidth = this.webGLPower[3]
     this.webglHeight = 256
@@ -39,7 +36,7 @@ class WorkGeneratorTool extends Component {
       output: '',
       savedOutput: [],
       selectedLoadOption: '3',
-      selectedMultiplierOption: '1',
+      selectedMultiplierOption: '0',
     }
 
     this.handleWorkHashChange = this.handleWorkHashChange.bind(this)
@@ -352,34 +349,22 @@ class WorkGeneratorTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <div className="gpu-load-title" title="PoW difficulty multiplier">Multiplier:</div>
+          <div className="gpu-load-title" title="PoW difficulty multiplier. 1x equals v21 threshold of fffffff800000000">Multiplier:</div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="multi1" value="0" checked={this.state.selectedMultiplierOption === "0"} onChange={this.handleMultiplierOptionChange}/>
-            <label className="form-check-label" htmlFor="multi1">1/8x</label>
+            <label className="form-check-label" htmlFor="multi1">1x</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="multi2" value="1" checked={this.state.selectedMultiplierOption === "1"} onChange={this.handleMultiplierOptionChange}/>
-            <label className="form-check-label" htmlFor="multi2">1x</label>
+            <label className="form-check-label" htmlFor="multi2">2x</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="multi3" value="2" checked={this.state.selectedMultiplierOption === "2"} onChange={this.handleMultiplierOptionChange}/>
-            <label className="form-check-label" htmlFor="multi3">2x</label>
+            <label className="form-check-label" htmlFor="multi3">4x</label>
           </div>
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="multi4" value="3" checked={this.state.selectedMultiplierOption === "3"} onChange={this.handleMultiplierOptionChange}/>
-            <label className="form-check-label" htmlFor="multi4">4x</label>
-          </div>
-          <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="multi5" value="4" checked={this.state.selectedMultiplierOption === "4"} onChange={this.handleMultiplierOptionChange}/>
-            <label className="form-check-label" htmlFor="multi5">8x</label>
-          </div>
-          <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="multi6" value="5" checked={this.state.selectedMultiplierOption === "5"} onChange={this.handleMultiplierOptionChange}/>
-            <label className="form-check-label" htmlFor="multi6">16x</label>
-          </div>
-          <div className="form-check form-check-inline index-checkbox">
-            <input className="form-check-input" type="radio" id="multi7" value="6" checked={this.state.selectedMultiplierOption === "6"} onChange={this.handleMultiplierOptionChange}/>
-            <label className="form-check-label" htmlFor="multi7">32x</label>
+            <label className="form-check-label" htmlFor="multi4">8x</label>
           </div>
         </InputGroup>
 
