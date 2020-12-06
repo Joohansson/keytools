@@ -85,7 +85,7 @@
     "react-confirm-alert": "^2.6.1",
     "react-dom": "^16.13.1",
     "react-hot-keys": "^2.6.0",
-    "react-scripts": "3.3.0",
+    "react-scripts": "^3.4.3",
     "react-toastify": "^5.4.1",
     "remove-trailing-zeros": "^1.0.3",
     "sass": "^1.26.10",

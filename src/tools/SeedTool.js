@@ -19,6 +19,7 @@ class SeedTool extends Component {
       seed: '',
       bip39Seed: '',
       mnemonic: '',
+      passphrase: '',
       selectedDerivationMethod: '0',
       index: '0',
       privKey: '',
@@ -33,6 +34,7 @@ class SeedTool extends Component {
 
     this.handleSeedChange = this.handleSeedChange.bind(this)
     this.handleMnemonicChange = this.handleMnemonicChange.bind(this)
+    this.handlePassphraseChange = this.handlePassphraseChange.bind(this)
     this.handleIndexChange = this.handleIndexChange.bind(this)
     this.handlePrivChange = this.handlePrivChange.bind(this)
     this.handlePubChange = this.handlePubChange.bind(this)
@@ -64,7 +66,9 @@ class SeedTool extends Component {
     switch(event.target.value) {
       case 'seed':
         this.setState({
-          seed: ''
+          seed: '',
+          mnemonic: '',
+          bip39Seed: ''
         },
         function() {
           this.updateQR()
@@ -72,7 +76,9 @@ class SeedTool extends Component {
         break
       case 'mnemonic':
         this.setState({
-          mnemonic: ''
+          mnemonic: '',
+          bip39Seed: '',
+          seed: ''
         },
         function() {
           this.updateQR()
@@ -113,7 +119,7 @@ class SeedTool extends Component {
   }
 
   derivationChange(val) {
-    if (val === '0' && this.state.bip39Seed.length === 128 && this.state.seed.length !== 64) {
+    if (val === '0' && this.state.mnemonic !== '' && this.state.bip39Seed.length === 128 && this.state.seed.length !== 64) {
       this.inputToast = toast("The derivation method can't be used with that seed/mnemonic", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
     }
     else {
@@ -144,7 +150,7 @@ class SeedTool extends Component {
       index: helpers.constants.INDEX_MAX
     },
     function() {
-      this.seedChange(this.state.seed)
+      this.mnemonicChange(this.state.mnemonic)
     })
   }
 
@@ -225,7 +231,9 @@ class SeedTool extends Component {
 
     if (invalid) {
       this.setState({
-        seed: seed
+        seed: seed,
+        mnemonic: '',
+        bip39Seed: ''
       },
       function() {
         this.updateQR()
@@ -238,7 +246,7 @@ class SeedTool extends Component {
       return
     }
 
-    let nanowallet = wallet.generate(seed)
+    let nanowallet = this.state.passphrase !== '' ? wallet.generate(seed, this.state.passphrase) : wallet.generate(seed)
     let mnemonic = nanowallet.mnemonic
     var privKey
     if (this.state.selectedDerivationMethod === '0') {
@@ -284,7 +292,8 @@ class SeedTool extends Component {
     if (invalid) {
       this.setState({
         mnemonic: mnemonic,
-        bip39Seed: ''
+        bip39Seed: '',
+        seed: ''
       },
       function() {
         this.updateQR()
@@ -298,7 +307,7 @@ class SeedTool extends Component {
     }
 
     let seed = bip39.mnemonicToEntropy(mnemonic).toUpperCase()
-    var bip39Seed = bip39.mnemonicToSeedSync(mnemonic).toString('hex')
+    var bip39Seed = this.state.passphrase !== '' ? bip39.mnemonicToSeedSync(mnemonic, this.state.passphrase).toString('hex') : bip39.mnemonicToSeedSync(mnemonic).toString('hex')
     
     // seed must be 64 or the nano wallet can't be created. Bip39/44 derivation will be forced for any mnemonic that is not 24 words
     if (seed.length !== 32 && seed.length !== 40 && seed.length !== 48 && seed.length !== 56 && seed.length !== 64) {
@@ -323,7 +332,7 @@ class SeedTool extends Component {
     }
     if (this.state.selectedDerivationMethod !== '0' || seed.length !== 64) {
       if (seed.length === 64) {
-        bip39Seed = wallet.generate(seed).seed
+        bip39Seed = this.state.passphrase !== '' ? wallet.generate(seed, this.state.passphrase).seed : wallet.generate(seed).seed
       }
       
       let accounts = wallet.accounts(bip39Seed, index, index)
@@ -343,6 +352,19 @@ class SeedTool extends Component {
     },
     function() {
       this.updateQR()
+    })
+  }
+
+  handlePassphraseChange(event) {
+    this.passphraseChange(event.target.value)
+  }
+
+  passphraseChange(pass) {
+    this.setState({
+      passphrase: pass
+    },
+    function() {
+      this.mnemonicChange(this.state.mnemonic)
     })
   }
 
@@ -392,7 +414,7 @@ class SeedTool extends Component {
     if (this.state.selectedDerivationMethod !== '0' || this.state.seed.length !== 64) {
       var bip39Seed = ''
       if (this.state.seed.length === 64) {
-        bip39Seed = wallet.generate(this.state.seed).seed
+        bip39Seed = this.state.passphrase !== '' ? wallet.generate(this.state.seed, this.state.passphrase).seed : wallet.generate(this.state.seed).seed
       }
       else {
         bip39Seed = this.state.bip39Seed
@@ -549,34 +571,6 @@ class SeedTool extends Component {
           <li><strong>Address &gt;</strong> Pub Key </li>
         </ul>
 
-        <InputGroup size="sm" className="mb-3 has-clear">
-          <InputGroup.Prepend>
-            <InputGroup.Text id="seed">
-              Seed
-            </InputGroup.Text>
-          </InputGroup.Prepend>
-          <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing private keys" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange} autoComplete="off"/>
-          <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText}></Button>
-            <Button variant="outline-secondary" className={this.state.qrActive === 'seed' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='seed' onClick={this.handleQRChange}></Button>
-          </InputGroup.Append>
-        </InputGroup>
-
-        <InputGroup size="sm" className="mb-3 has-clear">
-          <InputGroup.Prepend>
-            <InputGroup.Text id="mnemonic">
-              Mnemonic
-            </InputGroup.Text>
-          </InputGroup.Prepend>
-          <FormControl id="mnemonic" aria-describedby="mnemonic" value={this.state.mnemonic} title="A 24-word passphrase is interchangeable with the seed" placeholder="12,15,18,21 or 24 words passphrase" onChange={this.handleMnemonicChange} autoComplete="off"/>
-          <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='mnemonic' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.mnemonic} onClick={helpers.copyText}></Button>
-            <Button variant="outline-secondary" className={this.state.qrActive === 'mnemonic' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='mnemonic' onClick={this.handleQRChange}></Button>
-          </InputGroup.Append>
-        </InputGroup>
-
         <InputGroup size="sm" className="mb-3">
           <div className="derivation-title">Derivation Method:</div>
           <div className="form-check form-check-inline index-checkbox">
@@ -588,6 +582,47 @@ class SeedTool extends Component {
             <label className="form-check-label" htmlFor="receive-check">Ledger/Magnum (BIP39/44)</label>
           </div>
         </InputGroup>
+
+        {this.state.selectedDerivationMethod === '0' &&
+          <InputGroup size="sm" className="mb-3 has-clear">
+            <InputGroup.Prepend>
+              <InputGroup.Text id="seed">
+                Nano Seed
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl id="seed" aria-describedby="seed" value={this.state.seed} title="64 hex Master key containing private keys" placeholder="ABC123... or abc123..." maxLength="64" onChange={this.handleSeedChange} autoComplete="off"/>
+            <InputGroup.Append>
+              <Button variant="outline-secondary" className="fas fa-times-circle" value='seed' onClick={this.clearText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.seed} onClick={helpers.copyText}></Button>
+              <Button variant="outline-secondary" className={this.state.qrActive === 'seed' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='seed' onClick={this.handleQRChange}></Button>
+            </InputGroup.Append>
+          </InputGroup>
+        }
+
+        <InputGroup size="sm" className="mb-3 has-clear">
+          <InputGroup.Prepend>
+            <InputGroup.Text id="mnemonic">
+              Mnemonic
+            </InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl id="mnemonic" aria-describedby="mnemonic" value={this.state.mnemonic} title="A 24-word Nano mnemonic is interchangeable with a Nano seed" placeholder="12,15,18,21 or 24 words mnemonic" onChange={this.handleMnemonicChange} autoComplete="off"/>
+          <InputGroup.Append>
+            <Button variant="outline-secondary" className="fas fa-times-circle" value='mnemonic' onClick={this.clearText}></Button>
+            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.mnemonic} onClick={helpers.copyText}></Button>
+            <Button variant="outline-secondary" className={this.state.qrActive === 'mnemonic' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='mnemonic' onClick={this.handleQRChange}></Button>
+          </InputGroup.Append>
+        </InputGroup>
+
+        {this.state.selectedDerivationMethod === '1' &&
+          <InputGroup size="sm" className="mb-3">
+            <InputGroup.Prepend>
+              <InputGroup.Text id="passphrase">
+                BIP39 Passphrase
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl type="password" id="passphrase" aria-describedby="passphrase" value={this.state.passphrase} title="Required only if the BIP39 seed is protected by a password / passphrase" placeholder="Optional" onChange={this.handlePassphraseChange} autoComplete="off"/>
+          </InputGroup>
+        }
 
         <InputGroup size="sm" className="mb-3 index-input">
           <InputGroup.Prepend>
@@ -645,7 +680,7 @@ class SeedTool extends Component {
 
         <p>Generate secure random keypairs or demo addresses</p>
         <InputGroup className="mb-3">
-          <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Nano Seed</Button>
+          <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Mnemonic</Button>
           <Button variant="primary" onClick={this.generatePriv} className="btn-medium">Private Key</Button>
           <Button variant="primary" onClick={this.generatePub} className="btn-medium">Address</Button>
         </InputGroup>
