@@ -17,6 +17,7 @@ class PaymentTool extends Component {
       address: '',
       amount: '',
       message: '',
+      recipient: '', // optional name
       isPay: false,
       validAddress: false,
       validAmount: false,
@@ -27,6 +28,7 @@ class PaymentTool extends Component {
 
     this.handleAddressChange = this.handleAddressChange.bind(this)
     this.handleAmountChange = this.handleAmountChange.bind(this)
+    this.handleRecipientChange = this.handleRecipientChange.bind(this)
     this.handleMessageChange = this.handleMessageChange.bind(this)
     this.clearText = this.clearText.bind(this)
     this.clearAll = this.clearAll.bind(this)
@@ -41,6 +43,7 @@ class PaymentTool extends Component {
     var address = this.props.state.address
     var amount = this.props.state.amount
     var message = this.props.state.message
+    var recipient = this.props.state.recipient
 
     if (address) {
       this.addressChange(address)
@@ -51,18 +54,21 @@ class PaymentTool extends Component {
     if (amount) {
       this.amountChange(amount)
     }
+    if (recipient) {
+      this.recipientChange(recipient)
+    }
     if (message) {
       this.messageChange(message)
     }
 
-    if (!address && !amount && !message) {
+    if (!address && !amount && !message && !recipient) {
       this.setParams()
     }
   }
 
   // Defines the url params
   setParams() {
-    helpers.setURLParams('?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&message=' + this.state.message)
+    helpers.setURLParams('?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount  + '&recipient=' + this.state.recipient + '&message=' + this.state.message)
   }
 
   //Clear text from input field
@@ -90,6 +96,15 @@ class PaymentTool extends Component {
       })
       break
 
+      case 'recipient':
+      this.setState({
+        recipient: '',
+      },
+      function() {
+        this.setParams()
+      })
+      break
+
       case 'message':
       this.setState({
         message: '',
@@ -110,6 +125,7 @@ class PaymentTool extends Component {
     this.setState({
       address: '',
       amount: '',
+      recipient: '',
       message: '',
       isPay: false,
       validAddress: false,
@@ -204,6 +220,19 @@ class PaymentTool extends Component {
     })
   }
 
+  handleRecipientChange(event) {
+    this.recipientChange(event.target.value)
+  }
+
+  recipientChange(recipient) {
+    this.setState({
+      recipient: recipient,
+    },
+    function() {
+      this.setParams()
+    })
+  }
+
   updateQR() {
     let address = this.state.address
     let amount = this.state.amount
@@ -245,7 +274,8 @@ class PaymentTool extends Component {
       validAddress: true,
       amount: '0.1',
       validAmount: true,
-      message: 'Donate to KeyTools'
+      message: 'Donate to KeyTools',
+      recipient: 'KeyTools'
     },
     function() {
       this.updateQR()
@@ -262,7 +292,7 @@ class PaymentTool extends Component {
       <div>
         <div className="noprint">
           <p className={this.state.isPay ? "hidden":""}>Generate a Payment Card</p>
-          <p className={this.state.isPay ? "":"hidden"}>Pay NANO to <a href={'https://nanocrawler.cc/explorer/account/' + this.state.address}>{this.state.address.slice(0,13) + '...' + this.state.address.slice(-8)}</a></p>
+          <p className={this.state.isPay ? "":"hidden"}>Pay NANO to <a href={'https://nanocrawler.cc/explorer/account/' + this.state.address}>{this.state.address.slice(0,13) + '...' + this.state.address.slice(-8)}</a> {this.state.recipient  != '' ? ('['+this.state.recipient+']'):''}</p>
 
           <ul className={this.state.isPay ? "hidden":""}>
             <li>Print QR or share the URL with anyone!</li>
@@ -313,12 +343,25 @@ class PaymentTool extends Component {
             </InputGroup.Append>
           </InputGroup>
 
+          <InputGroup size="sm" className={this.state.isPay ? "hidden":"mb-3"}>
+            <InputGroup.Prepend>
+              <InputGroup.Text id="recipient">
+                Optional Name
+              </InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl id="recipient" aria-describedby="recipient" value={this.state.recipient} title="Name of recipient to be displayed after the address" placeholder="Name of recipient to be displayed after the address" maxLength="30" onChange={this.handleRecipientChange} autoComplete="off"/>
+            <InputGroup.Append>
+              <Button variant="outline-secondary" className="fas fa-times-circle" value='recipient' onClick={this.clearText}></Button>
+              <Button variant="outline-secondary" className="fas fa-copy" value={this.state.recipient} onClick={helpers.copyText}></Button>
+            </InputGroup.Append>
+          </InputGroup>
+
           <InputGroup size="sm" className="mb-3">
             <Button className={this.state.isPay ? "hidden":"btn-medium"} variant="primary" onClick={this.sample}>Sample</Button>
             <Button className={this.state.isPay ? "btn-medium":"hidden"} variant="primary" value={this.state.address} onClick={helpers.copyText}>Copy Address</Button>
             <a className={this.state.isPay ? "btn-medium btn btn-primary":"hidden"} id="wallet-btn" href="https://tools.nanos.cc" role="button">Open in Wallet</a>
             <Button variant="primary" className={this.state.isPay ? "hidden":"btn-medium"} onClick={this.print}>Print QR</Button>
-            <Button variant="primary" className={this.state.isPay ? "hidden":"btn-medium"} value={'https://tools.nanos.cc/?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&message=' + this.state.message.split(' ').join('%20')} onClick={helpers.copyText}>Copy Link</Button>
+            <Button variant="primary" className={this.state.isPay ? "hidden":"btn-medium"} value={'https://tools.nanos.cc/?tool='+toolParam + '&address=' + this.state.address + '&amount=' + this.state.amount + '&recipient=' + this.state.recipient + '&message=' + this.state.message.split(' ').join('%20')} onClick={helpers.copyText}>Copy Link</Button>
             <Button className={this.state.isPay ? "btn-medium":"hidden"} variant="primary" onClick={this.clearAll}>Create New</Button>
           </InputGroup>
         </div>

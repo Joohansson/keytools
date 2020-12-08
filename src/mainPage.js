@@ -92,6 +92,7 @@ class MainPage extends Component {
         toolId = 4
         let address = helpers.getUrlParams().address
         let amount = helpers.getUrlParams().amount
+        let recipient = helpers.getUrlParams().recipient
         let message = helpers.getUrlParams().message
         if (typeof address !== 'undefined') {
           this.setState({
@@ -101,6 +102,11 @@ class MainPage extends Component {
         if (typeof amount !== 'undefined') {
           this.setState({
             amount: amount
+          })
+        }
+        if (typeof recipient !== 'undefined') {
+          this.setState({
+            recipient: recipient
           })
         }
         if (typeof message !== 'undefined') {
