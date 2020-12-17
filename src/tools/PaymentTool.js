@@ -292,7 +292,7 @@ class PaymentTool extends Component {
       <div>
         <div className="noprint">
           <p className={this.state.isPay ? "hidden":""}>Generate a Payment Card</p>
-          <p className={this.state.isPay ? "":"hidden"}>Pay NANO to <a href={'https://nanocrawler.cc/explorer/account/' + this.state.address}>{this.state.address.slice(0,13) + '...' + this.state.address.slice(-8)}</a> {this.state.recipient  != '' ? ('['+this.state.recipient+']'):''}</p>
+          <p className={this.state.isPay ? "":"hidden"}>Pay NANO to <a href={'https://nanocrawler.cc/explorer/account/' + this.state.address}>{this.state.address.slice(0,13) + '...' + this.state.address.slice(-8)}</a> {this.state.recipient  !== '' ? ('['+this.state.recipient+']'):''}</p>
 
           <ul className={this.state.isPay ? "hidden":""}>
             <li>Print QR or share the URL with anyone!</li>
