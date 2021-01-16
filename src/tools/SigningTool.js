@@ -282,8 +282,8 @@ class SigningTool extends Component {
     this.showNanoBalance = this.showNanoBalance.bind(this)
 
     // Tuning for webGL PoW performance. 512 is default load
-    this.webglWidth = 512
-    this.webglHeight = 1024
+    this.webglWidth = 2048
+    this.webglHeight = 2048
   }
 
   // Init component

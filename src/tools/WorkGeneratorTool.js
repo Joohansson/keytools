@@ -12,7 +12,7 @@ class WorkGeneratorTool extends Component {
   constructor(props) {
     super(props)
 
-    this.webGLPower = [256,512,1024,2048,4096,8192,16384]
+    this.webGLPower = [256,512,1024,2048,4096,8192,16384,32768,65536,131072]
     this.difficulties = [
       helpers.constants.WORK_THRESHOLD_ORIGINAL,
       helpers.constants.WORK_THRESHOLD_2X,
@@ -20,7 +20,7 @@ class WorkGeneratorTool extends Component {
       helpers.constants.WORK_THRESHOLD_8X
     ]
     this.webglWidth = this.webGLPower[3]
-    this.webglHeight = 256
+    this.webglHeight = 1024
 
     this.state = {
       workHash: '',
@@ -397,6 +397,18 @@ class WorkGeneratorTool extends Component {
           <div className="form-check form-check-inline index-checkbox">
             <input className="form-check-input" type="radio" id="load7" value="6" checked={this.state.selectedLoadOption === "6"} onChange={this.handleLoadOptionChange}/>
             <label className="form-check-label" htmlFor="load7">64</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="load8" value="7" checked={this.state.selectedLoadOption === "7"} onChange={this.handleLoadOptionChange}/>
+            <label className="form-check-label" htmlFor="load8">128</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="load9" value="8" checked={this.state.selectedLoadOption === "8"} onChange={this.handleLoadOptionChange}/>
+            <label className="form-check-label" htmlFor="load9">256</label>
+          </div>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="radio" id="load10" value="9" checked={this.state.selectedLoadOption === "9"} onChange={this.handleLoadOptionChange}/>
+            <label className="form-check-label" htmlFor="load10">512</label>
           </div>
         </InputGroup>
 
