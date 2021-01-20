@@ -76,6 +76,11 @@ a:hover, a:focus {
   margin-bottom: 4px;
 }
 
+.section-title {
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+
 .link-span:hover, .link-span:focus {
   color: #377ccc;
   text-decoration: underline;
@@ -240,6 +245,11 @@ a:hover, a:focus {
 .btn-active {
   background-color: #6C757D;
   color: #FFF;
+}
+
+/* Long width button */
+.btn-wide {
+  width: 240px;
 }
 
 /* Medium width button */

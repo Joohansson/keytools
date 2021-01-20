@@ -181,9 +181,21 @@ export function copyText(event) {
   }
 }
 
-// Copy output of textarea to clipboard, and preserve line breaks
 export function copyOutput() {
-  $('#output-area').select()
+  copyOutputText()
+}
+
+export function copyInput1() {
+  copyOutputText('#input-area')
+}
+
+export function copyInput2() {
+  copyOutputText('#input2-area')
+}
+
+// Copy output of textarea to clipboard, and preserve line breaks
+export function copyOutputText(id='#output-area') {
+  $(id).select()
   document.execCommand('copy')
 
   // clear selection
