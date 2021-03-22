@@ -101,7 +101,7 @@ a:hover, a:focus {
 
 
 .header-wrapper {
-  width: 820px;
+  width: 1000px;
   margin: 0 auto;
   padding: 0 0;
 }
@@ -121,7 +121,7 @@ a:hover, a:focus {
 }
 
 .content {
-  max-width: 820px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -277,6 +277,10 @@ a:hover, a:focus {
   width: 100px;
 }
 
+.wide-prepend, .input-group-text {
+  width: 160px;
+}
+
 /* Multiple input group on one row */
 .multi-group {
   margin-left: 20px;
@@ -359,6 +363,21 @@ a:hover, a:focus {
 /* INSPECTOR TOOL */
 .command-help {
   margin-bottom: 15px;
+}
+
+/* MUSTISIG */
+#output-edit {
+  font-size: 10px;
+  height: 32px;
+}
+
+#input2-area {
+  font-size: 10px;
+  white-space: pre-wrap;
+}
+
+.number-input {
+  width: 250px;
 }
 
 /* Visible content to activate if no javascript */

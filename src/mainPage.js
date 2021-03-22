@@ -374,15 +374,23 @@ class MainPage extends Component {
         // MultisigTool
         case 'multisig':
         toolId = 16
+        let m_hash = helpers.getUrlParams().hash
+        let m_participants = helpers.getUrlParams().parties
+        if (typeof m_hash !== 'undefined') {
+          this.setState({
+            hash: m_hash
+          })
+        }
+        if (typeof m_participants !== 'undefined') {
+          this.setState({
+            participants: m_participants
+          })
+        }
         break
 
         default:
-        toolId = 0
         break
       }
-    }
-    else {
-      toolId = 0
     }
 
     this.setState({
