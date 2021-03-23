@@ -626,6 +626,22 @@ class MultisigTool extends Component {
     }
   }
 
+  copyUrl() {
+    var dummy = document.createElement("input")
+    document.body.appendChild(dummy)
+    dummy.setAttribute('value', window.location.href)
+    dummy.select()
+    let success = document.execCommand("copy")
+    document.body.removeChild(dummy)
+
+    if (success) {
+      new MainPage().notifyCopy()
+    }
+    else {
+      new MainPage().notifyCopyFail()
+    }
+  }
+
   calculateAddressChecksum(pubkey) {
     const blake2b = new base32.Blake2b(5);
     base32.blake2bUpdate(blake2b, pubkey);
@@ -905,8 +921,8 @@ class MultisigTool extends Component {
         <ul>
           <li>Use 2 or more input accounts to get a multisig account</li>
           <li>The generated multisig account is the one you will use for transactions</li>
-          <li>Make sure the participant(s) own a private key for each input account before funding the multisig!</li>
-          <li>Each participant will use THEIR priv key and will only share safe output codes</li>
+          <li>Make sure each participant own a private key for their corresponding account before funding the multisig!</li>
+          <li>Each participant will use THEIR priv key and will only share safe data.</li>
           <li>If done correct, all participants will produce the same signature</li>
           <li>Works together with the Block Processor tool: Calculate a block hash => Publish block with the multi-signature</li>
         </ul>
@@ -991,7 +1007,8 @@ class MultisigTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button className="btn-wide" variant="primary" onClick={this.alertError(this.sign)} disabled={!this.state.validBlockHash || !this.state.validPrivKey || !this.state.validParticipants || this.state.isInvalidStage || (this.state.activeStep > 1 && !this.state.isInputAddDisabled)}>{this.state.activeStep !== 4 ? (this.state.activeStep === 1 ? 'Start Signing' : 'Step '+ (this.state.activeStep - 1) + '/3 | Next') : 'Final Step'}</Button>
+          <Button className="btn-wide" variant="primary" onClick={this.alertError(this.sign)} disabled={!this.state.validBlockHash || !this.state.validPrivKey || !this.state.validParticipants || this.state.isInvalidStage || (this.state.activeStep > 1 && !this.state.isInputAddDisabled)}>{this.state.activeStep !== 4 ? (this.state.activeStep === 1 ? 'Start Signing' : 'Step '+ (this.state.activeStep - 1) + '/3 | Next') : 'Step '+ (this.state.activeStep - 1) + '/3 | Final'}</Button>
+          <Button className="btn-wide" variant="primary" onClick={this.copyUrl} disabled={!this.state.validBlockHash || !this.state.validParticipants}>Share Signing URL</Button>
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3" hidden={this.state.activeStep < 2 || this.state.signature}>
