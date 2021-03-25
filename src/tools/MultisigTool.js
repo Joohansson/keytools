@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import * as nano from 'nanocurrency'
 import * as nano_old from 'nanocurrency174'
-import { InputGroup, FormControl, Button} from 'react-bootstrap'
+import { InputGroup, FormControl, Button } from 'react-bootstrap'
 import * as helpers from '../helpers'
 import MainPage from '../mainPage'
-import {toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import QrImageStyle from './components/qrImageStyle'
 import importedWasm from '../musig_nano.wasm.b64';
 import * as base32 from '../base32'
+import hermes from "hermes-channel";
+import { data } from 'jquery'
 const toolParam = 'multisig'
 
 class MultisigTool extends Component {
@@ -21,6 +23,8 @@ class MultisigTool extends Component {
     this.musigStagePtr = null
     this.musigStageNum = null
     this.savedPublicKeys = []
+    this.tabData = []
+    this.tabListenerActive = false
 
     this.state = {
       accountAdd: '',
@@ -50,6 +54,8 @@ class MultisigTool extends Component {
       inputAdd: '',
       validInputAdd: false,
       isInputAddDisabled: false,
+      tabMode: false,
+      tabChecked: false,
     }
 
     this.handleAccountAddChange = this.handleAccountAddChange.bind(this)
@@ -61,6 +67,7 @@ class MultisigTool extends Component {
     this.handleParticipantChange = this.handleParticipantChange.bind(this)
     this.handleInputAddChange = this.handleInputAddChange.bind(this)
     this.handleInputAddFinal = this.handleInputAddFinal.bind(this)
+    this.handleModeCheck = this.handleModeCheck.bind(this)
     this.sample1 = this.sample1.bind(this)
     this.sample2 = this.sample2.bind(this)
     this.updateQR = this.updateQR.bind(this)
@@ -72,6 +79,8 @@ class MultisigTool extends Component {
     this.addData = this.addData.bind(this)
     this.addAccount = this.addAccount.bind(this)
     this.alertError = this.alertError.bind(this)
+    this.runMultiTabs = this.runMultiTabs.bind(this)
+    this.startSign = this.startSign.bind(this)
   }
 
   // Init component
@@ -79,6 +88,7 @@ class MultisigTool extends Component {
     // Read URL params from parent and construct new quick path
     const hash = this.props.state.hash
     const participants = this.props.state.participants
+    const multi = this.props.state.multi
 
     if (hash) {
       this.blockHashChange(hash)
@@ -86,7 +96,10 @@ class MultisigTool extends Component {
     if (participants) {
       this.participantChange(participants)
     }
-    if (!hash && !participants) {
+    if (multi) {
+      this.modeCheck(multi === 'true' ? true : false)
+    }
+    if (!hash && !participants && !multi) {
       this.setParams()
     }
 
@@ -136,6 +149,82 @@ class MultisigTool extends Component {
       });
 
     await nano_old.init()
+
+    hermes.on('tab-ping', (data_) => {
+      console.log("Tab was pinged")
+      if (this.state.blockHash === data_[0]) {
+        // Init step for remote tab
+        this.remoteTabInit = true;
+        this.setState({
+          tabMode: true,
+          participants: parseInt(data_[2])
+        },
+        function() {
+          this.tabListener(false); // start in passive mode
+          this.alertError(this.sign)();
+        })
+      } else {
+        console.log("Non-matching block hash")
+        this.inputToast = toast("This tab has the wrong block hash", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      }
+    });
+
+    // Dual tab mode for auto signing
+    hermes.on('sign-remote', (data_) => {
+      console.log("Receiving data from other tab: " + data_);
+      if (!this.tabData.includes(data_[1])) {
+        this.tabData.push(data_[1])
+      }
+    });
+
+    // Multi-tab mode checkbox
+    hermes.on('multi-tab', (data_) => {
+      console.log("Multi-tab mode enabled");
+      this.setState({
+        tabChecked: data_
+      })
+    });
+
+    // Multi-tab mode participant changes
+    hermes.on('participants', (data_) => {
+      console.log("Participant count changed");
+      this.setState({
+        participants: data_
+      })
+    });
+
+    // Multi-tab mode hash changes
+    hermes.on('hash', (data_) => {
+      console.log("Block hash changed");
+      this.setState({
+        blockHash: data_
+      })
+    });
+  }
+
+  // Checking input tab data and act when enough data is available for the current active step
+  tabListener(activate = false) {
+    this.tabListenerActive = activate ? true : this.tabListenerActive;
+    if (this.tabListenerActive) {
+      let stepData = []
+      for (let data_ of this.tabData) {
+        if (data_.substring(0,1) === (this.state.activeStep - 1).toString()) {
+          stepData.push(data_)
+        }
+      }
+      // Enough data for this step
+      if (stepData.length >= this.state.participants - 1) {
+        this.tabListenerActive = false;
+        // Input the data and let the automation start
+        for (let data_ of stepData) {
+          this.inputAddChange(data_);
+        }
+      }
+    }
+
+    if (this.state.tabMode) {
+      setTimeout(() => {  this.tabListener(); }, 100);
+    }
   }
 
   resetAll() {
@@ -166,17 +255,23 @@ class MultisigTool extends Component {
       inputAdd: '',
       validInputAdd: false,
       isInputAddDisabled: false,
+      tabMode: false,
+      tabChecked: false,
     })
     this.numAddresses = 0
     this.inputToast = null //disallow duplicates
     this.musigStagePtr = null
     this.musigStageNum = null
     this.privateKeyPtr = null
+    this.savedPublicKeys = [];
+    this.tabData = [];
+    this.tabListenerActive = false;
+    this.remoteTabInit = false;
   }
 
   // Defines the url params
   setParams() {
-    helpers.setURLParams('?tool='+toolParam + '&parties='+this.state.participants + '&hash='+this.state.blockHash)
+    helpers.setURLParams('?tool='+toolParam + '&parties='+this.state.participants + '&multi='+this.state.tabChecked + '&hash='+this.state.blockHash)
   }
 
   //Clear text from input field
@@ -210,7 +305,8 @@ class MultisigTool extends Component {
       case 'input':
         this.setState({
           input: '',
-          validAccounts: false
+          validAccounts: false,
+          multisigAccount: '',
         })
         break
 
@@ -243,6 +339,43 @@ class MultisigTool extends Component {
 
       default:
         break
+    }
+  }
+
+  // Start signing procedure using multiple tabs
+  runMultiTabs() {
+    console.log('Starting automatic tab signing');
+    // Ping other tabs and make sure enough of them respond and with correct hash
+    this.tabCount = 1;
+    hermes.on('tab-pong', (data_) => {
+      console.log("Tab " + this.tabCount + " responded");
+      if (this.state.blockHash === data_[0]) {
+        this.tabCount++;
+        if (this.tabCount === this.state.participants) {
+          hermes.off('tab-pong'); // unsubscribe
+          // Start the process
+          console.log('Starting step 1 from local tab');
+          this.tabListener(false); // start in passive mode to wait for signing process
+          // Init step
+          this.alertError(this.sign)();
+        }
+      }
+    });
+    this.setState({
+      tabMode: true,
+    },
+    function() {
+      console.log("Send ping to other tabs");
+      hermes.send('tab-ping', [this.state.blockHash, '', this.state.participants]);
+    })
+    // Set a timeout
+    setTimeout(() => {  this.checkTabs(); }, 2000);
+  }
+
+  checkTabs() {
+    if (this.tabCount < this.state.participants) {
+      hermes.off('tab-pong'); // unsubscribe
+      this.inputToast = toast("Make sure you have enough tabs running with the same block hash", helpers.getToast(helpers.toastType.ERROR_AUTO_LONG))
     }
   }
 
@@ -321,7 +454,7 @@ class MultisigTool extends Component {
       blockHash: '42C93CAAF366FCABAE5DEC4EAFF33029AA96D466E78B0A99E53CBF7F0C7D1E2E',
       privKey: '956ED66BCAB32EC6BB155FA1E5289860118B0DE656105CE8BDDE168E5E67BFB3',
       validBlockHash: true,
-      validPrivKey: true
+      validPrivKey: true,
     },
     function() {
       this.setParams()
@@ -337,6 +470,24 @@ class MultisigTool extends Component {
       validPrivKey: true
     },
     function() {
+      this.setParams()
+    })
+  }
+
+  handleModeCheck(event) {
+    this.modeCheck(event.target.checked)
+  }
+
+  modeCheck(checked) {
+    this.setState({
+      tabChecked: checked
+    },
+    function() {
+      hermes.send('multi-tab', this.state.tabChecked);
+      if (this.state.tabChecked) {
+        hermes.send('participants', this.state.participants);
+        hermes.send('hash', this.state.blockHash);
+      }
       this.setParams()
     })
   }
@@ -454,6 +605,9 @@ class MultisigTool extends Component {
     function() {
       this.updateQR()
       this.setParams()
+      if (this.state.tabChecked) {
+        hermes.send('hash', this.state.blockHash);
+      }
     })
   }
 
@@ -500,7 +654,7 @@ class MultisigTool extends Component {
     }
 
     this.setState({
-      participants: index
+      participants: parseInt(index)
     })
 
     if (!helpers.isNumeric(index)) {
@@ -513,15 +667,23 @@ class MultisigTool extends Component {
       return
     }
     this.setState({
-      validParticipants: true
+      validParticipants: true,
+      participants: parseInt(index)
     },
     function() {
       this.setParams()
+      if (this.state.tabChecked) {
+        hermes.send('participants', this.state.participants);
+      }
     })
   }
 
   handleInputAddChange(event) {
-    const hashString = event.target.value
+    this.inputAddChange(event.target.value);
+    
+  }
+
+  inputAddChange(hashString) {
     const hashFull = hashString.substring(2)
     let valid = true
     if (hashFull.length === 64) {
@@ -549,10 +711,11 @@ class MultisigTool extends Component {
         validInputAdd: false,
       },
       function() {
-        this.updateQR()
+        this.updateQR();
       })
       if (hashString !== '') {
         if (!correctStep) {
+          console.log("Wrong input for this step. Expected step " + (this.state.activeStep - 1))
           this.inputToast = toast("Wrong input for this step. Expected step " + (this.state.activeStep - 1), helpers.getToast(helpers.toastType.ERROR_AUTO))
         }
         else {
@@ -567,7 +730,10 @@ class MultisigTool extends Component {
     },
     function() {
       this.updateQR()
-      this.setParams()
+      // Automatic tab mode is running, go ahead with the next step
+      if (this.state.tabMode) {
+        this.addData();
+      }
     })
   }
 
@@ -617,6 +783,13 @@ class MultisigTool extends Component {
         if (this.state.savedParticipants === this.state.participants - 1) {
           this.setState({
             isInputAddDisabled: true,
+          },
+          function() {
+            // Automatic tab mode is running, go ahead with the next step
+            if (this.state.tabMode) {
+              this.tabListenerActive = false; // pause processing input data
+              this.alertError(this.sign)();
+            }
           })
         }
       })
@@ -775,6 +948,14 @@ class MultisigTool extends Component {
     return aggPubkey;
   }
 
+  startSign() {
+    if (this.state.tabChecked) {
+      this.runMultiTabs();
+    } else {
+      this.alertError(this.sign)();
+    }
+  }
+
   sign() {
     // Stage 0 (init)
     if (!this.musigStagePtr) {
@@ -818,9 +999,24 @@ class MultisigTool extends Component {
         input: input,
         accountAdd: '',
         multisigAccount: '',
+      },
+      function() {
+        this.wasm.musig_free(outPtr);
+        // If using dual tabs, send back the result
+        if (this.state.tabMode) {
+          if (this.remoteTabInit) {
+            this.remoteTabInit = false;
+            console.log("Responding with pong");
+            this.tabListenerActive = true; // resume processing input data
+            hermes.send('tab-pong', [this.state.blockHash, this.state.output]);
+            hermes.send('sign-remote', [this.state.blockHash, this.state.output]);
+          } else {
+            console.log("Sending signing data");
+            this.tabListenerActive = true; // resume processing input data
+            hermes.send('sign-remote', [this.state.blockHash, this.state.output]);
+          }
+        }
       })
-
-      this.wasm.musig_free(outPtr);
 
       // Further steps
     } else {
@@ -834,9 +1030,11 @@ class MultisigTool extends Component {
       let privateKeyPtr
       if (this.musigStageNum === 0) {
           privateKeyPtr = this.copyToWasm(this.fromHexString(this.state.privKey));
+          /**
           this.setState({
             privKey: this.state.privKey.slice(0, 2) + "*".repeat(60) + this.state.privKey.slice(62)
           })
+          */
       }
 
       const outLen = (this.musigStageNum === 2) ? 65 : 33;
@@ -859,9 +1057,6 @@ class MultisigTool extends Component {
           const flags = 0; // Set to 1 if private key is a raw/expanded scalar (unusual)
           newStagePtr = this.wasm.musig_stage1(this.musigStagePtr, privateKeyPtr, pubkeys, pubkeysLen, flags, blockhashPtr, blockhash.length, protocolInputPtrs, protocolInputs.length, outPtr, null, outPtr + 1);
         });
-        /**
-        newStagePtr = this.wasm.musig_stage1(this.musigStagePtr, this.privateKeyPtr, pubkeyPtrs, pubkeys.length, flags, blockhashPtr, blockhash.length, protocolInputPtrs, protocolInputs.length, outPtr, outPtr + 1, outPtr + 33);
-        */
         this.musigStageNum = 0;
         this.wasm.musig_free(privateKeyPtr);
         this.wasm.musig_free(blockhashPtr);
@@ -896,8 +1091,10 @@ class MultisigTool extends Component {
             signature: this.toHexString(outBuf.subarray(1)),
             input2: '',
             output: '',
+            tabMode: false
           })
           toast("Multi-Signature Finished!", helpers.getToast(helpers.toastType.SUCCESS));
+          this.tabListenerActive = false;
       }
       else {
         this.setState({
@@ -908,6 +1105,13 @@ class MultisigTool extends Component {
           savedParticipants: 0,
           inputAdd: '',
           validInputAdd: false,
+        },
+        function() {
+          // If using dual tabs, send back the result
+          if (this.state.tabMode) {
+            this.tabListenerActive = true; // resume processing input data
+            hermes.send('sign-remote', [this.state.blockHash, this.state.output]);
+          }
         })
       }
       this.wasm.musig_free(outPtr);
@@ -919,12 +1123,12 @@ class MultisigTool extends Component {
       <div>
         <p>Generate a Multisig Account or Sign using Multiple Participants</p>
         <ul>
-          <li>Use 2 or more input accounts to get a multisig account</li>
+          <li>Use 2 or more participating accounts to get a <a href="https://github.com/PlasmaPower/musig-nano">multisig account</a></li>
           <li>The generated multisig account is the one you will use for transactions</li>
           <li>Make sure each participant own a private key for their corresponding account before funding the multisig!</li>
           <li>Each participant will use THEIR priv key and will only share safe data.</li>
-          <li>If done correct, all participants will produce the same signature</li>
-          <li>Works together with the Block Processor tool: Calculate a block hash => Publish block with the multi-signature</li>
+          <li>Works together with the <a href="/?tool=sign">Block Processor tool</a>: Calculate a block hash | Publish block with the multi-signature</li>
+          <li>Check out the <a href="https://medium.com/@nanojson/how-to-use-nano-multisig-33c8865ef8b1">Description and User guide</a> or <a href="">Video Demo</a></li>
         </ul>
 
         <InputGroup size="sm" className='mb-3'>
@@ -1007,7 +1211,14 @@ class MultisigTool extends Component {
         </InputGroup>
 
         <InputGroup size="sm" className="mb-3">
-          <Button className="btn-wide" variant="primary" onClick={this.alertError(this.sign)} disabled={!this.state.validBlockHash || !this.state.validPrivKey || !this.state.validParticipants || this.state.isInvalidStage || (this.state.activeStep > 1 && !this.state.isInputAddDisabled)}>{this.state.activeStep !== 4 ? (this.state.activeStep === 1 ? 'Start Signing' : 'Step '+ (this.state.activeStep - 1) + '/3 | Next') : 'Step '+ (this.state.activeStep - 1) + '/3 | Final'}</Button>
+          <div className="form-check form-check-inline index-checkbox">
+            <input className="form-check-input" type="checkbox" id="method-check" value="method" title="" checked={this.state.tabChecked} onChange={this.handleModeCheck}/>
+            <label className="form-check-label" htmlFor="method-check">Multi-Tab Mode</label>
+          </div>
+        </InputGroup>
+        <div className="section-title" hidden={!this.state.tabChecked}>Automatic signing if you open multiple tabs with the same hash but different private keys</div>
+        <InputGroup size="sm" className="mb-3">
+          <Button className="btn-wide" variant="primary" onClick={this.startSign} disabled={!this.state.validBlockHash || !this.state.validPrivKey || !this.state.validParticipants || this.state.isInvalidStage || (this.state.activeStep > 1 && !this.state.isInputAddDisabled)}>{this.state.activeStep !== 4 ? (this.state.activeStep === 1 ? 'Start Signing' : 'Step '+ (this.state.activeStep - 1) + '/3 | Next') : 'Step '+ (this.state.activeStep - 1) + '/3 | Final'}</Button>
           <Button className="btn-wide" variant="primary" onClick={this.copyUrl} disabled={!this.state.validBlockHash || !this.state.validParticipants}>Share Signing URL</Button>
         </InputGroup>
 
@@ -1069,7 +1280,7 @@ class MultisigTool extends Component {
         </InputGroup>
 
         <div className="line noprint"></div>
-        <div className="section-title">You can test the process using two tabs, one with Sample 1 and the other with Sample 2</div>
+        <div className="section-title">For testing, use one tab with Sample 1 and another tab with Sample 2 (Multi-tab Mode for automatic signing)</div>
 
         <InputGroup size="sm" className="mb-3">
           <Button className="btn-wide" variant="primary" onClick={this.sample1}>Sample 1</Button>

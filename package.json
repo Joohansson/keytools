@@ -69,6 +69,7 @@
     "fibers": "^4.0.3",
     "file-saver": "^2.0.5",
     "glamor": "^2.20.40",
+    "hermes-channel": "0.0.6",
     "hsimp-named-number": "^0.1.3",
     "jquery": "^3.5.1",
     "js-base64": "^2.6.4",

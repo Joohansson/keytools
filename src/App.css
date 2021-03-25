@@ -21,7 +21,7 @@ body {
   /*text-align: center;*/
   color: #EEE;
   font-size: calc(10px + 0.5vmin);
-  line-height: calc(10px + 1.2vmin);
+  line-height: calc(10px + 1.1vmin);
   font-family: 'NotoSans Regular', Fallback, sans-serif;
   height: 100%;
   max-height: 100%;
@@ -101,7 +101,7 @@ a:hover, a:focus {
 
 
 .header-wrapper {
-  width: 1000px;
+  width: 1050px;
   margin: 0 auto;
   padding: 0 0;
 }
@@ -121,7 +121,7 @@ a:hover, a:focus {
 }
 
 .content {
-  max-width: 1000px;
+  max-width: 1050px;
   margin: 0 auto;
 }
 

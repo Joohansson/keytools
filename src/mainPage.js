@@ -376,6 +376,7 @@ class MainPage extends Component {
         toolId = 16
         let m_hash = helpers.getUrlParams().hash
         let m_participants = helpers.getUrlParams().parties
+        let m_multi = helpers.getUrlParams().multi
         if (typeof m_hash !== 'undefined') {
           this.setState({
             hash: m_hash
@@ -384,6 +385,11 @@ class MainPage extends Component {
         if (typeof m_participants !== 'undefined') {
           this.setState({
             participants: m_participants
+          })
+        }
+        if (typeof m_multi !== 'undefined') {
+          this.setState({
+            multi: m_multi
           })
         }
         break
