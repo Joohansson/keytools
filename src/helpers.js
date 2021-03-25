@@ -195,8 +195,15 @@ export function copyInput2() {
 
 // Copy output of textarea to clipboard, and preserve line breaks
 export function copyOutputText(id='#output-area') {
-  $(id).select()
+  const disabledProp = $(id).prop("disabled")
+  if (disabledProp) {
+    $(id).prop("disabled", false);
+  }
+  $(id).trigger('select')
   document.execCommand('copy')
+  if (disabledProp) {
+    $(id).prop("disabled", true)
+  }
 
   // clear selection
   if (window.getSelection) {window.getSelection().removeAllRanges();}
