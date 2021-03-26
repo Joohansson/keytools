@@ -1127,7 +1127,8 @@ class MultisigTool extends Component {
         <ul>
           <li>Use 2 or more participating accounts to get a <a href="https://github.com/PlasmaPower/musig-nano">multisig account</a></li>
           <li>The generated multisig account is the one you will use for transactions</li>
-          <li>Make sure each participant own a private key for their corresponding account before funding the multisig!</li>
+          <li>Make sure EACH participant own a private key for their corresponding account before funding the multisig!</li>
+          <li>This is NOT (yet) an M-N multisig which means 100% of the keys must exist</li>
           <li>Each participant will use THEIR priv key and will only share safe data.</li>
           <li>Works together with the <a href="/?tool=sign">Block Processor tool</a>: Calculate a block hash | Publish block with the multi-signature</li>
           <li>Check out the <a href="https://medium.com/@nanojson/how-to-use-nano-multisig-33c8865ef8b1">Description and User guide</a> or <a href="https://youtu.be/2pO0QZLaBF8">Video Demo</a></li>
