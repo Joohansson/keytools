@@ -98,7 +98,7 @@ class PaperWalletTool extends Component {
   /* Download card */
   download(event) {
     var imageWidth = 600
-    var imageHeight = 310
+    var imageHeight = 360
     var node =  null
 
     node = this.refs.QRContainerPaperInner

@@ -13,7 +13,7 @@ class DifficultyTool extends Component {
     this.inputToast = null //disallow duplicates
 
     this.state = {
-      baseDifficulty: 'ffffffc000000000',
+      baseDifficulty: 'fffffff800000000',
       newDifficulty: '',
       multiplier: '',
       validBase: true,
@@ -262,8 +262,8 @@ class DifficultyTool extends Component {
       <div>
         <p>Convert PoW difficulty threshold OR multiplier from the Base</p>
         <ul>
-          <li>The default base threshold is ffffffc000000000</li>
-          <li>Since node v21 send/change blocks are using 8x multiplier and receive blocks 0.125x</li>
+          <li>The default base threshold is fffffff800000000 since node v21</li>
+          <li>Send/change blocks are using 1x multiplier and receive blocks 1/64x or 0.0625</li>
           <li>More info about how this is calculated <a href="https://docs.nano.org/integration-guides/the-basics/#difficulty-multiplier">HERE</a></li>
         </ul>
 
@@ -299,11 +299,11 @@ class DifficultyTool extends Component {
               Multiplier
             </InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.multiplier} title="Difficulty multiplier. Positive Natural or Decimal number" maxLength="50" placeholder="Positive natural or decimal number such as 2 or 13.5" onChange={this.handleMultiplierChange} autoComplete="off"/>
+          <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.multiplier} title="Difficulty multiplier. Positive Natural or Decimal number" maxLength="50" placeholder="Positive natural or decimal number such as 2, 13.5 or 64" onChange={this.handleMultiplierChange} autoComplete="off"/>
           <InputGroup.Append>
           <Button variant="outline-secondary" className="fas fa-times-circle" value='multiplier' onClick={this.clearText}></Button>
           <Button variant="outline-secondary" className="fas fa-copy" value={this.state.multiplier} onClick={helpers.copyText}></Button>
-          <Button variant="outline-secondary" disabled={!this.state.validMultiplier} title="8 will become 1/8 = 0.125" onClick={this.invertMultiplier}>1/x</Button>
+          <Button variant="outline-secondary" disabled={!this.state.validMultiplier} title="64 will become 1/64 = 0.015625" onClick={this.invertMultiplier}>1/x</Button>
           </InputGroup.Append>
         </InputGroup>
 

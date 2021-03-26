@@ -34,7 +34,7 @@ class Terms extends Component {
         <h4>IP BLOCK</h4>
         <ul>
           <li>KeyTools have the right to slow down or block access to RPC node server if any malicious or unreasonable high amount of requests are done.</li>
-          <li>The IP number of the device target for such blockage is stored in server RAM during that period solely for that purpose and nothing else.</li>
+          <li>The IP number of the client is temporary stored for this purpose as a pure access log and nothing else.</li>
         </ul>
       </div>
     )
