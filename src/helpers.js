@@ -182,10 +182,29 @@ export function copyText(event) {
   }
 }
 
-// Copy output of textarea to clipboard, and preserve line breaks
 export function copyOutput() {
-  $('#output-area').select()
+  copyOutputText()
+}
+
+export function copyInput1() {
+  copyOutputText('#input-area')
+}
+
+export function copyInput2() {
+  copyOutputText('#input2-area')
+}
+
+// Copy output of textarea to clipboard, and preserve line breaks
+export function copyOutputText(id='#output-area') {
+  const disabledProp = $(id).prop("disabled")
+  if (disabledProp) {
+    $(id).prop("disabled", false);
+  }
+  $(id).trigger('select')
   document.execCommand('copy')
+  if (disabledProp) {
+    $(id).prop("disabled", true)
+  }
 
   // clear selection
   if (window.getSelection) {window.getSelection().removeAllRanges();}

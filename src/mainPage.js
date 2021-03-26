@@ -9,8 +9,8 @@ import donation from './img/donation.png';
 import Hotkeys from 'react-hot-keys'
 import packageJson from '../package.json';
 import { Start, Terms, ConvertTool, SeedTool, FindAddressTool, KeyGeneratorTool, AddressExtractorTool, PaperWalletTool, PaymentTool,
-  SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool, SweepTool, DifficultyTool} from './tools'
-const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG", "SWEEP", "DIFF"]
+  SigningTool, WorkGeneratorTool, VanityTool, InspectTool, QRTool, MessengerTool, SweepTool, DifficultyTool, MultisigTool} from './tools'
+const tools = ['HOME', 'CONVERT', 'SEED', 'PAPER', 'PAY', 'KEYGEN', 'EXTRACT', 'FINDADDR', 'SIGN', 'POW', 'VANITY', 'INSPECTOR', 'QR', "MSG", "SWEEP", "DIFF", "MULTISIG"]
 global.appVersion = packageJson.version;
 
 class MainPage extends Component {
@@ -18,7 +18,7 @@ class MainPage extends Component {
     super(props)
     this.tools = ['0: HOME', '1: Unit Converter', '2: Key Converter', '3: Paper Wallet Generator ', '4: Payment Card', '5: Mass Wallet Generator',
     '6: Mass Keypair Extractor', '7: Find Address in Seed', '8: Block Processor', '9: PoW Generator',
-    '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger', '14: Wallet Sweeper', '15: PoW Threshold Converter']
+    '10: Vanity Address Generator', '11: Network Inspector', '12: QR Generator / Reader', '13: Offline Audio Messenger', '14: Wallet Sweeper', '15: PoW Threshold Converter', '16: Multi-Signature']
     this.state = {
       activeTool: this.tools[0],
       activeToolId: 0,
@@ -371,13 +371,32 @@ class MainPage extends Component {
         }
         break
 
+        // MultisigTool
+        case 'multisig':
+        toolId = 16
+        let m_hash = helpers.getUrlParams().hash
+        let m_participants = helpers.getUrlParams().parties
+        let m_multi = helpers.getUrlParams().multi
+        if (typeof m_hash !== 'undefined') {
+          this.setState({
+            hash: m_hash
+          })
+        }
+        if (typeof m_participants !== 'undefined') {
+          this.setState({
+            participants: m_participants
+          })
+        }
+        if (typeof m_multi !== 'undefined') {
+          this.setState({
+            multi: m_multi
+          })
+        }
+        break
+
         default:
-        toolId = 0
         break
       }
-    }
-    else {
-      toolId = 0
     }
 
     this.setState({
@@ -513,6 +532,10 @@ class MainPage extends Component {
 
       case 'ctrl+shift+alt+5':
       this.selectTool(15)
+      break
+
+      case 'ctrl+shift+alt+6':
+      this.selectTool(16)
       break
 
       default:
@@ -783,6 +806,7 @@ class MainPage extends Component {
             {(active === 'MSG') && <MessengerTool {...this} /> }
             {(active === 'SWEEP') && <SweepTool {...this} /> }
             {(active === 'DIFF') && <DifficultyTool {...this} /> }
+            {(active === 'MULTISIG') && <MultisigTool {...this} /> }
           </div>
         </div>
 

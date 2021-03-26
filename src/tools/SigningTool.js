@@ -1963,6 +1963,7 @@ class SigningTool extends Component {
         </InputGroup>
 
         <div className={this.state.selectedOption === "4" ? 'hidden':'input-title'}>SIGN WITH PRIVATE KEY OR SIGNATURE AND PROVIDE PROOF OF WORK</div>
+        <a className="btn-medium" variant="primary" hidden={!this.state.blockHash} href={window.location.href.split('/').slice(0, 3).join('/') + "/?tool=multisig&parties=2&hash=" + this.state.blockHash} target="_blank">Optional: Create Multi-Signature from the Block Hash</a>
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
             <InputGroup.Text id="privKey">
