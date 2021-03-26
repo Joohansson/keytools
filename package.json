@@ -1,6 +1,6 @@
 {
   "name": "keytools",
-  "version": "1.1.5",
+  "version": "1.2.1",
   "private": true,
   "homepage": ".",
   "license": "MIT",
@@ -82,7 +82,7 @@
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
-    "react-clear-cache": "^1.4.11",
+    "react-clear-cache": "^1.4.12",
     "react-confirm-alert": "^2.6.2",
     "react-dom": "^17.0.1",
     "react-hot-keys": "^2.6.0",

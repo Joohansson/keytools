@@ -12,6 +12,8 @@ import hermes from "hermes-channel";
 import { data } from 'jquery'
 const toolParam = 'multisig'
 
+//** The multisig wasm library can be validated by running build-or-validate_musig_wasm.sh */
+
 class MultisigTool extends Component {
   constructor(props) {
     super(props)
@@ -1093,7 +1095,7 @@ class MultisigTool extends Component {
             output: '',
             tabMode: false
           })
-          toast("Multi-Signature Finished!", helpers.getToast(helpers.toastType.SUCCESS));
+          toast("Multi-Signature Finished!", helpers.getToast(helpers.toastType.SUCCESS_AUTO));
           this.tabListenerActive = false;
       }
       else {
@@ -1128,7 +1130,7 @@ class MultisigTool extends Component {
           <li>Make sure each participant own a private key for their corresponding account before funding the multisig!</li>
           <li>Each participant will use THEIR priv key and will only share safe data.</li>
           <li>Works together with the <a href="/?tool=sign">Block Processor tool</a>: Calculate a block hash | Publish block with the multi-signature</li>
-          <li>Check out the <a href="https://medium.com/@nanojson/how-to-use-nano-multisig-33c8865ef8b1">Description and User guide</a> or <a href="">Video Demo</a></li>
+          <li>Check out the <a href="https://medium.com/@nanojson/how-to-use-nano-multisig-33c8865ef8b1">Description and User guide</a> or <a href="https://youtu.be/2pO0QZLaBF8">Video Demo</a></li>
         </ul>
 
         <InputGroup size="sm" className='mb-3'>
