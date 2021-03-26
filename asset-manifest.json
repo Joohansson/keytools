@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "./static/css/main.d37b3a90.chunk.css",
-    "main.js": "./static/js/main.487193db.chunk.js",
-    "main.js.map": "./static/js/main.487193db.chunk.js.map",
+    "main.css": "./static/css/main.4069ab6c.chunk.css",
+    "main.js": "./static/js/main.79ae509f.chunk.js",
+    "main.js.map": "./static/js/main.79ae509f.chunk.js.map",
     "runtime-main.js": "./static/js/runtime-main.099b4fd6.js",
     "runtime-main.js.map": "./static/js/runtime-main.099b4fd6.js.map",
     "static/css/2.8da14603.chunk.css": "./static/css/2.8da14603.chunk.css",
@@ -15,24 +15,24 @@
     "2292a1fbdc43654a7350.worker.js.LICENSE.txt": "./2292a1fbdc43654a7350.worker.js.LICENSE.txt",
     "2292a1fbdc43654a7350.worker.js.map": "./2292a1fbdc43654a7350.worker.js.map",
     "index.html": "./index.html",
-    "precache-manifest.e7cd30f4e08e02ff105c13fc18f6303b.js": "./precache-manifest.e7cd30f4e08e02ff105c13fc18f6303b.js",
+    "precache-manifest.11f6cf54e9aca3eafebeaf0e1a47b8d0.js": "./precache-manifest.11f6cf54e9aca3eafebeaf0e1a47b8d0.js",
     "service-worker.js": "./service-worker.js",
     "static/css/2.8da14603.chunk.css.map": "./static/css/2.8da14603.chunk.css.map",
-    "static/css/main.d37b3a90.chunk.css.map": "./static/css/main.d37b3a90.chunk.css.map",
+    "static/css/main.4069ab6c.chunk.css.map": "./static/css/main.4069ab6c.chunk.css.map",
     "static/js/2.34f49ff1.chunk.js.LICENSE.txt": "./static/js/2.34f49ff1.chunk.js.LICENSE.txt",
-    "static/js/main.487193db.chunk.js.LICENSE.txt": "./static/js/main.487193db.chunk.js.LICENSE.txt",
+    "static/js/main.79ae509f.chunk.js.LICENSE.txt": "./static/js/main.79ae509f.chunk.js.LICENSE.txt",
     "static/media/App.css": "./static/media/modal-bg.0ae84ba6.png",
     "static/media/donation.png": "./static/media/donation.b97f0e19.png",
     "static/media/all.min.css": "./static/media/fa-solid-900.8e1ed89b.woff2",
     "static/media/logo.png": "./static/media/logo.fafb30c0.png",
-    "static/media/musig_nano.wasm.b64": "./static/media/musig_nano.wasm.dc45e341.b64",
+    "static/media/musig_nano.wasm.b64": "./static/media/musig_nano.wasm.2b1bfbe8.b64",
     "static/media/nano.ab6ebbf4.svg": "./static/media/nano.ab6ebbf4.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.099b4fd6.js",
     "static/css/2.8da14603.chunk.css",
     "static/js/2.34f49ff1.chunk.js",
-    "static/css/main.d37b3a90.chunk.css",
-    "static/js/main.487193db.chunk.js"
+    "static/css/main.4069ab6c.chunk.css",
+    "static/js/main.79ae509f.chunk.js"
   ]
 }
