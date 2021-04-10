@@ -9,7 +9,6 @@ import QrImageStyle from './components/qrImageStyle'
 import importedWasm from '../musig_nano.wasm.b64';
 import * as base32 from '../base32'
 import hermes from "hermes-channel";
-import { data } from 'jquery'
 const toolParam = 'multisig'
 
 //** The multisig wasm library can be validated by running build-or-validate_musig_wasm.sh */
