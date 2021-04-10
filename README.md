@@ -59,6 +59,7 @@ Your app is ready to be deployed!
 * [Fancy QR generation - jsQR](https://github.com/cozmo/jsQR)
 * [Auditable high-security cryptographic library - Tweetnacl](https://tweetnacl.js.org/)
 * [Messaging over sound - Chirp](https://developers.chirp.io/)
+* [Musig - Multisig library](https://github.com/PlasmaPower/musig-nano)
 
 ## Inspiration Hall of Fame
 
