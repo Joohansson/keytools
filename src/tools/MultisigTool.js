@@ -158,6 +158,7 @@ class MultisigTool extends Component {
         this.remoteTabInit = true;
         this.setState({
           tabMode: true,
+          tabChecked: true,
           participants: parseInt(data_[2])
         },
         function() {
@@ -183,6 +184,9 @@ class MultisigTool extends Component {
       console.log("Multi-tab mode enabled");
       this.setState({
         tabChecked: data_
+      },
+      function() {
+        this.setParams()
       })
     });
 
@@ -263,7 +267,6 @@ class MultisigTool extends Component {
     this.inputToast = null //disallow duplicates
     this.musigStagePtr = null
     this.musigStageNum = null
-    this.privateKeyPtr = null
     this.savedPublicKeys = [];
     this.tabData = [];
     this.tabListenerActive = false;
@@ -749,6 +752,10 @@ class MultisigTool extends Component {
   }
 
   addData() {
+    if (!this.state.validInputAdd) {
+      this.inputToast = toast("Data not in valid format", helpers.getToast(helpers.toastType.ERROR_AUTO))
+      return
+    }
     if (this.state.output.includes(this.state.inputAdd.substring(2))) {
       this.inputToast = toast("Don't add your own output", helpers.getToast(helpers.toastType.ERROR_AUTO))
       return
@@ -760,44 +767,39 @@ class MultisigTool extends Component {
     if (this.state.savedParticipants >= this.state.participants) {
       this.inputToast = toast("You have all data needed", helpers.getToast(helpers.toastType.ERROR_AUTO))
     }
-    else if (this.state.validInputAdd) {
-      // Derive address and add to stored list (not used but nice feedback for the user)
-      if (this.state.activeStep === 2) {
-        this.setState({
-          input: this.state.input + nano.deriveAddress(this.state.inputAdd.substring(66), {useNanoPrefix: true}) + '\n'
-        },
-        function() {
-          // Don't calculate multisig account until all participant data has been entered
-          if (this.state.savedParticipants === this.state.participants - 1) {
-            this.alertError(this.aggregate)()
-          }
-        })
-      }
-
+    // Derive address and add to stored list (not used but nice feedback for the user)
+    if (this.state.activeStep === 2) {
       this.setState({
-        input2: this.state.input2 + this.state.inputAdd.substring(2) + '\n',
-        savedParticipants: this.state.savedParticipants + 1,
-        inputAdd: '',
-        validInputAdd: false,
+        input: this.state.input + nano.deriveAddress(this.state.inputAdd.substring(66), {useNanoPrefix: true}) + '\n'
       },
       function() {
+        // Don't calculate multisig account until all participant data has been entered
         if (this.state.savedParticipants === this.state.participants - 1) {
-          this.setState({
-            isInputAddDisabled: true,
-          },
-          function() {
-            // Automatic tab mode is running, go ahead with the next step
-            if (this.state.tabMode) {
-              this.tabListenerActive = false; // pause processing input data
-              this.alertError(this.sign)();
-            }
-          })
+          this.alertError(this.aggregate)()
         }
       })
     }
-    else {
-      this.inputToast = toast("Data not in valid format", helpers.getToast(helpers.toastType.ERROR_AUTO))
-    }
+
+    this.setState({
+      input2: this.state.input2 + this.state.inputAdd.substring(2) + '\n',
+      savedParticipants: this.state.savedParticipants + 1,
+      inputAdd: '',
+      validInputAdd: false,
+    },
+    function() {
+      if (this.state.savedParticipants === this.state.participants - 1) {
+        this.setState({
+          isInputAddDisabled: true,
+        },
+        function() {
+          // Automatic tab mode is running, go ahead with the next step
+          if (this.state.tabMode) {
+            this.tabListenerActive = false; // pause processing input data
+            this.alertError(this.sign)();
+          }
+        })
+      }
+    })
   }
 
   copyUrl() {
