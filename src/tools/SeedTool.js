@@ -42,7 +42,6 @@ class SeedTool extends Component {
     this.updateQR = this.updateQR.bind(this)
     this.generateSeed = this.generateSeed.bind(this)
     this.generatePriv = this.generatePriv.bind(this)
-    this.generatePub = this.generatePub.bind(this)
     this.setMax = this.setMax.bind(this)
     this.clearText = this.clearText.bind(this)
     this.double = this.double.bind(this)
@@ -552,12 +551,6 @@ class SeedTool extends Component {
     this.privChange(key.toUpperCase())
   }
 
-  // Generate a new demo account
-  generatePub() {
-    let key = helpers.genSecureKey()
-    this.pubChange(key.toUpperCase())
-  }
-
   render() {
     return (
       <div>
@@ -678,11 +671,10 @@ class SeedTool extends Component {
           </InputGroup.Append>
         </InputGroup>
 
-        <p>Generate secure random keypairs or demo addresses</p>
+        <p>Generate secure random keypairs</p>
         <InputGroup className="mb-3">
           <Button variant="primary" onClick={this.generateSeed} className="btn-medium">Mnemonic</Button>
           <Button variant="primary" onClick={this.generatePriv} className="btn-medium">Private Key</Button>
-          <Button variant="primary" onClick={this.generatePub} className="btn-medium">Address</Button>
         </InputGroup>
 
         <div className={ this.state.qrHidden ? "hidden" : ""}>
