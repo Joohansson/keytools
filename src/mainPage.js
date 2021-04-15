@@ -678,7 +678,7 @@ class MainPage extends Component {
         <Hotkeys
           keyName="shift+alt+0,shift+alt+1,shift+alt+2,shift+alt+3,shift+alt+4,shift+alt+5,shift+alt+6,shift+alt+7,
           shift+alt+8,shift+alt+9,ctrl+shift+alt+0,ctrl+shift+alt+1,ctrl+shift+alt+2,ctrl+shift+alt+3,ctrl+shift+alt+4,
-          ctrl+shift+alt+5"
+          ctrl+shift+alt+5,ctrl+shift+alt+6"
           onKeyDown={this.onKeyDown.bind(this)}
         />
 
