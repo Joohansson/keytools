@@ -15,7 +15,6 @@ class ConvertTool extends Component {
 
     this.state = {
       raw: '1000000000000000000000000000000',
-      nano: '1000000',
       Mnano: '1',
       qrContent: '1',
       qrSize: 512,
@@ -25,7 +24,6 @@ class ConvertTool extends Component {
     }
 
     this.handleRawChange = this.handleRawChange.bind(this)
-    this.handlenanoChange = this.handlenanoChange.bind(this)
     this.handleMnanoChange = this.handleMnanoChange.bind(this)
     this.updateQR = this.updateQR.bind(this)
     this.clearText = this.clearText.bind(this)
@@ -37,17 +35,13 @@ class ConvertTool extends Component {
     // Read URL params from parent and construct new quick path
     var raw = this.props.state.raw
     var nano = this.props.state.nano
-    var mnano = this.props.state.mnano
 
     if (raw) {
       this.rawChange(raw)
     }
     else if (nano) {
 
-      this.nanoChange(nano)
-    }
-    else if (mnano) {
-      this.MnanoChange(mnano)
+      this.MnanoChange(nano)
     }
     else {
       this.setParams()
@@ -62,15 +56,11 @@ class ConvertTool extends Component {
       break
 
       case 'nano':
-      helpers.setURLParams('?tool='+toolParam + '&nano=' + this.state.nano)
-      break
-
-      case 'mnano':
-      helpers.setURLParams('?tool='+toolParam + '&mnano=' + this.state.Mnano)
+      helpers.setURLParams('?tool='+toolParam + '&nano=' + this.state.Mnano)
       break
 
       default:
-      helpers.setURLParams('?tool='+toolParam + '&mnano=' + this.state.Mnano)
+      helpers.setURLParams('?tool='+toolParam + '&nano=' + this.state.Mnano)
       break
     }
   }
@@ -79,7 +69,6 @@ class ConvertTool extends Component {
   clearText(event) {
     this.setState({
       raw: '',
-      nano: '',
       Mnano: ''
     },
     function() {
@@ -129,11 +118,6 @@ class ConvertTool extends Component {
           qrContent: this.state.raw,
         })
         break
-      case 'nano':
-        this.setState({
-          qrContent: this.state.nano,
-        })
-        break
       case 'Mnano':
         this.setState({
           qrContent: this.state.Mnano,
@@ -155,59 +139,25 @@ class ConvertTool extends Component {
     if (!nano.checkAmount(val)) {
       if (val !== '' && val.slice(-1) !== '.') {
         if (! toast.isActive(this.inputToast)) {
-          this.inputToast = toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          this.inputToast = toast("Invalid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
         }
       }
       else {
-        helpers.setURLParams('?tool='+toolParam + '&mnano=')
+        helpers.setURLParams('?tool='+toolParam + '&nano=')
       }
       this.setState({
         raw: val,
-        nano: '',
         Mnano: ''
       })
       return
     }
     this.setState({
       raw: val,
-      nano: helpers.rawTonano(val),
       Mnano: helpers.rawToMnano(val)
     },
     function() {
       this.updateQR()
       this.setParams('raw')
-    })
-  }
-
-  handlenanoChange(event) {
-    this.nanoChange(event.target.value)
-  }
-  nanoChange(val) {
-    let raw = helpers.nanoToRaw(val)
-    if (!nano.checkAmount(raw)) {
-      if (val !== '' && val.slice(-1) !== '.') {
-        if (! toast.isActive(this.inputToast)) {
-          this.inputToast = toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
-        }
-      }
-      else {
-        helpers.setURLParams('?tool='+toolParam + '&mnano=')
-      }
-      this.setState({
-        raw: '',
-        nano: val,
-        Mnano: ''
-      })
-      return
-    }
-    this.setState({
-      raw: raw,
-      nano: val,
-      Mnano: helpers.nanoToMnano(val),
-    },
-    function() {
-      this.updateQR()
-      this.setParams('nano')
     })
   }
 
@@ -219,27 +169,25 @@ class ConvertTool extends Component {
     if (!nano.checkAmount(raw)) {
       if (val !== '' && val.slice(-1) !== '.') {
         if (! toast.isActive(this.inputToast)) {
-          this.inputToast = toast("Not a valid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
+          this.inputToast = toast("Invalid amount", helpers.getToast(helpers.toastType.ERROR_AUTO))
         }
       }
       else {
-        helpers.setURLParams('?tool='+toolParam + '&mnano=')
+        helpers.setURLParams('?tool='+toolParam + '&nano=')
       }
       this.setState({
         raw: '',
-        nano: '',
         Mnano: val
       })
       return
     }
     this.setState({
       raw: raw,
-      nano: helpers.MnanoTonano(val),
       Mnano: val
     },
     function() {
       this.updateQR()
-      this.setParams('mnano')
+      this.setParams('nano')
     })
   }
 
@@ -248,8 +196,9 @@ class ConvertTool extends Component {
       <div>
         <p>Convert between Nano units</p>
         <ul>
-          <li>raw is the smallest possible unit | NANO is used in wallets and exchanges</li>
-          <li>1 nano = 10^24 raw | 1 NANO = 10^30 raw</li>
+          <li>raw is the smallest possible unit</li>
+          <li>Nano (previous Mnano) is used in wallets and exchanges</li>
+          <li>1 Nano = 10^30 raw</li>
         </ul>
 
         <InputGroup size="sm" className="mb-3">
@@ -268,22 +217,8 @@ class ConvertTool extends Component {
 
         <InputGroup size="sm" className="mb-3">
           <InputGroup.Prepend>
-            <InputGroup.Text id="nano">
-              nano
-            </InputGroup.Text>
-          </InputGroup.Prepend>
-          <FormControl id="nano" aria-describedby="nano" value={this.state.nano} title="Original main unit" maxLength="26" onChange={this.handlenanoChange} autoComplete="off"/>
-          <InputGroup.Append>
-            <Button variant="outline-secondary" className="fas fa-times-circle" value='nano' onClick={this.clearText}></Button>
-            <Button variant="outline-secondary" className="fas fa-copy" value={this.state.nano} onClick={helpers.copyText}></Button>
-            <Button variant="outline-secondary" className={this.state.qrActive === 'nano' ? "btn-active fas fa-qrcode" : "fas fa-qrcode"} value='nano' onClick={this.handleQRChange}></Button>
-          </InputGroup.Append>
-        </InputGroup>
-
-        <InputGroup size="sm" className="mb-3">
-          <InputGroup.Prepend>
             <InputGroup.Text id="Mnano">
-              NANO
+              Nano
             </InputGroup.Text>
           </InputGroup.Prepend>
           <FormControl id="Mnano" aria-describedby="Mnano" value={this.state.Mnano} title="Unit for wallets/exchanges" maxLength="32"  onChange={this.handleMnanoChange} autoComplete="off"/>
