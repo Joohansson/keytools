@@ -1,6 +1,6 @@
 # KeyTools - High performance Nano web tools written with reactJS
 * Can be run from local file system offline by downloading [the gh-pages branch zip package](https://codeload.github.com/Joohansson/keytools/zip/gh-pages)
-* Hosted by [github pages](https://github.com/Joohansson/keytools/tree/gh-pages) via https://tools.nanos.cc
+* Hosted by [github pages](https://github.com/Joohansson/keytools/tree/gh-pages) as [joohansson.github.io/keytools](https://joohansson.github.io/keytools/)
 
 ## Developer instructions
 
